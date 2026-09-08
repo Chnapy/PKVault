@@ -598,49 +598,6 @@
         }
       }
     },
-    "/api/static-data/spritesheet/{sheetName}": {
-      "get": {
-        "tags": [
-          "StaticData"
-        ],
-        "operationId": "StaticData_GetSpritesheetImg",
-        "parameters": [
-          {
-            "name": "sheetName",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "buildID",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "guid",
-              "nullable": true
-            },
-            "x-position": 2
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/storage/action": {
       "get": {
         "tags": [
@@ -4702,6 +4659,132 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "DesktopMessageRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/DesktopMessageType"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "directoryOnly": {
+            "type": "boolean",
+            "default": false
+          },
+          "basePath": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "multiselect": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "DesktopMessageType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "FILE_EXPLORE",
+          "OPEN_FOLDER"
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
+      "DesktopMessageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/DesktopMessageType"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "directoryOnly": {
+            "type": "boolean",
+            "default": true
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DesktopFetchRequestInit": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "method",
+          "headers"
+        ],
+        "properties": {
+          "method": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      },
+      "DesktopFetchResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url",
+          "status",
+          "statusText",
+          "ok",
+          "headers"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusText": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "body": {
+            "type": "string"
           }
         }
       }

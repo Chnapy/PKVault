@@ -1,4 +1,3 @@
-using System.Net.Mime;
 
 namespace PKVault.Core.storage.routes;
 
@@ -9,27 +8,5 @@ public class StaticDataController(StaticDataService staticDataService)
     public async Task<StaticDataDTO> Get()
     {
         return await staticDataService.GetStaticDataDTO();
-    }
-
-    [HttpGet("spritesheet/{sheetName}")]
-    public async Task<CoreFileResponse> GetSpritesheetImg(string sheetName, Guid? buildID)
-    {
-        var stream = await staticDataService.GetSpritesheetStream(sheetName);
-
-        return new(
-            StatusCode: 200,
-            ContentType: MediaTypeNames.Image.Webp,
-            File: new(
-                stream,
-                ContentType: MediaTypeNames.Image.Webp,
-                FileName: sheetName
-            ),
-            Header: new()
-            {
-                ["Pragma"] = "cache",
-                ["CacheControl"] = "public, max-age=31536000",  // 1y
-                ["Expires"] = DateTime.UtcNow.AddYears(1).ToString("R"),
-            }
-        );
     }
 }

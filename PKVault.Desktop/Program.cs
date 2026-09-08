@@ -24,11 +24,6 @@ class Program
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
     private static readonly string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
 
-    private static readonly DesktopMessageJsonContext messageJsonContext = new(new()
-    {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-    });
-
     private static IFileChooser fileChooser = new DefaultFileChooser();
 
     private static IServiceProvider? ServiceProvider = null;
@@ -275,13 +270,13 @@ class Program
 
             try
             {
-                var desktopRequest = JsonSerializer.Deserialize(message, messageJsonContext.DesktopRequestMessage)!;
+                var desktopRequest = JsonSerializer.Deserialize(message, RouteJsonContext.Default.DesktopMessageRequest)!;
 
                 string responseSerialized = "";
 
                 switch (desktopRequest.type)
                 {
-                    case DesktopRequestMessage.FILE_EXPLORE_TYPE:
+                    case DesktopMessageType.FILE_EXPLORE:
                         {
                             var appBasePath = MatcherUtil
                                     .NormalizePath(SettingsService.GetAppDirectory())
@@ -320,7 +315,7 @@ class Program
                                 return MatcherUtil.NormalizePath(path);
                             }
 
-                            async Task<DesktopResponseMessage> GetDialogResponse()
+                            async Task<DesktopMessageResponse> GetDialogResponse()
                             {
                                 var results = await fileChooser.ShowChooserAsync(
                                     window,
@@ -338,10 +333,10 @@ class Program
                             }
 
                             var response = await GetDialogResponse();
-                            responseSerialized = JsonSerializer.Serialize(response, messageJsonContext.DesktopResponseMessage);
+                            responseSerialized = JsonSerializer.Serialize(response, RouteJsonContext.Default.DesktopMessageResponse);
                             break;
                         }
-                    case DesktopRequestMessage.OPEN_FOLDER_TYPE:
+                    case DesktopMessageType.OPEN_FOLDER:
                         {
                             ArgumentException.ThrowIfNullOrWhiteSpace(desktopRequest.basePath);
 

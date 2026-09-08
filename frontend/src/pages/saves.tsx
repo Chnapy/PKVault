@@ -3,6 +3,7 @@ import { DownloadIcon, FolderIcon, FolderSearchIcon, PackageOpenIcon, TrashIcon,
 import type React from "react";
 import { HistoryContext } from '../context/history-context';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
+import { DesktopMessageType } from '../data/sdk/model';
 import { getSaveInfosDownloadUrl, useSaveInfosDelete, useSaveInfosGetAll } from '../data/sdk/save-infos/save-infos.gen';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { withErrorCatcher } from '../error/with-error-catcher';
@@ -105,7 +106,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                         size='compact-xs'
                         fullWidth
                         onClick={() => desktopMessage.openFile({
-                          type: 'open-folder',
+                          type: DesktopMessageType.OPEN_FOLDER,
                           directoryOnly: false,
                           basePath: save.path
                         })}
