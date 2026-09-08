@@ -8,6 +8,7 @@ public record SynchronizePkmActionInput(
 );
 
 public class SynchronizePkmAction(
+    StaticDataService staticDataService,
     IPkmSharePropertiesService pkmSharePropertiesService,
     IPkmVariantLoader pkmVariantLoader, ISavesLoadersService savesLoadersService
 ) : DataAction<SynchronizePkmActionInput>
@@ -79,6 +80,8 @@ public class SynchronizePkmAction(
             throw new ArgumentException($"Pkm main & pkm save ids cannot be empty");
         }
 
+        var evolves = await staticDataService.GetStaticEvolves();
+
         async Task act(string pkmVariantId, string savePkmIdBase)
         {
             Log.Information($"Synchronize save->variant {savePkmIdBase} -> {pkmVariantId}");
@@ -116,11 +119,11 @@ public class SynchronizePkmAction(
                     && version.Context == variantPkm.Context
                 );
 
-                var correctSpeciesForm = savePkm.Pkm.Species >= variantPkm.Species
+                var correctSpeciesForm = EvolveUtil.IsSameOrDescendantOf(evolves, variantPkm.Species, savePkm.Pkm.Species)
                     && versions.Any(version => BlankSaveFile.Get(version).Personal.IsPresentInGame(savePkm.Pkm.Species, savePkm.Pkm.Form));
                 if (!correctSpeciesForm)
                 {
-                    Log.Debug($"!correctSpeciesForm => {variant.Id} / {savePkm.Pkm.Species} {savePkm.Pkm.Form} / {savePkm.Pkm.Species} {variantPkm.Species}");
+                    Log.Debug($"!correctSpeciesForm => {variant.Id} / save.Species={savePkm.Pkm.Species} save.Form={savePkm.Pkm.Form} / variant.Species={variantPkm.Species}");
                     continue;
                 }
 
