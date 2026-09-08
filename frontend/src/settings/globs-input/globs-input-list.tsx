@@ -2,6 +2,7 @@ import { EmptyState } from '@mantine/core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { DesktopMessageType } from '../../data/sdk/model';
 import { SavesUploadButton } from '../../saves/saves-upload-popover/saves-upload-button';
 import { useTranslate } from '../../translate/i18n';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
@@ -37,7 +38,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
                 const typeInfos = getDesktopFileTypeInfos(type);
 
                 const response = await desktopMessage.fileExplore({
-                    type: 'file-explore',
+                    type: DesktopMessageType.FILE_EXPLORE,
                     id: typeInfos.id,
                     directoryOnly: typeInfos.directoryOnly,
                     basePath: '',

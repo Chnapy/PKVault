@@ -1,4 +1,5 @@
 import React from 'react';
+import { DesktopMessageType } from '../../data/sdk/model';
 import { useSettingsGet, useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
 import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui/form/globs-input/ui-globs-input-item';
 import { UIPathButton } from '../../ui/form/globs-input/ui-path-button';
@@ -52,7 +53,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
         hasWarning={hasWarning}
         isLoading={isLoading}
         openFolder={desktopMessage && (() => desktopMessage.openFile({
-            type: 'open-folder',
+            type: DesktopMessageType.OPEN_FOLDER,
             directoryOnly: isDirectory,
             basePath: value,
         }))}
@@ -82,7 +83,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
                         const desktopInfos = getDesktopFileTypeInfos(isExclude ? 'exclude' : isDirectory ? 'folder' : 'file');
 
                         const response = await desktopMessage.fileExplore({
-                            type: 'file-explore',
+                            type: DesktopMessageType.FILE_EXPLORE,
                             id: desktopInfos.id,
                             directoryOnly: desktopInfos.directoryOnly,
                             basePath,

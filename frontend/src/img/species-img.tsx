@@ -2,10 +2,10 @@ import type React from 'react';
 import { getApiFullUrl } from '../data/mutator/custom-instance';
 import { EntityContext } from '../data/sdk/model';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
-import { getStaticDataGetSpritesheetImgUrl } from '../data/sdk/static-data/static-data.gen';
 import { useStaticData } from '../hooks/use-static-data';
 import { UISpeciesImg } from '../ui/sprite-img/species-img/ui-species-img';
 import { type SpriteImgProps } from './sprite-img';
+import { getSpritesheetUrl } from './util/get-spritesheet-url';
 
 export type SpeciesImgProps = {
     species: number;
@@ -57,9 +57,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
     if (!spriteInfos)
         console.log('No sprite -', staticForm.name, species, context, form, staticForms);
 
-    const sheetRelativeUrl = spriteInfos && getStaticDataGetSpritesheetImgUrl(spriteInfos.sheetName, {
-        buildID: settings.data?.data.buildID ?? null,
-    });
+    const sheetRelativeUrl = spriteInfos && getSpritesheetUrl(spriteInfos.sheetName, settings.data?.data.buildID);
     const sheetUrl = getApiFullUrl(sheetRelativeUrl ?? '');
 
     return spriteInfos && <UISpeciesImg

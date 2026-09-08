@@ -12,9 +12,9 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 
-		SetupTask ??= SetupCore();
+		SetupTask = SetupCore();
 
-		hybridWebView.SetInvokeJavaScriptTarget(new JavaScriptInvoker(ServiceProvider, SetupTask));
+		hybridWebView.SetInvokeJavaScriptTarget(new DesktopInvoker(ServiceProvider, SetupTask));
 	}
 
 	private async Task SetupCore()

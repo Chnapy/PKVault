@@ -1,20 +1,5 @@
 import z from 'zod';
-
-type WebViewRequest = {
-    type: 'file-explore' | 'open-folder';
-    id?: number;
-    directoryOnly: boolean;
-    basePath: string;
-    title?: string;
-    multiselect?: boolean;
-};
-
-type WebViewResponse = {
-    type: string;
-    id: number;
-    directoryOnly: boolean;
-    values?: string[];
-};
+import type { DesktopMessageRequest, DesktopMessageResponse } from '../../../data/sdk/model';
 
 declare global {
     // Photino
@@ -32,8 +17,8 @@ declare global {
             },
         ];
         SendMessage: [
-            [{type: string}],
-            WebViewResponse | undefined
+            [DesktopMessageRequest],
+            DesktopMessageResponse | undefined
         ];
     };
 
@@ -55,9 +40,9 @@ const desktopResponseSchema = z.object({
     })
 });
 
-const isDesktopMessageResponse = (data: unknown): data is { detail: WebViewResponse } => desktopResponseSchema.safeParse(data).success;
+const isDesktopMessageResponse = (data: unknown): data is { detail: DesktopMessageResponse } => desktopResponseSchema.safeParse(data).success;
 
-const requestDesktop = (request: WebViewRequest) => {
+const requestDesktop = (request: DesktopMessageRequest) => {
     console.log('send to desktop:', request);
 
     if (window.HybridWebView) {
@@ -70,7 +55,7 @@ const requestDesktop = (request: WebViewRequest) => {
             });
     }
 
-    return new Promise<WebViewResponse | undefined>(resolve => {
+    return new Promise<DesktopMessageResponse | undefined>(resolve => {
         let resolved = false;
 
         external?.sendMessage?.(JSON.stringify(request));
@@ -109,14 +94,7 @@ export const useDesktopMessage = () => {
     }
 
     return {
-        fileExplore: (request: WebViewRequest) => requestDesktop(request),
-
-        openFile: (request: WebViewRequest) => requestDesktop(request),
-
-        // startLoadingFinished: (hasError: boolean) => requestDesktop({
-        //     type: 'start-finish',
-        //     hasError,
-        // } as StartFinishRequest),
-
+        fileExplore: requestDesktop,
+        openFile: requestDesktop,
     };
 };

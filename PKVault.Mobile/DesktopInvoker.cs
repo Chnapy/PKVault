@@ -7,46 +7,9 @@ using Serilog;
 
 namespace PKVault.Mobile;
 
-public class JavaScriptInvoker(IServiceProvider ServiceProvider, Task SetupTask)
+public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : IDesktopInvoker
 {
-    public record FetchRequestInit(
-        string method,
-        Dictionary<string, string> headers,
-        string? body = null
-    );
-
-    public record FetchResponse(
-        string url,
-        int status,
-        string statusText,
-        bool ok,
-        Dictionary<string, string> headers,
-        string? body = null
-    );
-
-    public record DesktopRequestMessage
-    (
-        string type, //'file-explore' | 'open-folder'
-        int? id = null,
-        bool directoryOnly = false,
-        string? basePath = null,
-        string? title = null,
-        bool multiselect = false
-    )
-    {
-        public const string FILE_EXPLORE_TYPE = "file-explore";
-        public const string OPEN_FOLDER_TYPE = "open-folder";
-    };
-
-    public record DesktopResponseMessage
-    (
-        string type, //'file-explore'
-        int id,
-        bool directoryOnly = false,
-        string[]? values = null
-    );
-
-    public async Task<FetchResponse> Fetch(string url, FetchRequestInit? requestInit)
+    public async Task<DesktopFetchResponse> Fetch(string url, DesktopFetchRequestInit? requestInit)
     {
         Console.WriteLine($"FETCH {url} {JsonSerializer.Serialize(requestInit)}");
 
@@ -64,7 +27,7 @@ public class JavaScriptInvoker(IServiceProvider ServiceProvider, Task SetupTask)
 
         var result = await coreRouter.Dispatch(scope.ServiceProvider, requestInit.method, path, queryString, reqBody);
 
-        var response = new FetchResponse(
+        var response = new DesktopFetchResponse(
             url,
             status: result.StatusCode,
             statusText: "OK",
@@ -107,20 +70,19 @@ public class JavaScriptInvoker(IServiceProvider ServiceProvider, Task SetupTask)
             throw new Exception($"Unhandled request {requestInit.method} {url}");
         }
 
-        // body.Position = 0;
         return response;
     }
 
-    public async Task<DesktopResponseMessage?> SendMessage(DesktopRequestMessage request)
+    public async Task<DesktopMessageResponse?> SendMessage(DesktopMessageRequest request)
     {
         Console.WriteLine($"REQUEST TYPE = {request.type}");
         try
         {
-            DesktopResponseMessage? response = null;
+            DesktopMessageResponse? response = null;
 
             switch (request.type)
             {
-                case DesktopRequestMessage.FILE_EXPLORE_TYPE:
+                case DesktopMessageType.FILE_EXPLORE:
                     {
                         var appBasePath = MatcherUtil
                                 .NormalizePath(SettingsService.GetAppDirectory())
@@ -147,7 +109,7 @@ public class JavaScriptInvoker(IServiceProvider ServiceProvider, Task SetupTask)
                             return MatcherUtil.NormalizePath(path);
                         }
 
-                        async Task<DesktopResponseMessage> GetDialogResponse()
+                        async Task<DesktopMessageResponse> GetDialogResponse()
                         {
                             string[] results = [];
 
@@ -189,7 +151,7 @@ public class JavaScriptInvoker(IServiceProvider ServiceProvider, Task SetupTask)
                         // responseSerialized = JsonSerializer.Serialize(response, messageJsonContext.FileExploreResponseMessage);
                         break;
                     }
-                case DesktopRequestMessage.OPEN_FOLDER_TYPE:
+                case DesktopMessageType.OPEN_FOLDER:
                     {
                         ArgumentException.ThrowIfNullOrWhiteSpace(request.basePath);
 
