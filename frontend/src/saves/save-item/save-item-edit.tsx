@@ -125,7 +125,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                             language={staticData.languages[ s.language ] ?? ''}
                             path={s.path}
                             editDropdown={null}
-                            actions={!isDesktop && <>
+                            actions={!isDesktop() && <>
                                 <UIConfirmPopover
                                     label={t('saves.action.delete')}
                                     icon={<TriangleAlertIcon />}

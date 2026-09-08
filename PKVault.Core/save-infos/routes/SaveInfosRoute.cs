@@ -51,11 +51,14 @@ public class SaveInfosController(
         byte[] fileBytes = save.GetSaveFileData();
 
         return new(
+            StatusCode: 200,
+            ContentType: MediaTypeNames.Application.Octet,
             File: new(
                 Stream: new MemoryStream(fileBytes),
                 ContentType: MediaTypeNames.Application.Octet,
                 FileName: filename ?? ""
-            )
+            ),
+            Header: []
         );
     }
 

@@ -106,8 +106,8 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                         fullWidth
                         onClick={() => desktopMessage.openFile({
                           type: 'open-folder',
-                          isDirectory: false,
-                          path: save.path
+                          directoryOnly: false,
+                          basePath: save.path
                         })}
                       >
                         <FolderIcon />
@@ -156,7 +156,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
 
       <Card.Section inheritPadding withBorder py='inherit'>
         <Group justify='center'>
-          {isDesktop
+          {isDesktop()
             ? <>
               <UIButton
                 name='add-game-path'

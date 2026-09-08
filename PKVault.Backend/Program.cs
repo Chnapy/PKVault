@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -80,7 +81,7 @@ public class Program
 
             var result = await coreRouter.Dispatch(scope.ServiceProvider, req.Method, req.Path, queryString, req.Body);
 
-            res.StatusCode = result.StatusCode ?? 200;
+            res.StatusCode = result.StatusCode;
 
             if (result.Header is not null)
                 foreach (var (key, values) in result.Header)
@@ -88,7 +89,7 @@ public class Program
 
             if (result is CoreFileResponse fileResponse)
             {
-                res.ContentType = fileResponse.ContentType ?? "application/octet-stream";
+                res.ContentType = fileResponse.ContentType ?? MediaTypeNames.Application.Octet;
 
                 var contentDispositionHeader = new System.Net.Mime.ContentDisposition()
                 {
@@ -106,7 +107,7 @@ public class Program
 
             else if (result is CoreJSONResponse jsonResponse)
             {
-                res.ContentType = jsonResponse.ContentType ?? "application/json";
+                res.ContentType = jsonResponse.ContentType ?? MediaTypeNames.Application.Json;
                 if (jsonResponse.Data is not null)
                 {
                     var typeInfo = RouteJsonContext.DefaultWithOptions.GetTypeInfo(jsonResponse.Data.GetType())

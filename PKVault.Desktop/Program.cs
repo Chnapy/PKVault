@@ -31,7 +31,8 @@ class Program
 
     private static IFileChooser fileChooser = new DefaultFileChooser();
 
-    private static Task<IServiceProvider>? SetupTask = null;
+    private static IServiceProvider? ServiceProvider = null;
+    private static Task SetupTask = Task.CompletedTask;
 
     [DllImport("kernel32.dll")]
     static extern bool AttachConsole(uint dwProcessId);
@@ -68,10 +69,10 @@ class Program
             });
             window.RegisterWindowClosingHandler((sender, e) =>
             {
-                if (SetupTask == null || !SetupTask.IsCompletedSuccessfully)
+                if (ServiceProvider == null || SetupTask == null || !SetupTask.IsCompletedSuccessfully)
                     return false;
 
-                var emptyActionList = Core.Program.HasEmptyActionList(SetupTask.Result);
+                var emptyActionList = Core.Program.HasEmptyActionList(ServiceProvider);
 
                 if (!emptyActionList)
                 {
@@ -92,7 +93,11 @@ class Program
 
             SetupWindow(window, baseUrl);
 
-            SetupTask = SetupCore();
+            var services = new ServiceCollection();
+            Core.Program.ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            SetupTask = Core.Program.SetupData(ServiceProvider);
 
             InjectIntoFrontend(window);
 
@@ -106,17 +111,6 @@ class Program
         {
             LogUtil.Dispose();
         }
-    }
-
-    private static async Task<IServiceProvider> SetupCore()
-    {
-        var services = new ServiceCollection();
-        Core.Program.ConfigureServices(services);
-        var sp = services.BuildServiceProvider();
-
-        await Core.Program.SetupData(sp);
-
-        return sp;
     }
 
     private static Func<Task> SetupServer(out string baseUrl)
@@ -135,24 +129,24 @@ class Program
             {
                 if (path.StartsWith("/api/"))
                 {
-                    var sp = await SetupTask!;
-                    using var scope = sp.CreateScope();
-                    var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
+                    ArgumentNullException.ThrowIfNull(ServiceProvider);
 
                     var req = context.Request;
                     var res = context.Response;
 
-                    string queryString = context.Request.QueryString.HasValue
-                        ? context.Request.QueryString.Value
+                    string queryString = req.QueryString.HasValue
+                        ? req.QueryString.Value
                         : "";
+
+                    using var scope = ServiceProvider.CreateScope();
+                    var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
 
                     var result = await coreRouter.Dispatch(scope.ServiceProvider, req.Method, req.Path, queryString, req.Body);
 
-                    res.StatusCode = result.StatusCode ?? 200;
+                    res.StatusCode = result.StatusCode;
 
-                    if (result.Header is not null)
-                        foreach (var (key, values) in result.Header)
-                            res.Headers[key] = values;
+                    foreach (var (key, value) in result.Header)
+                        res.Headers[key] = value;
 
                     if (result is CoreFileResponse fileResponse)
                     {
@@ -278,29 +272,27 @@ class Program
 
             try
             {
-                var desktopRequest = JsonSerializer.Deserialize(message, messageJsonContext.DesktopRequestMessage);
+                var desktopRequest = JsonSerializer.Deserialize(message, messageJsonContext.DesktopRequestMessage)!;
 
                 string responseSerialized = "";
 
                 switch (desktopRequest.type)
                 {
-                    case FileExploreRequestMessage.TYPE:
+                    case DesktopRequestMessage.FILE_EXPLORE_TYPE:
                         {
-                            var fileExploreRequest = JsonSerializer.Deserialize(message, messageJsonContext.FileExploreRequestMessage);
-
                             var appBasePath = MatcherUtil
                                     .NormalizePath(SettingsService.GetAppDirectory())
                                     .Replace('/', '\\');
 
                             string? GetDefaultPath()
                             {
-                                if (fileExploreRequest.basePath == default)
+                                if (desktopRequest.basePath == default)
                                 {
                                     return null;
                                 }
 
                                 return MatcherUtil
-                                    .NormalizePath(Path.Combine(appBasePath, fileExploreRequest.basePath))
+                                    .NormalizePath(Path.Combine(appBasePath, desktopRequest.basePath))
                                     .Replace('/', '\\');
                             }
 
@@ -325,38 +317,38 @@ class Program
                                 return MatcherUtil.NormalizePath(path);
                             }
 
-                            async Task<FileExploreResponseMessage> GetDialogResponse()
+                            async Task<DesktopResponseMessage> GetDialogResponse()
                             {
                                 var results = await fileChooser.ShowChooserAsync(
                                     window,
-                                    directoryOnly: fileExploreRequest.directoryOnly,
-                                    multiSelect: fileExploreRequest.multiselect,
+                                    directoryOnly: desktopRequest.directoryOnly,
+                                    multiSelect: desktopRequest.multiselect,
                                     defaultPath: GetDefaultPath()
                                 );
 
                                 return new(
-                                    type: fileExploreRequest.type,
-                                    id: fileExploreRequest.id,
-                                    directoryOnly: fileExploreRequest.directoryOnly,
+                                    type: desktopRequest.type,
+                                    id: desktopRequest.id ?? 0,
+                                    directoryOnly: desktopRequest.directoryOnly,
                                     values: [.. results.Select(ToRelative)]
                                 );
                             }
 
                             var response = await GetDialogResponse();
-                            responseSerialized = JsonSerializer.Serialize(response, messageJsonContext.FileExploreResponseMessage);
+                            responseSerialized = JsonSerializer.Serialize(response, messageJsonContext.DesktopResponseMessage);
                             break;
                         }
-                    case OpenFolderRequestMessage.TYPE:
+                    case DesktopRequestMessage.OPEN_FOLDER_TYPE:
                         {
-                            var openFolderRequest = JsonSerializer.Deserialize(message, messageJsonContext.OpenFolderRequestMessage);
+                            ArgumentException.ThrowIfNullOrWhiteSpace(desktopRequest.basePath);
 
-                            var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), openFolderRequest.path));
+                            var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), desktopRequest.basePath));
 
                             var path = normalizedPath.Replace('/', '\\');
 
                             if (WindowsOS)
                             {
-                                var arg = openFolderRequest.isDirectory
+                                var arg = desktopRequest.directoryOnly
                                     ? path
                                     : string.Format("/e, /select, \"{0}\"", path);
 
@@ -375,7 +367,7 @@ class Program
                             {
                                 // xdg can open only folders
                                 var arg = $"\"{(
-                                    openFolderRequest.isDirectory
+                                    desktopRequest.directoryOnly
                                         ? MatcherUtil.NormalizePath(path)
                                         : Path.GetDirectoryName(MatcherUtil.NormalizePath(path))!
                                 )}\"";
@@ -398,7 +390,7 @@ class Program
                                     // if xdg-open doesn't work, try something else
                                     var fallback = new ProcessStartInfo
                                     {
-                                        FileName = openFolderRequest.path,
+                                        FileName = desktopRequest.basePath,
                                         UseShellExecute = true
                                     };
                                     Process.Start(fallback);
@@ -423,13 +415,6 @@ class Program
                             {
                                 throw new PlatformNotSupportedException($"OS not supported: {RuntimeInformation.OSDescription}");
                             }
-                            break;
-                        }
-                    case StartFinishRequestMessage.TYPE:
-                        {
-                            // var startFinishRequest = JsonSerializer.Deserialize(message, messageJsonContext.StartFinishRequestMessage);
-                            // fullStartupTime.Dispose();
-
                             break;
                         }
                 }

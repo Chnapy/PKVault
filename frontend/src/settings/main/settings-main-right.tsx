@@ -31,7 +31,7 @@ export const SettingsMainRight: React.FC = () => {
             disabled={!settings?.canUpdateSettings}
             limit={200}
         >
-            {!isDesktop && settings && <GlobsInputItem
+            {!isDesktop() && settings && <GlobsInputItem
                 name='uploads-path'
                 value={settings.savesUploadsPath}
                 disabled

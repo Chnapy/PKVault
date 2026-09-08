@@ -171,7 +171,7 @@ export const StoragePanelGameList: React.FC = () => {
                         })}
                 />)}
         createActions={<Group justify='center'>
-            {isDesktop
+            {isDesktop()
                 ? <>
                     <UIButton
                         name='add-game-path'

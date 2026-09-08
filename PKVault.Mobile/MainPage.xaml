@@ -6,9 +6,8 @@
              >
 
     <HybridWebView x:Name="hybridWebView"
-        WebViewInitializing="OnHybridWebViewInitializing"
+        WebViewInitialized="OnHybridWebViewInitialized"
         RawMessageReceived="OnHybridWebViewRawMessageReceived"
-        WebResourceRequested="OnHybridWebViewWebResourceRequested"
         HorizontalOptions="Fill"
         VerticalOptions="Fill"
     />
