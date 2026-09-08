@@ -288,7 +288,7 @@ public class UpdateExternalPkmAction(
         // careful here to not delete PK files !
         foreach (var pkmVariant in externalPkmsToRemove)
         {
-            await pkmVariantLoader.DeleteEntityDBOnly(pkmVariant);
+            await pkmVariantLoader.DeleteEntityDBOnlyAndUntrackFile(pkmVariant);
         }
 
         var pkmsBoxes = (await boxLoader.GetEntitiesByIds(
