@@ -1,3 +1,5 @@
+using System.Net.Mime;
+
 namespace PKVault.Core.storage.routes;
 
 [Route("api/[controller]")]
@@ -15,9 +17,11 @@ public class StaticDataController(StaticDataService staticDataService)
         var stream = await staticDataService.GetSpritesheetStream(sheetName);
 
         return new(
+            StatusCode: 200,
+            ContentType: MediaTypeNames.Image.Webp,
             File: new(
                 stream,
-                ContentType: "image/webp",
+                ContentType: MediaTypeNames.Image.Webp,
                 FileName: sheetName
             ),
             Header: new()

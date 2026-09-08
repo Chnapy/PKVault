@@ -13,13 +13,17 @@ public class MatcherUtil
         List<string> globs = [.. globsNullable
             .OfType<string>()
             .Select(glob => glob.Trim())
-            .Where(glob => glob.Length > 0 && glob[0] != '!')];
+            .Where(glob => glob.Length > 0 && glob[0] != '!')
+            .Select(glob => glob.StartsWith(Directory.GetCurrentDirectory())
+                ? glob[(Directory.GetCurrentDirectory().Length + 1)..]
+                : glob)
+        ];
 
         if (globs.Count == 0)
         {
             return [];
         }
-        
+
         List<string> excludeGlobs = [.. globsNullable
             .OfType<string>()
             .Select(glob => glob.Trim())
@@ -29,12 +33,10 @@ public class MatcherUtil
         var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
 
         var absoluteGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
-        var driveGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
-        var relativeGlobs = globs.FindAll(glob => !IsAbsolute(glob));
-
         var absoluteMatches = ExecuteMatcher(absoluteGlobs, excludeGlobs, "/");
         var absoluteResults = absoluteMatches.Select(path => Path.Combine("/", path));
 
+        var driveGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
         var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct();
         var driveResults = driveLetters.SelectMany(drive =>
         {
@@ -49,7 +51,8 @@ public class MatcherUtil
             return results;
         });
 
-        var relativeMatches = ExecuteMatcher(relativeGlobs, excludeGlobs, SettingsService.GetAppDirectory());
+        var relativeGlobs = globs.FindAll(glob => !IsAbsolute(glob));
+        var relativeMatches = ExecuteMatcher(relativeGlobs, excludeGlobs, Directory.GetCurrentDirectory());
         var relativeResults = relativeMatches.Select(path => Path.Combine(".", path));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
@@ -59,6 +62,9 @@ public class MatcherUtil
 
     private string[] ExecuteMatcher(IEnumerable<string> globs, IEnumerable<string> excludeGlobs, string rootDir)
     {
+        if (!globs.Any() && !excludeGlobs.Any())
+            return [];
+
         rootDir = NormalizePath(rootDir);
 
         globs = globs

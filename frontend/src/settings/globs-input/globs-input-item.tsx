@@ -53,8 +53,8 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
         isLoading={isLoading}
         openFolder={desktopMessage && (() => desktopMessage.openFile({
             type: 'open-folder',
-            isDirectory,
-            path: value,
+            directoryOnly: isDirectory,
+            basePath: value,
         }))}
     >
         {props => {
@@ -89,7 +89,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
                             multiselect: false,
                         });
 
-                        const newValue = desktopInfos.getFinalPaths(response.values)[ 0 ];
+                        const newValue = desktopInfos.getFinalPaths(response?.values ?? [])[ 0 ];
                         if (!newValue)
                             return;
 

@@ -1,48 +1,22 @@
 
 public record DesktopRequestMessage
 (
-    string type
-);
+    string type, //'file-explore' | 'open-folder'
+    int? id = null,
+    bool directoryOnly = false,
+    string? basePath = null,
+    string? title = null,
+    bool multiselect = false
+)
+{
+    public const string FILE_EXPLORE_TYPE = "file-explore";
+    public const string OPEN_FOLDER_TYPE = "open-folder";
+};
 
-public record FileExploreRequestMessage
+public record DesktopResponseMessage
 (
     string type, //'file-explore'
     int id,
-    bool directoryOnly,
-    string basePath,
-    string title,
-    bool multiselect
-)
-{
-    public const string TYPE = "file-explore";
-}
-
-public record FileExploreResponseMessage
-(
-    string type, //'file-explore';
-    int id,
-    bool directoryOnly,
-    string[] values
-)
-{
-    public const string TYPE = "file-explore";
-};
-
-public record OpenFolderRequestMessage
-(
-    string type, //'open-folder'
-    string path,
-    bool isDirectory
-)
-{
-    public const string TYPE = "open-folder";
-}
-
-public record StartFinishRequestMessage
-(
-    string type, //'start-finish'
-    bool hasError
-)
-{
-    public const string TYPE = "start-finish";
-}
+    bool directoryOnly = false,
+    string[]? values = null
+);

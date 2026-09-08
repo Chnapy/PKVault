@@ -13,13 +13,36 @@ export const responseBackSchema = z.object({
     status: z.number().int(),
 });
 
+export type SerializableResponse = Pick<Response, 'url' | 'ok' | 'status' | 'statusText' | 'headers'> & {
+    body?: string;
+};
+
 export const customInstance = async <T extends ResponseBack>(url: string, init?: RequestInit): Promise<T> => {
     const targetUrl = normalizeUrlParams(getApiFullUrl(url));
+
+    if (window.HybridWebView) {
+
+        const res = await window.HybridWebView.InvokeDotNet("Fetch", [ targetUrl, init ]);
+
+        const headers = new Headers(res.headers);
+
+        if (!res.ok) {
+            throw new QueryError({ ...res, headers });
+        }
+
+        const body = res.body?.toString();
+        const data = body ? JSON.parse(body) : {};
+
+        return { data, status: res.status, headers } satisfies ResponseBack as T;
+    }
 
     const res = await fetch(targetUrl, init);
 
     if (!res.ok) {
-        throw new QueryError(res);
+        throw new QueryError({
+            ...res,
+            body: undefined,
+        });
     }
 
     const body = [ 204, 205, 304 ].includes(res.status) ? null : await res.text();
@@ -56,7 +79,7 @@ export class QueryError extends Error {
     public readonly errorMessage: string | null;
     public readonly errorStack: string | null;
 
-    constructor(res: Response) {
+    constructor(res: SerializableResponse) {
         const errorMessage = QueryError.getHeaderContent(res.headers.get('error-message'));
         const errorStack = QueryError.getHeaderContent(res.headers.get('error-stack'));
 

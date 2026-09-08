@@ -44,7 +44,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
                     multiselect: false,
                 });
 
-                if (!response.values[ 0 ]) {
+                if (!response?.values?.[ 0 ]) {
                     return;
                 }
 
@@ -63,7 +63,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
             }
         }}
         disabled={disabled}
-        isDesktop={isDesktop}
+        isDesktop={isDesktop()}
         uploadAbbButton={<SavesUploadButton
             disabled={disabled}
             size='compact-sm'
