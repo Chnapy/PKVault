@@ -279,6 +279,84 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
             }
         }
 
+        if (sourcePkm is IRibbonSetCommon8)
+        {
+            if (
+                targetPkm is IRibbonSetCommon8 targetPkmCommon8
+                && resultPkm is IRibbonSetCommon8 resultPkmCommon8
+            )
+            {
+                resultPkmCommon8.CopyRibbonSetCommon8(targetPkmCommon8);
+            }
+        }
+
+        if (sourcePkm is IRibbonSetCommon9)
+        {
+            if (
+                targetPkm is IRibbonSetCommon9 targetPkmCommon9
+                && resultPkm is IRibbonSetCommon9 resultPkmCommon9
+            )
+            {
+                resultPkmCommon9.CopyRibbonSetCommon9(targetPkmCommon9);
+            }
+        }
+
+        if (sourcePkm is IRibbonSetMark8)
+        {
+            if (
+                targetPkm is IRibbonSetMark8 targetPkmMark8
+                && resultPkm is IRibbonSetMark8 resultPkmMark8
+            )
+            {
+                resultPkmMark8.CopyRibbonSetMark8(targetPkmMark8);
+            }
+        }
+
+        if (sourcePkm is IRibbonSetMark9)
+        {
+            if (
+                targetPkm is IRibbonSetMark9 targetPkmMark9
+                && resultPkm is IRibbonSetMark9 resultPkmMark9
+            )
+            {
+                resultPkmMark9.CopyRibbonSetMark9(targetPkmMark9);
+            }
+        }
+
+        // no PKHeX Copy* helper for these G3-only sets (#239)
+        if (sourcePkm is IRibbonSetOnly3)
+        {
+            if (
+                targetPkm is IRibbonSetOnly3 targetPkmOnly3
+                && resultPkm is IRibbonSetOnly3 resultPkmOnly3
+            )
+            {
+                resultPkmOnly3.CopyRibbonSetOnly3(targetPkmOnly3);
+            }
+        }
+
+        if (sourcePkm is IRibbonSetUnique3)
+        {
+            if (
+                targetPkm is IRibbonSetUnique3 targetPkmUnique3
+                && resultPkm is IRibbonSetUnique3 resultPkmUnique3
+            )
+            {
+                resultPkmUnique3.CopyRibbonSetUnique3(targetPkmUnique3);
+            }
+        }
+
+        if (sourcePkm is IRibbonSetUnique4)
+        {
+            if (
+                targetPkm is IRibbonSetUnique4 targetPkmUnique4
+                && resultPkm is IRibbonSetUnique4 resultPkmUnique4
+            )
+            {
+                resultPkmUnique4.CopyRibbonSetUnique4(targetPkmUnique4);
+            }
+        }
+
         targetPkm.TID16 = resultPkm.TID16;
         if (sourcePkm is not GBPKM)
         {
