@@ -48,6 +48,10 @@ export const customInstance = async <T extends ResponseBack>(url: string, init?:
 
         return { data, status: res.status, headers: res.headers } satisfies ResponseBack as T;
     } catch(err) {
+        if (err instanceof DOMException && err.name === 'AbortError') {
+            throw err;
+        }
+
         throw new QueryError({
             url: targetUrl,
             status: 500,
