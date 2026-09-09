@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
 <!-- 
@@ -55,7 +55,7 @@ dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program File
 		<ApplicationTitle>PKVault</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.pkvault.mobile</ApplicationId>
+		<ApplicationId>io.github.chnapy.pkvault</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationVersion>1</ApplicationVersion>
@@ -68,6 +68,18 @@ dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program File
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+
+		<DefaultLanguage>en</DefaultLanguage>
+		<ErrorReport>none</ErrorReport>
+
+		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+		<AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+		<GenerateTestArtifacts>False</GenerateTestArtifacts>
+		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<PackageCertificateThumbprint>059BA97F475A66567DFB154A74126E0947CCBD6C</PackageCertificateThumbprint>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -79,6 +91,7 @@ dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program File
 
 		<!-- Images -->
 		<!-- <MauiImage Include="Resources\Images\*" /> -->
+		<MauiAsset Include="Resources\Images\Windows\*" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" />
 		<!-- <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" /> -->
 		
 		<!-- Custom Fonts -->

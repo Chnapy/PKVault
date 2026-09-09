@@ -249,6 +249,18 @@ jobs:
 
           ls -la .
 
+      - name: Build Android mobile image & extract app bundle
+        run: |
+          docker build . --target mobile-android --build-arg RID=linux-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
+          docker create --name tmp-mobile-android tmp-mobile-android
+
+          docker cp tmp-mobile-android:/app/pkvault.apk pkvault-${{ env.VERSION }}-${{ matrix.arch }}.apk
+
+          docker rm tmp-mobile-android
+          docker rmi tmp-mobile-android
+
+          ls -la .
+
       - name: Upload desktop executables
         uses: actions/upload-artifact@v7
         with:
@@ -260,6 +272,7 @@ jobs:
             pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
             pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
             pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip
+            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.apk
           if-no-files-found: error
           retention-days: 1
 

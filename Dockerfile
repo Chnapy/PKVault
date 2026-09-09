@@ -249,6 +249,36 @@ RUN mkdir -p /app && \
   cp /tmp/raw/* /tmp/appimage/* /tmp/deb/* /tmp/flatpak/* /app/ && \
   ls -la /app/
 
+# mobile builder
+FROM core-builder AS mobile-builder
+
+WORKDIR /src
+
+COPY ["PKVault.Mobile/PKVault.Mobile.csproj", "PKVault.Mobile/"]
+
+RUN dotnet restore "PKVault.Mobile/PKVault.Mobile.csproj"
+
+COPY ./PKVault.Mobile ./PKVault.Mobile
+COPY --from=frontend-publish /app/dist ./PKVault.Mobile/Resources/Raw/wwwroot
+
+RUN dotnet build "PKVault.Mobile/PKVault.Mobile.csproj"
+
+# mobile publish android
+FROM mobile-builder AS mobile-publish-android
+
+ARG RID
+ENV RID=${RID:-linux-x64}
+
+RUN dotnet publish "PKVault.Mobile/PKVault.Mobile.csproj" -f net10.0-android -c Release -o /app/publish -r ${RID}
+
+RUN ls -la /app/publish
+
+FROM alpine:latest AS mobile-android
+
+COPY --from=mobile-publish-android /app/publish/io.github.chnapy.pkvault-Signed.apk /app/pkvault.apk
+
+RUN ls -la /app
+
 # monolith: backend & frontend
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS monolith
 
