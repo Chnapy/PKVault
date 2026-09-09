@@ -6,15 +6,27 @@ public partial class MainPage : ContentPage
 {
 	private static Task SetupTask = Task.CompletedTask;
 
-	private IServiceProvider ServiceProvider => Application.Current!.Handler.MauiContext!.Services;
+	private IServiceProvider ServiceProvider => IPlatformApplication.Current!.Services;
+
+	public static HybridWebView? HybridWebView = null;
 
 	public MainPage()
 	{
 		InitializeComponent();
 
+		HybridWebView = hybridWebView;
+
 		SetupTask = SetupCore();
 
 		hybridWebView.SetInvokeJavaScriptTarget(new DesktopInvoker(ServiceProvider, SetupTask));
+	}
+
+	protected override void OnChildRemoved(Element child, int oldLogicalIndex)
+	{
+		if (child.GetType() == typeof(HybridWebView))
+			HybridWebView = null;
+
+		base.OnChildRemoved(child, oldLogicalIndex);
 	}
 
 	private async Task SetupCore()

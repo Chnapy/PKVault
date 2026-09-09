@@ -277,7 +277,8 @@ public partial class CoreRouter
         if (kind == OpenApiParameterKind.Body)
         {
             using var reader = new StreamReader(bodyStream);
-            var body = JsonNode.Parse(reader.ReadToEnd())?.AsObject() ?? [];
+            var json = await reader.ReadToEndAsync();
+            var body = JsonNode.Parse(json)?.AsObject() ?? [];
             return body?.Deserialize(p.ParameterType, RouteJsonContext.DefaultWithOptions);
         }
 
