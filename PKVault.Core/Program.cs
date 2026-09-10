@@ -14,6 +14,7 @@ namespace PKVault.Core;
 public class Program
 {
     public static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
+    private static bool Initialized = false;
 
     // public static async Task Main(string[] args)
     // {
@@ -89,9 +90,29 @@ public class Program
 
     public static void Initialize(LoggerConfiguration? config = null)
     {
-        LogUtil.Initialize(config);
+        var currentDirectoryFixed = false;
 
-        // SettingsService.ProgramArgs = args;
+        // Should be done BEFORE initialize
+        // otherwise some tests may fail (because of concurrency run ?)
+        if (!FileIOService.IsScriptsContext
+            && Directory.GetCurrentDirectory() == InitialCurrentDirectory)
+        {
+            // case in tests only
+            if (!Directory.Exists(SettingsService.AppDirectory))
+                Directory.CreateDirectory(SettingsService.AppDirectory);
+
+            // Ensure behavior consistency between backend & desktop
+            // Required to ensure photino directory wwwroot being created in app directory
+            // since app directory can be different than executable one (flatpak ran by steam)
+            Directory.SetCurrentDirectory(SettingsService.AppDirectory);
+            currentDirectoryFixed = true;
+        }
+
+        if (Initialized)
+            return;
+        Initialized = true;
+
+        LogUtil.Initialize(config);
 
         // "Microsoft Windows 10.0.123"
         // "GNOME 50 (Flatpak runtime)"
@@ -106,16 +127,8 @@ public class Program
 
         Log.Logger.Debug($"Current directory : {InitialCurrentDirectory}");
 
-        // SettingsService.ProgramArgs = args;
-
-        if (!FileIOService.IsScriptsContext)
-        {
-            // Ensure behavior consistency between backend & desktop
-            // Required to ensure photino directory wwwroot being created in app directory
-            // since app directory can be different than executable one (flatpak ran by steam)
-            Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+        if (currentDirectoryFixed)
             Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
-        }
 
         var (BuildID, Version) = SettingsService.GetBuildInfo();
         Log.Information("PKVault Copyright (C) 2026  Richard Haddad"

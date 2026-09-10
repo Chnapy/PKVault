@@ -279,7 +279,7 @@ class Program
                     case DesktopMessageType.FILE_EXPLORE:
                         {
                             var appBasePath = MatcherUtil
-                                    .NormalizePath(SettingsService.GetAppDirectory())
+                                    .NormalizePath(Directory.GetCurrentDirectory())
                                     .Replace('/', '\\');
 
                             string? GetDefaultPath()
@@ -340,7 +340,7 @@ class Program
                         {
                             ArgumentException.ThrowIfNullOrWhiteSpace(desktopRequest.basePath);
 
-                            var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), desktopRequest.basePath));
+                            var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), desktopRequest.basePath));
 
                             var path = normalizedPath.Replace('/', '\\');
 

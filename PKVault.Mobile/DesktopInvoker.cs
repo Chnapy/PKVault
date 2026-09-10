@@ -85,7 +85,7 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                 case DesktopMessageType.FILE_EXPLORE:
                     {
                         var appBasePath = MatcherUtil
-                                .NormalizePath(SettingsService.GetAppDirectory())
+                                .NormalizePath(Directory.GetCurrentDirectory())
                                 .Replace('/', '\\');
 
                         string ToRelative(string path)
@@ -155,7 +155,7 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                     {
                         ArgumentException.ThrowIfNullOrWhiteSpace(request.basePath);
 
-                        var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), request.basePath));
+                        var normalizedPath = MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), request.basePath));
 
                         var path = normalizedPath.Replace('/', '\\');
 

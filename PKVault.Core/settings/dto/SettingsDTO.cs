@@ -52,7 +52,7 @@ public record SettingsDTO(
     }
 
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(
-        SettingsService.GetAppDirectory(),
+        Directory.GetCurrentDirectory(),
         path
     ));
 }

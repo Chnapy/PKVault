@@ -238,7 +238,7 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
         if (IsScriptsContext)
             return path;
 
-        var prefix = SettingsService.GetAppDirectory();
+        var prefix = Directory.GetCurrentDirectory();
 
         return path.StartsWith(prefix) ? path : Path.Combine(prefix, path);
     }
@@ -283,7 +283,7 @@ public class ArchiveEntry(ZipArchiveEntry entry, IFileSystem fileSystem) : IArch
 
     public void ExtractToFile(string destinationFileName, bool overwrite)
     {
-        destinationFileName = NormalizePath(destinationFileName);
+        destinationFileName = FileIOService.NormalizePath(destinationFileName);
 
         var directoryPath = Path.GetDirectoryName(destinationFileName);
         if (!string.IsNullOrWhiteSpace(directoryPath))
@@ -300,12 +300,5 @@ public class ArchiveEntry(ZipArchiveEntry entry, IFileSystem fileSystem) : IArch
         });
         using var entryStream = entry.Open();
         entryStream.CopyTo(fs);
-    }
-
-    private string NormalizePath(string path)
-    {
-        var prefix = SettingsService.GetAppDirectory();
-
-        return path.StartsWith(prefix) ? path : Path.Combine(prefix, path);
     }
 }

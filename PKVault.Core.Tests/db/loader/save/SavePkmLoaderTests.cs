@@ -4,13 +4,15 @@ using PKVault.Core;
 
 public class SavePkmLoaderTests : IAsyncLifetime
 {
-    private StaticEvolvesData evolves;
+    private StaticEvolvesData evolves = [];
 
     private readonly Mock<IPkmConvertService> mockConvertService;
     private readonly SaveWrapper mockSave;
 
     public SavePkmLoaderTests()
     {
+        Program.Initialize();
+
         mockConvertService = new Mock<IPkmConvertService>();
         mockConvertService.Setup(x => x
             .ConvertTo(It.IsAny<ImmutablePKM>(), It.IsAny<Type>(), It.IsAny<PKMRndValues?>(), It.IsAny<SaveFile?>())

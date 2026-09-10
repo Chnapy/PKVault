@@ -14,7 +14,7 @@ public class LogUtil
 
     public static void Initialize(LoggerConfiguration? config = null)
     {
-        var logDirectoryPath = Path.Combine(SettingsService.GetAppDirectory(), "logs");
+        var logDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "logs");
         var logFilepath = Path.Combine(logDirectoryPath, $"pkvault-.log");
 
         Log.Logger = (config ?? new LoggerConfiguration())

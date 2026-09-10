@@ -14,9 +14,6 @@ public class MatcherUtil
             .OfType<string>()
             .Select(glob => glob.Trim())
             .Where(glob => glob.Length > 0 && glob[0] != '!')
-            .Select(glob => glob.StartsWith(Directory.GetCurrentDirectory())
-                ? glob[(Directory.GetCurrentDirectory().Length + 1)..]
-                : glob)
         ];
 
         if (globs.Count == 0)
@@ -46,18 +43,28 @@ public class MatcherUtil
             var prefix = $"{drive}:/";
 
             var matches = ExecuteMatcher(filteredDriveGlobs, excludeGlobs, prefix);
-            var results = matches.Select(path => Path.Combine(prefix, path));
+            var results = matches.Select(path => path.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
+                ? path
+                : NormalizePath(Path.Combine(prefix, path)));
 
             return results;
         });
 
         var relativeGlobs = globs.FindAll(glob => !IsAbsolute(glob));
-        var relativeMatches = ExecuteMatcher(relativeGlobs, excludeGlobs, Directory.GetCurrentDirectory());
-        var relativeResults = relativeMatches.Select(path => Path.Combine(".", path));
+        var relativeMatches = ExecuteMatcher(relativeGlobs, excludeGlobs,
+            Directory.GetCurrentDirectory().TrimEnd(['/', '\\']) + '/'
+        );
+        var relativeResults = relativeMatches.Select(path => path.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
+            ? path
+            : NormalizePath(Path.Combine(".", path)));
 
         string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
-
-        return [.. results.Select(NormalizePath)];
+        return results
+            .Select(NormalizePath)
+            .Select(path => path.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
+                ? NormalizePath(Path.Combine(".", path[(Directory.GetCurrentDirectory().Length + 1)..]))
+                : path)
+            .ToList();
     }
 
     private string[] ExecuteMatcher(IEnumerable<string> globs, IEnumerable<string> excludeGlobs, string rootDir)
@@ -114,22 +121,20 @@ public class MatcherUtil
         var directoryInfo = GetMatcherDirectory(rootDir);
 
         var matches = matcher.Execute(directoryInfo);
-        return [.. matches.Files.Select(file => file.Path)];
+        return [.. matches.Files.Select(file => NormalizePath(file.Path))];
     }
 
     private DirectoryInfoBase GetMatcherDirectory(string rootDir)
     {
-        rootDir = NormalizePath(rootDir);
-
         if (GetAllPaths != null)
         {
             var testFiles = GetAllPaths()
                 .Select(NormalizePath)
                 .Select(glob =>
                 {
-                    if (IsAbsolute(rootDir) && glob.StartsWith(rootDir))
+                    if (IsAbsolute(rootDir) && glob.StartsWith(rootDir) && glob.Length > rootDir.Length)
                     {
-                        return glob[rootDir.Length..];
+                        return NormalizePath(Path.Combine(".", glob[rootDir.Length..]));
                     }
 
                     return glob;
