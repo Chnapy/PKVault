@@ -18,12 +18,15 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
     public PkmVariantLoaderTests()
     {
+        Program.Initialize();
+
+        mockFileSystem = new(new Dictionary<string, MockFileData>(), Directory.GetCurrentDirectory());
+
         var testId = Guid.NewGuid().ToString();
         dbPath = $"db-PkmVersionLoaderTests-{testId}.db";
 
-        mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllFiles];
 
         sessionService = new();
         dbSeedingService = new(fileIOService);

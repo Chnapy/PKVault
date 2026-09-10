@@ -3,7 +3,12 @@ using PKVault.Core;
 
 public class ImmutablePKMTests : IAsyncLifetime
 {
-    private StaticEvolvesData evolves;
+    private StaticEvolvesData evolves = [];
+
+    public ImmutablePKMTests()
+    {
+        Program.Initialize();
+    }
 
     public async ValueTask InitializeAsync()
     {

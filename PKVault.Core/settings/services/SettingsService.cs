@@ -22,12 +22,13 @@ public interface ISettingsService
  */
 public class SettingsService(IServiceProvider sp) : ISettingsService
 {
-    public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), "./config/pkvault.json"));
+    public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "es", "es-419", "pt-br", "zh-hant", "it"]; //GameLanguage.AllSupportedLanguages.ToArray();
     private static readonly SemaphoreSlim semaphore = new(1);
 
     // public static string[] ProgramArgs = [];
+    public static readonly string AppDirectory = GetAppDirectory();
     public static bool FlatpakMigrated = false;
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
@@ -198,7 +199,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         };
     }
 
-    public static string GetAppDirectory()
+    private static string GetAppDirectory()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
@@ -265,7 +266,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             FlatpakMigrated: FlatpakMigrated,
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
-            AppDirectory: MatcherUtil.NormalizePath(GetAppDirectory()),
+            AppDirectory: MatcherUtil.NormalizePath(Directory.GetCurrentDirectory()),
             SettingsPath: FilePath,
             UserId: "", // should be defined later
             CanUpdateSettings: false,
@@ -389,7 +390,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         var dbAlreadyExists = File.Exists(
             MatcherUtil.NormalizePath(Path.Combine(
-                GetAppDirectory(),
+                Directory.GetCurrentDirectory(),
                 GetDefaultSettingsMutable().DB_PATH,
                 "pkvault.db"
             ))
@@ -399,7 +400,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             return [];
         }
 
-        var dataPath = Path.Combine(MatcherUtil.NormalizePath(GetAppDirectory()), "../../org.chnapy.pkvault/data");
+        var dataPath = Path.Combine(MatcherUtil.NormalizePath(Directory.GetCurrentDirectory()), "../../org.chnapy.pkvault/data");
         if (!Directory.Exists(dataPath))
         {
             return [];
@@ -412,7 +413,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             return (
                 Folder: folder,
                 SrcPath: sourceDir,
-                DestPath: MatcherUtil.NormalizePath(Path.Combine(GetAppDirectory(), folder))
+                DestPath: MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), folder))
             );
         }).ToArray();
 

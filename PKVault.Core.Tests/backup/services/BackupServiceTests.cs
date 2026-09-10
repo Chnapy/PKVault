@@ -8,13 +8,16 @@ using PKVault.Core;
 
 public class BackupServiceTests
 {
-    private readonly MockFileSystem mockFileSystem = new();
+    private readonly MockFileSystem mockFileSystem;
     private readonly IFileIOService fileIOService;
 
     public BackupServiceTests()
     {
+        Program.Initialize();
+
+        mockFileSystem = new(new Dictionary<string, MockFileData>(), Directory.GetCurrentDirectory());
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllFiles];
     }
 
     private (BackupService backupService, Mock<ISavesLoadersService> mockSaveService, Mock<ISessionService> mockSessionService)
@@ -25,10 +28,10 @@ public class BackupServiceTests
         var mockTimeProvider = new Mock<TimeProvider>();
         mockTimeProvider.Setup(x => x.GetUtcNow()).Returns(new DateTimeOffset(now));
 
-        mockFileSystem.AddFile(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-db", "mock-main.db"), "mock-db");  // main db
+        mockFileSystem.AddFile(Path.Combine("mock-db", "mock-main.db"), "mock-db");  // main db
 
         // includes legacy data
-        DataNormalizeAction.GetLegacyFilepaths(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-db"))
+        DataNormalizeAction.GetLegacyFilepaths("mock-db")
             .ForEach(legacyPath => mockFileSystem.AddFile(legacyPath, "mock-legacy-data"));
 
         Mock<ISettingsService> mockSettingsService = new();
@@ -64,7 +67,7 @@ public class BackupServiceTests
             {saveWrapper.Object.Id, saveWrapper.Object}
         });
 
-        mockFileSystem.AddFile(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-pkm-files", "123"), "mock-data");
+        mockFileSystem.AddFile(Path.Combine("mock-pkm-files", "123"), "mock-data");
 
         var mockPkmFileService = new Mock<IPkmFileLoader>();
         mockPkmFileService.Setup(x => x.GetEnabledFilepaths()).ReturnsAsync([
@@ -101,8 +104,6 @@ public class BackupServiceTests
 
         await backupService.CreateBackup("test_backup", new());
 
-        // Console.WriteLine(string.Join('\n', mockFileSystem.AllPaths));
-
         Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2011-03-21T132611-000Z.zip")));
         var data = mockFileSystem.File.ReadAllBytes(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2011-03-21T132611-000Z.zip"));
         ArchiveMatchContent(data);
@@ -112,10 +113,10 @@ public class BackupServiceTests
     public async Task RestoreBackup_RestoreAllFiles()
     {
         var (backupService, mockSave, mockSessionService) = GetService(
-            now: DateTime.Parse("2011-03-21 13:26:11")
+            now: DateTime.Parse("2011-03-21 03:26:02")
         );
 
-        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2013-03-21T132611-000Z.zip");
+        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2013-03-21T032611-000Z.zip");
 
         var paths = new Dictionary<string, string>()
             {
@@ -151,10 +152,9 @@ public class BackupServiceTests
                     var entry = archive.CreateEntry(Path);
                     using var entryStream = await entry.OpenAsync(TestContext.Current.CancellationToken);
                     await entryStream.WriteAsync(fileContent, TestContext.Current.CancellationToken);
-                    // Console.WriteLine(fileEntry.Key);
                 }
             }
-            mockFileSystem.Directory.CreateDirectory(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp"));
+            mockFileSystem.Directory.CreateDirectory("mock-bkp");
             await mockFileSystem.File.WriteAllBytesAsync(expectedPath, memoryStream.ToArray(), TestContext.Current.CancellationToken);
         }
 
@@ -162,22 +162,20 @@ public class BackupServiceTests
         mockSave.Setup(x => x.Clear()).Verifiable();
 
         await backupService.RestoreBackup(
-            DateTime.Parse("2013-03-21 13:26:11"),
+            DateTime.Parse("2013-03-21 03:26:11"),
             withSafeBackup: true,
             new()
         );
 
         // check if backup creation were made
-        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_restore_2011-03-21T132611-000Z.zip")));
-        var data = mockFileSystem.File.ReadAllBytes(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_restore_2011-03-21T132611-000Z.zip"));
+        Assert.True(mockFileSystem.FileExists(Path.Combine("mock-bkp", "backup_before_restore_2011-03-21T032602-000Z.zip")));
+        var data = mockFileSystem.File.ReadAllBytes(Path.Combine("mock-bkp", "backup_before_restore_2011-03-21T032602-000Z.zip"));
         ArchiveMatchContent(data);
-
-        // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));
 
         // check all entries extracted
         paths.ToList().ForEach(pathItem =>
         {
-            var realPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), pathItem.Value);
+            var realPath = Path.Combine(pathItem.Value);
             Assert.True(mockFileSystem.FileExists(realPath));
             var fileContent = mockFileSystem.File.ReadAllText(realPath);
             var expectedContent = entries.ToList().Find(e => e.Path == pathItem.Key).Content;
@@ -192,7 +190,7 @@ public class BackupServiceTests
     public async Task RestoreBackup_RestorePartialFiles()
     {
         var (backupService, mockSave, mockSessionService) = GetService(
-            now: DateTime.Parse("2011-03-21 13:26:11")
+            now: DateTime.Parse("2011-03-21 16:26:56")
         );
 
         mockFileSystem.AddEmptyFile("mock-db/mock-main.db");
@@ -201,7 +199,7 @@ public class BackupServiceTests
         mockFileSystem.AddEmptyFile("mock-db/pkm-version.json");
         mockFileSystem.AddEmptyFile("mock-db/dex.json");
 
-        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2013-03-21T132611-000Z.zip");
+        var expectedPath = Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "test_backup_2013-03-21T162656-000Z.zip");
 
         var paths = new Dictionary<string, string>()
             {
@@ -229,7 +227,6 @@ public class BackupServiceTests
                     var entry = archive.CreateEntry(Path);
                     using var entryStream = await entry.OpenAsync(TestContext.Current.CancellationToken);
                     await entryStream.WriteAsync(fileContent, TestContext.Current.CancellationToken);
-                    // Console.WriteLine(fileEntry.Key);
                 }
             }
             mockFileSystem.Directory.CreateDirectory(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp"));
@@ -237,12 +234,10 @@ public class BackupServiceTests
         }
 
         await backupService.RestoreBackup(
-            DateTime.Parse("2013-03-21 13:26:11"),
+            DateTime.Parse("2013-03-21 16:26:56"),
             withSafeBackup: true,
             new()
         );
-
-        // Console.WriteLine(string.Join('\n', mockFileSystem.AllFiles));
 
         // check all entries extracted
         paths.ToList().ForEach(pathItem =>
@@ -265,8 +260,6 @@ public class BackupServiceTests
     {
         using var archive = new ZipArchive(new MemoryStream(value));
 
-        // Console.WriteLine($"Entries=\n{string.Join('\n', archive.Entries.Select(e => e.Name))}");
-
         var filenamesToCheck = archive.Entries.Select(entry => entry.Name).ToHashSet();
 
         void AssertArchiveFileContent(
@@ -281,9 +274,6 @@ public class BackupServiceTests
             var entryStream = entry.Open();
             var fileReader = new StreamReader(entryStream);
             var fileContent = fileReader.ReadToEnd();
-
-            // Console.WriteLine($"File {filename} => {fileContent}");
-            // Console.WriteLine($"expectedContent 1\n{expectedContent}\nfileContent 2\n{fileContent}");
 
             Assert.Equal(
                 expectedContent,

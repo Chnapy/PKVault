@@ -11,6 +11,8 @@ public class BankLoaderTests : IAsyncDisposable
 
     public BankLoaderTests()
     {
+        Program.Initialize();
+
         var testId = Guid.NewGuid().ToString();
         dbPath = $"db-{testId}.db";
 

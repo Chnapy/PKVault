@@ -2,7 +2,7 @@
     "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
     "parallelizeAssembly": true,
     "parallelizeTestCollections": true,
-    "maxParallelThreads": 0,
+    "maxParallelThreads": 1,
     "methodDisplay": "classAndMethod",
     "longRunningTestSeconds": 30,
     "stopOnFail": false,

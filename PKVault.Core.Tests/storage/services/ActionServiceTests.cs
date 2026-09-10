@@ -6,15 +6,18 @@ using PKVault.Core;
 
 public class ActionServiceTests
 {
-    private readonly MockFileSystem mockFileSystem = new();
+    private readonly MockFileSystem mockFileSystem;
     private readonly IFileIOService fileIOService;
     private readonly Mock<ISettingsService> mockSettingsService = new();
     private readonly Mock<ISessionService> mockSessionService = new();
 
     public ActionServiceTests()
     {
+        Program.Initialize();
+
+        mockFileSystem = new(new Dictionary<string, MockFileData>(), Directory.GetCurrentDirectory());
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllFiles];
     }
 
     private ActionService GetService(DateTime now, bool throwOnSessionPersist = false)
@@ -83,7 +86,7 @@ public class ActionServiceTests
         ConfigureSettings("mock-bkp");
 
         var actionService = GetService(
-            now: DateTime.Parse("2013-03-21 13:26:11")
+            now: DateTime.Parse("2015-03-21 23:26:11")
         );
 
         mockSessionService.Setup(x => x.Actions).Returns([
@@ -96,7 +99,7 @@ public class ActionServiceTests
         var flags = await actionService.Save();
 
         Assert.True(mockFileSystem.FileExists(
-                Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_save_2013-03-21T132611-000Z.zip")
+                Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_save_2015-03-21T232611-000Z.zip")
             ),
             $"File is missing, list of current files:\n{string.Join('\n', mockFileSystem.AllFiles)}");
     }
@@ -107,7 +110,7 @@ public class ActionServiceTests
         ConfigureSettings("mock-bkp");
 
         var actionService = GetService(
-            now: DateTime.Parse("2013-03-21 13:26:11"),
+            now: DateTime.Parse("2018-03-21 14:26:11"),
             throwOnSessionPersist: true
         );
 
@@ -121,7 +124,7 @@ public class ActionServiceTests
 
         await Assert.ThrowsAnyAsync<Exception>(actionService.Save);
 
-        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_save_2013-03-21T132611-000Z.zip")));
+        Assert.True(mockFileSystem.FileExists(Path.Combine(PathUtils.GetExpectedAppDirectory(), "mock-bkp", "backup_before_save_2018-03-21T142611-000Z.zip")));
 
         Assert.True(mockFileSystem.FileExists("mock-main.db"));
 
