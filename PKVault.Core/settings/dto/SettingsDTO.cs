@@ -12,8 +12,14 @@ public record SettingsDTO(
     string AppDirectory,
     string SettingsPath,
     string UserId,
+    bool IsDesktop,
+    string? UpdateUrl,
     bool CanUpdateSettings,
     bool CanScanSaves,
+    bool CanUploadSaves,
+    bool CanDeleteSaves,
+    bool CanOpenFolder,
+    bool CanUseDesktopFileExplorer,
     bool DemoMode,
     SettingsMutableDTO SettingsMutable
 )

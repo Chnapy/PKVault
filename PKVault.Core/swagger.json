@@ -4035,8 +4035,13 @@
           "appDirectory",
           "settingsPath",
           "userId",
+          "isDesktop",
           "canUpdateSettings",
           "canScanSaves",
+          "canUploadSaves",
+          "canDeleteSaves",
+          "canOpenFolder",
+          "canUseDesktopFileExplorer",
           "demoMode",
           "settingsMutable",
           "savesUploadsPath"
@@ -4070,10 +4075,28 @@
           "userId": {
             "type": "string"
           },
+          "isDesktop": {
+            "type": "boolean"
+          },
+          "updateUrl": {
+            "type": "string"
+          },
           "canUpdateSettings": {
             "type": "boolean"
           },
           "canScanSaves": {
+            "type": "boolean"
+          },
+          "canUploadSaves": {
+            "type": "boolean"
+          },
+          "canDeleteSaves": {
+            "type": "boolean"
+          },
+          "canOpenFolder": {
+            "type": "boolean"
+          },
+          "canUseDesktopFileExplorer": {
             "type": "boolean"
           },
           "demoMode": {

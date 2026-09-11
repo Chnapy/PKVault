@@ -22,7 +22,7 @@ public interface ISettingsService
  */
 public class SettingsService(IServiceProvider sp) : ISettingsService
 {
-    public static readonly string FilePath = MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), "./config/pkvault.json"));
+    public static string FilePath => MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), "./config/pkvault.json"));
     public static readonly string DefaultLanguage = "en";
     public static readonly string[] AllowedLanguages = [DefaultLanguage, "fr", "de", "es", "es-419", "pt-br", "zh-hant", "it"]; //GameLanguage.AllSupportedLanguages.ToArray();
     private static readonly SemaphoreSlim semaphore = new(1);
@@ -259,16 +259,38 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         var (BuildID, Version) = GetBuildInfo();
 
+        var runtimeSystem = GetRuntimeSystem();
+        var sourceProvider = GetSourceProvider();
+
+        var isDesktop = runtimeSystem != RuntimeSystem.DOCKER;
+
+        var updateUrl = sourceProvider == SourceProvider.GithubRelease
+            ? runtimeSystem == RuntimeSystem.WINDOWS
+                ? "https://projectpokemon.org/home/files/file/5766-pkvault"
+                : "https://github.com/Chnapy/PKVault/releases/latest"
+            : null;
+
+        var canUploadSaves = !isDesktop;
+        var canDeleteSaves = !isDesktop;
+        var canOpenFolder = isDesktop && runtimeSystem != RuntimeSystem.ANDROID;
+        var canUseDesktopFileExplorer = isDesktop && runtimeSystem != RuntimeSystem.ANDROID;
+
         return new(
             BuildID,
-            RuntimeSystem: GetRuntimeSystem(),
-            SourceProvider: GetSourceProvider(),
+            RuntimeSystem: runtimeSystem,
+            SourceProvider: sourceProvider,
             FlatpakMigrated: FlatpakMigrated,
             Version,
             PkhexVersion: Assembly.GetAssembly(typeof(PKHeX.Core.PKM))?.GetName().Version?.ToString(3) ?? "",
             AppDirectory: MatcherUtil.NormalizePath(Directory.GetCurrentDirectory()),
             SettingsPath: FilePath,
             UserId: "", // should be defined later
+            IsDesktop: isDesktop,
+            UpdateUrl: updateUrl,
+            CanUploadSaves: canUploadSaves,
+            CanDeleteSaves: canDeleteSaves,
+            CanOpenFolder: canOpenFolder,
+            CanUseDesktopFileExplorer: canUseDesktopFileExplorer,
             CanUpdateSettings: false,
             CanScanSaves: false,
             DemoMode: EnvUtil.DEMO_MODE,
@@ -278,6 +300,11 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     private static RuntimeSystem GetRuntimeSystem()
     {
+#if DEBUG
+        if (System.Diagnostics.Process.GetCurrentProcess().MainModule?.ModuleName == "PKVault.Backend.exe")
+            return RuntimeSystem.DOCKER;
+#endif
+
         if (!string.IsNullOrEmpty(EnvUtil.PKVAULT_PATH))
             return RuntimeSystem.DOCKER;
 
@@ -290,69 +317,71 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         if (RuntimeInformation.OSDescription.Contains("android", StringComparison.CurrentCultureIgnoreCase))
             return RuntimeSystem.ANDROID;
 
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return RuntimeSystem.UNKNOWN;
-
-        static bool IsSteamDeck()
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            try
+            static bool IsSteamDeck()
             {
-                var osReleasePath = "/etc/os-release";
-                if (!File.Exists(osReleasePath))
+                try
                 {
-                    // fallback
-                    osReleasePath = "/usr/lib/os-release";
+                    var osReleasePath = "/etc/os-release";
                     if (!File.Exists(osReleasePath))
-                        return false;
-                }
+                    {
+                        // fallback
+                        osReleasePath = "/usr/lib/os-release";
+                        if (!File.Exists(osReleasePath))
+                            return false;
+                    }
 
-                foreach (var line in File.ReadLines(osReleasePath))
+                    foreach (var line in File.ReadLines(osReleasePath))
+                    {
+                        if (line.StartsWith("ID="))
+                        {
+                            var id = line.Split('=')[1].Trim('"');
+                            if (id == "steamos")
+                                return true;
+                        }
+
+                        if (line.StartsWith("NAME="))
+                        {
+                            var name = line.Split('=')[1].Trim('"');
+                            if (name == "SteamOS")
+                                return true;
+                        }
+
+                        if (line.StartsWith("VERSION_ID="))
+                        {
+                            var version = line.Split('=')[1].Trim('"');
+                            if (version.Contains("steamdeck"))
+                                return true;
+                        }
+                    }
+                }
+                catch (Exception ex)
                 {
-                    if (line.StartsWith("ID="))
-                    {
-                        var id = line.Split('=')[1].Trim('"');
-                        if (id == "steamos")
-                            return true;
-                    }
-
-                    if (line.StartsWith("NAME="))
-                    {
-                        var name = line.Split('=')[1].Trim('"');
-                        if (name == "SteamOS")
-                            return true;
-                    }
-
-                    if (line.StartsWith("VERSION_ID="))
-                    {
-                        var version = line.Split('=')[1].Trim('"');
-                        if (version.Contains("steamdeck"))
-                            return true;
-                    }
+                    Log.Error(ex, "Exception during is-steamdeck check");
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception during is-steamdeck check");
+
+                try
+                {
+                    var hostname = Dns.GetHostName().ToLower();
+                    if (hostname.Contains("steamdeck"))
+                        return true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Exception during is-steamdeck hostname check");
+                }
+
+                return false;
             }
 
-            try
-            {
-                var hostname = Dns.GetHostName().ToLower();
-                if (hostname.Contains("steamdeck"))
-                    return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Exception during is-steamdeck hostname check");
-            }
+            if (IsSteamDeck())
+                return RuntimeSystem.STEAMDECK;
 
-            return false;
+            return RuntimeSystem.LINUX;
         }
 
-        if (IsSteamDeck())
-            return RuntimeSystem.STEAMDECK;
-
-        return RuntimeSystem.LINUX;
+        return RuntimeSystem.UNKNOWN;
     }
 
     private static SourceProvider GetSourceProvider()

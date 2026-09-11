@@ -4,11 +4,11 @@ import { ArrowDown01Icon, FolderSearchIcon, SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import type { SaveInfosDTO } from '../../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../../data/sdk/save-infos/save-infos.gen';
+import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { getGameInfos } from '../../../pokedex/details/util/get-game-infos';
 import { Route } from '../../../routes/storage';
 import { SavesUploadButton } from '../../../saves/saves-upload-popover/saves-upload-button';
-import { isDesktop } from '../../../settings/globs-input/hooks/use-desktop-message';
 import { useTranslate } from '../../../translate/i18n';
 import { UIButton } from '../../../ui/form/button/ui-button';
 import type { UISelectItem } from '../../../ui/form/select/ui-select';
@@ -39,6 +39,8 @@ export const StoragePanelGameList: React.FC = () => {
     const { t } = useTranslate();
 
     const staticData = useStaticData();
+
+    const settingsQuery = useSettingsGet();
 
     const { getStorage, setStorage } = useCurrentStorage();
     const otherStorage = useOtherStorage();
@@ -171,7 +173,7 @@ export const StoragePanelGameList: React.FC = () => {
                         })}
                 />)}
         createActions={<Group justify='center'>
-            {isDesktop()
+            {!settingsQuery.data?.data.canUploadSaves
                 ? <>
                     <UIButton
                         name='add-game-path'

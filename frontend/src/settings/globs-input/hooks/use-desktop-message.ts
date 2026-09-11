@@ -1,5 +1,6 @@
 import z from 'zod';
 import type { DesktopMessageRequest, DesktopMessageResponse } from '../../../data/sdk/model';
+import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
 
 declare global {
     // Photino
@@ -89,12 +90,15 @@ const requestDesktop = (request: DesktopMessageRequest) => {
  * If returns undefined, then app is in web context.
  */
 export const useDesktopMessage = () => {
-    if (!isDesktop()) {
-        return undefined;
-    }
+    const settingsQuery = useSettingsGet();
+    const settings = settingsQuery.data?.data;
 
     return {
-        fileExplore: requestDesktop,
-        openFile: requestDesktop,
+        fileExplore: settings?.canUseDesktopFileExplorer
+            ? requestDesktop
+            : undefined,
+        openFile: settings?.canOpenFolder
+            ? requestDesktop
+            : undefined,
     };
 };
