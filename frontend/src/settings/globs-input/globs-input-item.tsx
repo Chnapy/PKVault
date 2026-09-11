@@ -52,7 +52,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
         hasError={hasError}
         hasWarning={hasWarning}
         isLoading={isLoading}
-        openFolder={desktopMessage && (() => desktopMessage.openFile({
+        openFolder={desktopMessage.openFile && (() => desktopMessage.openFile!({
             type: DesktopMessageType.OPEN_FOLDER,
             directoryOnly: isDirectory,
             basePath: value,
@@ -68,7 +68,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
                     uploadPath={uploadPath ?? ''}
                 />;
 
-            if (desktopMessage)
+            if (desktopMessage.fileExplore)
                 return <UIPathButton
                     {...props}
                     value={value}
@@ -82,7 +82,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
 
                         const desktopInfos = getDesktopFileTypeInfos(isExclude ? 'exclude' : isDirectory ? 'folder' : 'file');
 
-                        const response = await desktopMessage.fileExplore({
+                        const response = await desktopMessage.fileExplore!({
                             type: DesktopMessageType.FILE_EXPLORE,
                             id: desktopInfos.id,
                             directoryOnly: desktopInfos.directoryOnly,

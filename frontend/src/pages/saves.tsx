@@ -11,7 +11,7 @@ import { useStaticData } from '../hooks/use-static-data';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { Route } from '../routes/saves';
 import { SavesUploadButton } from '../saves/saves-upload-popover/saves-upload-button';
-import { isDesktop, useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
+import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
 import { GameExpanded } from '../storage/panel/game-list/game-expanded';
 import { useTranslate } from '../translate/i18n';
 import { UIButton } from '../ui/form/button/ui-button';
@@ -99,13 +99,13 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
                   },
                 })}
                 actions={<>
-                  {desktopMessage
+                  {desktopMessage.openFile
                     ? <Tooltip label={t('saves.action.open')}>
                       <Button
                         variant='default'
                         size='compact-xs'
                         fullWidth
-                        onClick={() => desktopMessage.openFile({
+                        onClick={() => desktopMessage.openFile!({
                           type: DesktopMessageType.OPEN_FOLDER,
                           directoryOnly: false,
                           basePath: save.path
@@ -157,7 +157,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
 
       <Card.Section inheritPadding withBorder py='inherit'>
         <Group justify='center'>
-          {isDesktop()
+          {!settings?.canUploadSaves
             ? <>
               <UIButton
                 name='add-game-path'

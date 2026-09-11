@@ -256,6 +256,8 @@ WORKDIR /src
 
 COPY ["PKVault.Mobile/PKVault.Mobile.csproj", "PKVault.Mobile/"]
 
+RUN dotnet workload restore "PKVault.Mobile/PKVault.Mobile.csproj"
+
 RUN dotnet restore "PKVault.Mobile/PKVault.Mobile.csproj"
 
 COPY ./PKVault.Mobile ./PKVault.Mobile

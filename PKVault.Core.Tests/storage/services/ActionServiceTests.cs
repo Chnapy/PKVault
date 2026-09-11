@@ -142,7 +142,9 @@ public class ActionServiceTests
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
             BuildID: default, RuntimeSystem: RuntimeSystem.LINUX, SourceProvider: SourceProvider.GithubRelease, FlatpakMigrated: false,
             Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
-            CanUpdateSettings: false, CanScanSaves: false, DemoMode: false, SettingsMutable: new(
+            IsDesktop: false, UpdateUrl: null, CanUpdateSettings: false, CanScanSaves: false, DemoMode: false,
+            CanUploadSaves: true, CanDeleteSaves: true, CanOpenFolder: true, CanUseDesktopFileExplorer: true,
+            SettingsMutable: new(
                 DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: backupPath,
                 LANGUAGE: "en", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false
             )
