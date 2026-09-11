@@ -33,8 +33,6 @@ declare global {
 
 const external = window.external as External | undefined;
 
-export const isDesktop = () => external?.sendMessage !== undefined || window.HybridWebView !== undefined;
-
 const desktopResponseSchema = z.object({
     detail: z.object({
         type: z.string()
