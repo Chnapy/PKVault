@@ -41,7 +41,10 @@ class Program
     [STAThread]
     static void Main(string[] args)
     {
-        AttachConsole(ATTACH_PARENT_PROCESS);
+        if (WindowsOS)
+        {
+            AttachConsole(ATTACH_PARENT_PROCESS);
+        }
         Core.Program.Initialize();
 
         if (LinuxOS)
