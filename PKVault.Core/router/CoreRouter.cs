@@ -255,8 +255,9 @@ public partial class CoreRouter
         if (kind == OpenApiParameterKind.Body)
         {
             using var reader = new StreamReader(bodyStream);
-            var body = JsonNode.Parse(reader.ReadToEnd())?.AsObject() ?? [];
-            return body?.Deserialize(p.ParameterType, RouteJsonContext.Default);
+            var jsonText = await reader.ReadToEndAsync();
+            var body = JsonNode.Parse(jsonText)?.AsObject() ?? [];
+            return body?.Deserialize(p.ParameterType, RouteJsonContext.DefaultWithOptions);
         }
 
         throw new ArgumentException($"A {kind} parameter is missing: {p.Name} of type {p.ParameterType} {queries[p.Name!]?.GetType()}");
