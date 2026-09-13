@@ -4,18 +4,17 @@ import React from "react";
 import { HistoryContext } from '../../../context/history-context';
 import { type FileRouteTypes } from "../../../routeTree.gen";
 import { useTranslate } from '../../../translate/i18n';
-import { UIButton } from '../../form/button/ui-button';
+import { UIButton, type UIButtonProps } from '../../form/button/ui-button';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 import { useFocusControls } from '../../interaction/focus-controls/use-focus-controls';
 
-export type UIHeaderItemProps = {
+export type UIHeaderItemProps = Pick<UIButtonProps, 'leftSection' | 'noLabelMobileScreen' | 'children'> & {
   id: string;
   to?: FileRouteTypes[ "to" ];
   search?: Record<string, unknown>;
   label: string;
   selected?: boolean;
-  children: React.ReactNode;
 };
 
 export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
@@ -24,6 +23,8 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
   search: defaultSearch,
   label,
   selected,
+  leftSection,
+  noLabelMobileScreen,
   children,
 }) => {
   const { t } = useTranslate();
@@ -71,6 +72,9 @@ export const UIHeaderItem: React.FC<UIHeaderItemProps> = ({
       {...focusProps}
       {...controlProps('open')}
       style={{ pointerEvents: selected ? 'none' : undefined }}
+      px={{ base: 'xs', sm: 'md' }}
+      leftSection={leftSection}
+      noLabelMobileScreen={noLabelMobileScreen}
     >
       <Text fw='bold' tt='uppercase'>
         {children}

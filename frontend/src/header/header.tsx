@@ -95,8 +95,9 @@ export const Header: React.FC = () => {
                 id='help'
                 search={{ help: 'README.md' satisfies DocsGenEnSlugs }}
                 label={t('header.help')}
+                leftSection={<InfoIcon style={{ verticalAlign: 'text-bottom' }} />}
+                noLabelMobileScreen
             >
-                <InfoIcon style={{ verticalAlign: 'text-bottom', marginRight: 4 }} />
                 {t('header.help')}
             </UIHeaderItem>
 

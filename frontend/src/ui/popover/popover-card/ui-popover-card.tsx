@@ -22,6 +22,7 @@ export const UIPopoverCard = function <C>({
 }: UIPopoverCardProps<C>) {
     return <Card
         {...cardProps as object}
+        w='100%'
         style={{
             position: 'initial',
             overflow: 'initial',

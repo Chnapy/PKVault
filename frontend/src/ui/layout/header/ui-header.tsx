@@ -1,4 +1,4 @@
-import { Badge, Box, Flex, Group, Paper, Stack, Title } from '@mantine/core';
+import { Badge, Box, Flex, Group, Paper, Stack, Title, useMatches, type MantineSpacing } from '@mantine/core';
 import { clsx } from 'clsx';
 import React from 'react';
 import { baseTheme } from '../../base-theme';
@@ -18,6 +18,11 @@ export const UIHeader: React.FC<{
 }> = ({ left, right, sub, demoMode }) => {
 
     const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('header');
+
+    const gap = useMatches<MantineSpacing>({
+        base: 'xs',
+        sm: 'sm'
+    });
 
     return (
         <WithControlsIcons placement='in' icons={controlIcons('open')}
@@ -74,10 +79,10 @@ export const UIHeader: React.FC<{
                         </Flex>
 
                         <Stack className={classes.main} gap={0} maw='100%'>
-                            <Group className={classes.firstLine} gap='sm' wrap='nowrap' pr='sm'>
+                            <Group className={classes.firstLine} gap={gap} wrap='nowrap' pr='sm'>
                                 {left}
 
-                                <Box ml='auto' />
+                                {gap !== 'xs' && <Box ml='auto' />}
 
                                 {right}
                             </Group>

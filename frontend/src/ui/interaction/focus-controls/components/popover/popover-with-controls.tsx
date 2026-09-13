@@ -1,4 +1,4 @@
-import { getSingleElementChild, Popover } from '@mantine/core';
+import { getSingleElementChild, Popover, useMatches } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
@@ -27,6 +27,16 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
 
     const [ scopeId ] = React.useState((): FocusScopeId => `popover_${Math.random()}`);
 
+    const dropdownStyle = useMatches<React.CSSProperties>({
+        base: {
+            left: 4,
+            right: 4,
+            top: 62 + 4,
+            width: 'initial',
+        },
+        sm: {},
+    });
+
     const targetEl = getSingleElementChild(target);
     if (targetEl
         && targetEl.props && typeof targetEl.props === 'object'
@@ -49,11 +59,12 @@ export const PopoverWithControls: React.FC<PopoverWithControlsProps> = ({ opened
             </Popover.Target>
 
             <Popover.Dropdown
-                mah='calc(100vh - 1rem)'
+                mah='calc(100vh - 70px)'
                 display='flex'
                 p={0}
                 {...dropdownProps}
                 style={{
+                    ...dropdownStyle,
                     background: 'transparent',
                     border: 'none',
                     ...dropdownProps?.style,
