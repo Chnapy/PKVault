@@ -295,27 +295,9 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
      */
     public string GetPKMIdBase(Dictionary<ushort, StaticEvolve> evolves, int boxId = (int)BoxType.Box)
     {
-        ushort GetBaseSpecies(ushort species)
-        {
-            if (species == 0
-                // specific case with Shedinja which is created with Ninjask exact same data
-                || species == (ushort)PKHeX.Core.Species.Shedinja
-            )
-            {
-                return species;
-            }
-
-            var previousSpecies = evolves[species].PreviousSpecies;
-            if (previousSpecies != null)
-            {
-                return GetBaseSpecies((ushort)previousSpecies);
-            }
-            return species;
-        }
-
         var clone = Update(clone =>
         {
-            clone.Species = GetBaseSpecies(Pkm.Species);
+            clone.Species = EvolveUtil.GetBaseSpecies(evolves, Pkm.Species);
             clone.Form = 0;
             if (GetMutablePkm() is GBPKM gbpkm && clone is GBPKM gbclone)
             {
