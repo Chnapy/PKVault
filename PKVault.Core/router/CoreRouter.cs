@@ -47,6 +47,7 @@ public partial class CoreRouter
     public readonly IEnumerable<CoreRoute> Routes = GetAllRoutes();
 
     public async Task<ICoreResponse> Dispatch(
+        Task SetupTask,
         IServiceProvider sp,
         string httpMethod, string httpPath,
         string queriesString, Stream bodyStream
@@ -61,6 +62,8 @@ public partial class CoreRouter
 
         try
         {
+            await SetupTask;
+
             var match = Match(httpMethod, httpPath);
             if (!match.HasValue)
             {
