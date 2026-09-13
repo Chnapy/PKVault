@@ -31,7 +31,8 @@ class Program
 
     private static IFileChooser fileChooser = new DefaultFileChooser();
 
-    private static Task<IServiceProvider>? SetupTask = null;
+    private static IServiceProvider? ServiceProvider = null;
+    private static Task SetupTask = Task.CompletedTask;
 
     [DllImport("kernel32.dll")]
     static extern bool AttachConsole(uint dwProcessId);
@@ -68,10 +69,10 @@ class Program
             });
             window.RegisterWindowClosingHandler((sender, e) =>
             {
-                if (SetupTask == null || !SetupTask.IsCompletedSuccessfully)
+                if (ServiceProvider == null || SetupTask == null || !SetupTask.IsCompletedSuccessfully)
                     return false;
 
-                var emptyActionList = Core.Program.HasEmptyActionList(SetupTask.Result);
+                var emptyActionList = Core.Program.HasEmptyActionList(ServiceProvider);
 
                 if (!emptyActionList)
                 {
@@ -92,7 +93,11 @@ class Program
 
             SetupWindow(window, baseUrl);
 
-            SetupTask = SetupCore();
+            var services = new ServiceCollection();
+            Core.Program.ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
+            SetupTask = Core.Program.SetupData(ServiceProvider);
 
             InjectIntoFrontend(window);
 
@@ -106,17 +111,6 @@ class Program
         {
             LogUtil.Dispose();
         }
-    }
-
-    private static async Task<IServiceProvider> SetupCore()
-    {
-        var services = new ServiceCollection();
-        Core.Program.ConfigureServices(services);
-        var sp = services.BuildServiceProvider();
-
-        await Core.Program.SetupData(sp);
-
-        return sp;
     }
 
     private static Func<Task> SetupServer(out string baseUrl)
@@ -135,18 +129,19 @@ class Program
             {
                 if (path.StartsWith("/api/"))
                 {
-                    var sp = await SetupTask!;
-                    using var scope = sp.CreateScope();
-                    var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
+                    ArgumentNullException.ThrowIfNull(ServiceProvider);
 
                     var req = context.Request;
                     var res = context.Response;
 
-                    string queryString = context.Request.QueryString.HasValue
-                        ? context.Request.QueryString.Value
+                    string queryString = req.QueryString.HasValue
+                        ? req.QueryString.Value
                         : "";
 
-                    var result = await coreRouter.Dispatch(scope.ServiceProvider, req.Method, req.Path, queryString, req.Body);
+                    using var scope = ServiceProvider.CreateScope();
+                    var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
+
+                    var result = await coreRouter.Dispatch(SetupTask, scope.ServiceProvider, req.Method, req.Path, queryString, req.Body);
 
                     res.StatusCode = result.StatusCode ?? 200;
 
