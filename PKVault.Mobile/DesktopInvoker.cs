@@ -11,7 +11,6 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
 {
     public async Task<DesktopFetchResponse> Fetch(string url, DesktopFetchRequestInit? requestInit)
     {
-        await SetupTask;
         using var scope = ServiceProvider.CreateScope();
         var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
 
@@ -23,7 +22,7 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
         string queryString = uri.Query;
         var reqBody = new MemoryStream(Encoding.UTF8.GetBytes(requestInit.body ?? ""));
 
-        var result = await coreRouter.Dispatch(scope.ServiceProvider, requestInit.method, path, queryString, reqBody);
+        var result = await coreRouter.Dispatch(SetupTask, scope.ServiceProvider, requestInit.method, path, queryString, reqBody);
 
         var response = new DesktopFetchResponse(
             url,

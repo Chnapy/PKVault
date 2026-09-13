@@ -18,7 +18,7 @@ public class DbSeedingServiceTests : IAsyncDisposable
 
         mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = (rootDir, globs) => [.. mockFileSystem.AllPaths];
 
         dbSeedingService = new(fileIOService);
 
