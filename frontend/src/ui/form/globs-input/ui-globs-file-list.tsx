@@ -37,7 +37,7 @@ export const UIGlobsFileList: React.FC<UIGlobsFileListProps> = ({
                     loading={isLoading}
                     leftSection={<FileIcon />}
                     rightSection={hasWarning ? <AlertTriangleIcon /> : <ChevronDownIcon />}
-                    miw={80}
+                    miw={70}
                     styles={{
                         label: {
                             flexGrow: 1,

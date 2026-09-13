@@ -107,6 +107,27 @@ export const MoveProvider = function <C, P>({
         onClick: () => {
             dispatch({ type: 'CANCEL' });
         },
+        onTouchEnd: ({ event }) => {
+            const touch = event.changedTouches[ 0 ];
+            if (!touch)
+                return;
+
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!target)
+                return;
+
+            target.dispatchEvent(new PointerEvent('pointerup', {
+                bubbles: true,
+                cancelable: true,
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                pointerId: touch.identifier,
+                pointerType: 'touch',
+                isPrimary: true,
+                button: 0,
+                buttons: 0,
+            }));
+        },
     }, {
         target: document,
     });

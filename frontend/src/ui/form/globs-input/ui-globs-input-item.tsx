@@ -74,7 +74,7 @@ export const UIGlobsInputItem: React.FC<UIGlobsInputItemProps> = ({
         ],
     });
 
-    return <Group {...focusProps} align='center' wrap='nowrap' bdrs='md'>
+    return <Group {...focusProps} align='center' wrap='nowrap' gap='sm' bdrs='md'>
 
         {children({
             icons: controlIcons('open'),

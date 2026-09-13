@@ -128,7 +128,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
 
             keys: false,
             lock: false,
-            touch: false,
+            touch: true,
             mouse: false,
         },
     });
@@ -138,7 +138,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
     const useDragFn = <P>(params?: P) => {
         const filteredIds = useFilterStartDragIds(
             containerValue,
-            [ ...getAllIds()],
+            [ ...getAllIds() ],
         )(params);
 
         const enabled = filteredIds.size > 0;
@@ -230,6 +230,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
         getAllIds,
         useDrag: useDragFn,
         onPointerDown: enabled ? dragListeners.onPointerDown : undefined,
+        onTouchStart: enabled ? dragListeners.onTouchStart : undefined,
         ...dragUtils,
     };
 };
