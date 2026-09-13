@@ -2,13 +2,15 @@ import { EmptyState } from '@mantine/core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
+import { DesktopMessageType } from '../../data/sdk/model';
+import { useSettingsGet } from '../../data/sdk/settings/settings.gen';
 import { SavesUploadButton } from '../../saves/saves-upload-popover/saves-upload-button';
 import { useTranslate } from '../../translate/i18n';
 import { UIGlobsInputList, type UIGlobsInputListProps } from '../../ui/form/globs-input/ui-globs-input-list';
 import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desktop-file-type-infos';
 import { GlobsInputItem } from './globs-input-item';
 import { GlobsInputResults } from './globs-input-results';
-import { isDesktop, useDesktopMessage } from './hooks/use-desktop-message';
+import { useDesktopMessage } from './hooks/use-desktop-message';
 
 export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'>>
     & Pick<UIGlobsInputListProps, 'labelList' | 'labelAddFile' | 'labelAddFolder' | 'labelAddPath'>
@@ -23,6 +25,8 @@ export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'
 export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onChange, limit, disabled, children, ...rest }) => {
     const { t } = useTranslate();
 
+    const settingsQuery = useSettingsGet();
+
     const desktopMessage = useDesktopMessage();
 
     const splittedValue = value.split('\n').map(value => value.trim()).filter(Boolean);
@@ -33,18 +37,18 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
         id={id}
         onAdd={async (type, newValue) => {
 
-            if (desktopMessage) {
+            if (desktopMessage.fileExplore) {
                 const typeInfos = getDesktopFileTypeInfos(type);
 
                 const response = await desktopMessage.fileExplore({
-                    type: 'file-explore',
+                    type: DesktopMessageType.FILE_EXPLORE,
                     id: typeInfos.id,
                     directoryOnly: typeInfos.directoryOnly,
                     basePath: '',
                     multiselect: false,
                 });
 
-                if (!response.values[ 0 ]) {
+                if (!response?.values?.[ 0 ]) {
                     return;
                 }
 
@@ -54,7 +58,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
             const newValues = [ ...splittedValue, ...newValue ];
             onChange(newValues.join('\n'));
 
-            if (!desktopMessage) {
+            if (!desktopMessage.fileExplore) {
                 setTimeout(() => {
                     const el = document.getElementById(id)?.querySelector('[data-item-last]');
                     if (el)
@@ -63,7 +67,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
             }
         }}
         disabled={disabled}
-        isDesktop={isDesktop}
+        canUseDesktopFileExplorer={settingsQuery.data?.data.canUseDesktopFileExplorer}
         uploadAbbButton={<SavesUploadButton
             disabled={disabled}
             size='compact-sm'

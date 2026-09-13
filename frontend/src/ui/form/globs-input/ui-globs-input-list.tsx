@@ -10,14 +10,14 @@ export type UIGlobsInputListProps = Pick<UIGlobsInputAddProps, 'onAdd' | 'disabl
     labelAddFile: string;
     labelAddFolder: string;
     labelAddPath: string;
-    isDesktop: boolean;
+    canUseDesktopFileExplorer?: boolean;
     results: React.ReactNode;
     uploadAbbButton?: React.ReactNode;
     children: React.ReactNode;
 };
 
 export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
-    id, labelList, labelAddFile, labelAddFolder, labelAddPath, onAdd, disabled, isDesktop, results, uploadAbbButton, children
+    id, labelList, labelAddFile, labelAddFolder, labelAddPath, onAdd, disabled, canUseDesktopFileExplorer, results, uploadAbbButton, children
 }) => {
     const { t } = useTranslate();
 
@@ -41,7 +41,7 @@ export const UIGlobsInputList: React.FC<UIGlobsInputListProps> = ({
         </Card>
 
         <Group my='md'>
-            {isDesktop
+            {canUseDesktopFileExplorer
                 ? <>
                     <UIGlobsInputAdd
                         name='add-file'

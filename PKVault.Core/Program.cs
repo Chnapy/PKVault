@@ -14,84 +14,33 @@ namespace PKVault.Core;
 public class Program
 {
     public static readonly string InitialCurrentDirectory = Directory.GetCurrentDirectory();
+    private static bool Initialized = false;
 
-    // public static async Task Main(string[] args)
-    // {
-    //     Initialize();
-
-    //     var services = new ServiceCollection();
-    //     ConfigureServices(services);
-    //     var sp = services.BuildServiceProvider();
-
-    //     var router = sp.GetRequiredService<CoreRouter>();
-
-    //     OpenApi.OpenApiGenerator.GenerateOpenApiFile(
-    //         Path.Combine(InitialCurrentDirectory, "swagger.json"),
-    //         router.Routes
-    //     );
-
-    //     using var scope = sp.CreateScope();
-
-    //     // var str = await router.DispatchToJSON(scope.ServiceProvider, "GET", "api/backup", "{}", new MemoryStream(Encoding.Default.GetBytes("{}")));
-    //     // Console.WriteLine(str);
-
-    //     // test
-    //     var testMethod = "GET";
-    //     var testPath = "/api/static-data/spritesheet/spritesheet_species_0.webp";
-
-    //     // Dictionary<string, string?[]> testQuery = new()
-    //     // {
-    //     //    ["buildId"] = ["null"]
-    //     // };
-    //     var testQuery = """
-    //     {
-    //       "buildId": null
-    //     }
-    //     """;
-    //     var testBody = new MemoryStream(Encoding.Default.GetBytes("""
-    //     {
-    //       "toto": "azerty"
-    //     }
-    //     """));
-
-    //     // var foo2 = await router.DispatchToJSON(scope.ServiceProvider, testMethod, testPath, testQuery, testBody);
-    //     // Console.WriteLine(foo2);
-
-    //     var foo3 = await router.DispatchToJSON(scope.ServiceProvider,
-    //         "GET", "/api/settings/test-save-globs",
-    //         "?globs=.%2Ftmp%2Fsaves%2F&limit=200",
-    //         // """
-    //         // {
-    //         //     "globs": ["./tmp/saves/"],
-    //         //     "limit": "200"
-    //         // }
-    //         // """,
-    //         testBody
-    //     );
-    //     Console.WriteLine(foo3);
-
-    //     var foo4 = await router.DispatchToJSON(scope.ServiceProvider,
-    //         "GET", "/api/dex/moves",
-    //         "?context=2&species=12&form=0",
-    //         // """
-    //         // {
-    //         //     "context": 2,
-    //         //     "species": 12,
-    //         //     "form": 0
-    //         // }
-    //         // """,
-    //         testBody
-    //     );
-    //     Console.WriteLine(foo4);
-
-    //     Dispose();
-    // }
-
-    public static void Initialize()
+    public static void Initialize(LoggerConfiguration? config = null)
     {
-        LogUtil.Initialize();
+        var currentDirectoryFixed = false;
 
-        // SettingsService.ProgramArgs = args;
+        // Should be done BEFORE initialize
+        // otherwise some tests may fail (because of concurrency run ?)
+        if (!FileIOService.IsScriptsContext
+            && Directory.GetCurrentDirectory() == InitialCurrentDirectory)
+        {
+            // case in tests only
+            if (!Directory.Exists(SettingsService.AppDirectory))
+                Directory.CreateDirectory(SettingsService.AppDirectory);
+
+            // Ensure behavior consistency between backend & desktop
+            // Required to ensure photino directory wwwroot being created in app directory
+            // since app directory can be different than executable one (flatpak ran by steam)
+            Directory.SetCurrentDirectory(SettingsService.AppDirectory);
+            currentDirectoryFixed = true;
+        }
+
+        if (Initialized)
+            return;
+        Initialized = true;
+
+        LogUtil.Initialize(config);
 
         // "Microsoft Windows 10.0.123"
         // "GNOME 50 (Flatpak runtime)"
@@ -106,16 +55,8 @@ public class Program
 
         Log.Logger.Debug($"Current directory : {InitialCurrentDirectory}");
 
-        // SettingsService.ProgramArgs = args;
-
-        if (!FileIOService.IsScriptsContext)
-        {
-            // Ensure behavior consistency between backend & desktop
-            // Required to ensure photino directory wwwroot being created in app directory
-            // since app directory can be different than executable one (flatpak ran by steam)
-            Directory.SetCurrentDirectory(SettingsService.GetAppDirectory());
+        if (currentDirectoryFixed)
             Log.Logger.Debug($"Current directory (fixed) : {Directory.GetCurrentDirectory()}");
-        }
 
         var (BuildID, Version) = SettingsService.GetBuildInfo();
         Log.Information("PKVault Copyright (C) 2026  Richard Haddad"

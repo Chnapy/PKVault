@@ -19,6 +19,7 @@ using Serilog.Events;
 using System.Web;
 using System.Collections.Specialized;
 using PKVault.Core.OpenApi;
+using System.Net.Mime;
 
 namespace PKVault.Core;
 
@@ -68,39 +69,59 @@ public partial class CoreRouter
             }
             var (Route, PathVariables) = match.Value;
 
+            var controllerType = Route.MethodInfo.DeclaringType!;
+            object controller = sp.GetRequiredService(controllerType);
+
             List<object?> parameters = [];
             foreach (var (Param, Kind) in Route.Parameters)
             {
                 parameters.Add(await BindParameter(Param, Kind, PathVariables, queries, bodyStream));
             }
 
-            var controllerType = Route.MethodInfo.DeclaringType!;
-            object controller = sp.GetRequiredService(controllerType);
-
             var result = Route.MethodInfo.Invoke(controller, parameters.ToArray());
             object? resultValue = await UnwrapResultAsync(result);
 
             if (resultValue is not ICoreResponse response)
                 response = new CoreJSONResponse(
-                    Data: resultValue
+                    Data: resultValue,
+                    StatusCode: 200,
+                    ContentType: MediaTypeNames.Application.Json,
+                    Header: new()
+                    {
+                        ["Content-Type"] = MediaTypeNames.Application.Json
+                    }
                 );
 
             if (response is CoreFileResponse fileResponse)
+            {
+                var contentDispositionHeader = new ContentDisposition()
+                {
+                    FileName = fileResponse.File.FileName,
+                    DispositionType = "attachment"
+                };
+                response.Header["Content-Disposition"] = contentDispositionHeader.ToString();
+
+                if (fileResponse.LastModified is not null)
+                    response.Header["LastModified"] = fileResponse.LastModified.ToString()!;
+
                 response = fileResponse with
                 {
                     ContentType = fileResponse.ContentType ?? fileResponse.File.ContentType,
                 };
+            }
 
             statusCode = response is CoreJSONResponse jsonResponse && jsonResponse.Data == null
                 ? 204
                 : 200;
+
+            response.Header["Content-Type"] = response.ContentType;
 
             return response;
         }
         catch (Exception ex)
         {
             if (ex is TargetInvocationException tex)
-                ex = tex.GetBaseException();
+                ex = tex.InnerException ?? tex;
 
             statusCode = GetStatusCode(ex);
             exception = ex;
@@ -108,10 +129,11 @@ public partial class CoreRouter
             return new CoreJSONResponse(
                 Data: null,
                 StatusCode: statusCode,
-                ContentType: "text/plain",
+                ContentType: MediaTypeNames.Text.Plain,
                 Header: new()
                 {
-                    ["access-control-expose-headers"] = new StringValues(["error-message", "error-stack"]),
+                    ["Content-Type"] = MediaTypeNames.Text.Plain,
+                    ["access-control-expose-headers"] = new StringValues(["error-message", "error-stack"]).ToString(),
                     ["error-message"] = JsonSerializer.Serialize(
                         InvalidCharacterRegex().Replace(ex.Message, "\n").Replace("\n\n", "\n"),
                         RouteJsonContext.Default.String
@@ -131,7 +153,7 @@ public partial class CoreRouter
                     statusCode >= 400 ? LogEventLevel.Warning
                         : LogEventLevel.Information,
                 exception,
-                $"HTTP {httpMethod} {httpPath} responded {statusCode} in {sw.ElapsedMilliseconds} ms"
+                $"HTTP {httpMethod} {httpPath} responded {statusCode} in {sw.ElapsedMilliseconds} ms{(exception != null ? "\n" : "")}"
             );
         }
     }
@@ -255,8 +277,9 @@ public partial class CoreRouter
         if (kind == OpenApiParameterKind.Body)
         {
             using var reader = new StreamReader(bodyStream);
-            var body = JsonNode.Parse(reader.ReadToEnd())?.AsObject() ?? [];
-            return body?.Deserialize(p.ParameterType, RouteJsonContext.Default);
+            var json = await reader.ReadToEndAsync();
+            var body = JsonNode.Parse(json)?.AsObject() ?? [];
+            return body?.Deserialize(p.ParameterType, RouteJsonContext.DefaultWithOptions);
         }
 
         throw new ArgumentException($"A {kind} parameter is missing: {p.Name} of type {p.ParameterType} {queries[p.Name!]?.GetType()}");

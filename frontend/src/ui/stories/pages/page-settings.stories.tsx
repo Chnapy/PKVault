@@ -141,7 +141,7 @@ export const Primary: Story = {
                         labelAddFolder='Add a save directory'
                         labelAddPath='Add saves location'
                         onAdd={async (...params) => console.log(...params)}
-                        isDesktop//={false}
+                        canUseDesktopFileExplorer//={false}
                         results={<UIGlobsInputResults
                             name='results'
                             data={generatePaths('c:/abc/def/', 100)}

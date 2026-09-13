@@ -18,12 +18,15 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
     public PkmVariantLoaderTests()
     {
+        Program.Initialize();
+
+        mockFileSystem = new(new Dictionary<string, MockFileData>(), Directory.GetCurrentDirectory());
+
         var testId = Guid.NewGuid().ToString();
         dbPath = $"db-PkmVersionLoaderTests-{testId}.db";
 
-        mockFileSystem = new MockFileSystem();
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllPaths];
+        fileIOService.Matcher.GetAllPaths = (rootDir, globs) => [.. mockFileSystem.AllFiles];
 
         sessionService = new();
         dbSeedingService = new(fileIOService);
@@ -34,7 +37,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         mockSettings.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
             BuildID: default, RuntimeSystem: RuntimeSystem.LINUX, SourceProvider: SourceProvider.GithubRelease, FlatpakMigrated: false,
             Version: "", PkhexVersion: "", AppDirectory: "app", SettingsPath: "", UserId: "",
-            CanUpdateSettings: false, CanScanSaves: false, DemoMode: false, SettingsMutable: new(
+            IsDesktop: false, UpdateUrl: null, CanUpdateSettings: false, CanScanSaves: false, DemoMode: false,
+            CanUploadSaves: true, CanDeleteSaves: true, CanOpenFolder: true, CanUseDesktopFileExplorer: true,
+            SettingsMutable: new(
                 DB_PATH: "mock-db", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "mock-storage", BACKUP_PATH: "mock-bkp",
                 LANGUAGE: "en", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false
             )

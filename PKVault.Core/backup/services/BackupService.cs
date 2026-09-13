@@ -100,7 +100,7 @@ public class BackupService(
         List<string> rawFilepaths = DataNormalizeAction.GetLegacyFilepaths(dbPath);
         foreach (var rawFilepath in rawFilepaths)
         {
-            var filepath = MatcherUtil.NormalizePath(Path.Combine(SettingsService.GetAppDirectory(), rawFilepath));
+            var filepath = MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), rawFilepath));
             if (fileIOService.Exists(filepath))
             {
                 var fileName = Path.GetFileName(filepath);
@@ -164,7 +164,7 @@ public class BackupService(
         // get all PkmFile without distinction
         var allFilepaths = await pkmFileLoader.GetEnabledFilepaths();
 
-        foreach(var filepath in allFilepaths)
+        foreach (var filepath in allFilepaths)
         {
             var filename = Path.GetFileName(filepath);
             var dirname = new DirectoryInfo(Path.GetDirectoryName(filepath)!).Name;
@@ -184,16 +184,19 @@ public class BackupService(
                 continue;
             }
 
-            try {
+            try
+            {
                 var fileContent = await fileIOService.ReadBytes(filepath);
                 var targetPayload = (TargetPath: filepath, FileContent: fileContent);
-            
+
                 paths.Add(backupPath, targetPayload);
 
-            // it avoids to use fileIOService.Exists, performance reasons
-            } catch(FileNotFoundException)
+                // it avoids to use fileIOService.Exists, performance reasons
+            }
+            catch (FileNotFoundException)
             {
-            } catch(DirectoryNotFoundException)
+            }
+            catch (DirectoryNotFoundException)
             {
             }
         }
@@ -239,7 +242,7 @@ public class BackupService(
         var fileCountLimit = EnvUtil.BACKUP_FILE_COUNT_LIMIT ?? 0;
         if (fileCountLimit > 0 && result.Count > fileCountLimit)
         {
-            foreach(var bkp in result.Skip(fileCountLimit))
+            foreach (var bkp in result.Skip(fileCountLimit))
             {
                 DeleteBackup(bkp.Filepath);
             }

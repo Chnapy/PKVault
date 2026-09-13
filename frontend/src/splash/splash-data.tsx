@@ -7,7 +7,6 @@ import { useSettingsGet } from '../data/sdk/settings/settings.gen';
 import { useStaticDataGet } from '../data/sdk/static-data/static-data.gen';
 import { useStorageGetBoxes, useStorageGetMainBanks } from '../data/sdk/storage/storage.gen';
 import { Fallback } from '../error/fallback';
-import { useDesktopMessage } from '../settings/globs-input/hooks/use-desktop-message';
 import { UISplash } from '../ui/splash/ui-splash';
 
 /**
@@ -25,7 +24,7 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         useDexGetAll(),
     ] as const;
 
-    const desktopMessage = useDesktopMessage();
+    // const desktopMessage = useDesktopMessage();
 
     const isLoading = queries.some(query => query.isPending && query.isEnabled);
 
@@ -39,10 +38,10 @@ export const SplashData: React.FC<React.PropsWithChildren<{ appStartTime: number
         const appStartDuration = Date.now() - appStartTime;
         console.log('Setup data load duration:', appStartDuration);
 
-        desktopMessage?.startLoadingFinished(!!error);
+        // desktopMessage?.startLoadingFinished(!!error);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [ desktopMessage, isLoading ]);
+    }, [ isLoading ]);
 
     if (!isLoading && !error) {
         return children;

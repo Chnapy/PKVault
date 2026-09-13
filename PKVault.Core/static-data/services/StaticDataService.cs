@@ -12,8 +12,6 @@ public class StaticDataService(ISettingsService settingsService)
     private readonly CacheWithTiming Cache = new();
     private StaticEvolvesData? StaticEvolves = null;
 
-    private readonly SpritesheetFileClient spritesheetFileClient = new();
-
     public async Task<StaticDataDTO> GetStaticDataDTO(string? lang = null)
     {
         lang ??= settingsService.GetSettings().GetLanguageOrDefault();
@@ -83,11 +81,6 @@ public class StaticDataService(ISettingsService settingsService)
             "",
             _ => StaticEvolvesRichLoader.LoadData()
         );
-    }
-
-    public async Task<Stream> GetSpritesheetStream(string sheetName)
-    {
-        return await spritesheetFileClient.GetAsyncString(sheetName);
     }
 
     private async Task<D> GetCacheValue<D>(string cacheKey, string lang, Func<string, Task<D>> loadFn)
