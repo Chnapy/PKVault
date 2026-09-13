@@ -71,7 +71,7 @@ public class MatcherUtilTests
     {
         var matcher = new MatcherUtil
         {
-            GetAllPaths = () => [.. mockFileSystem.AllFiles]
+            GetAllPaths = (rootDir, globs) => [.. mockFileSystem.AllFiles]
         };
 
         Assert.Equal(
@@ -81,8 +81,9 @@ public class MatcherUtilTests
 
         mockFileSystem.AddFile("./folder/foobar.zip", "content");
         mockFileSystem.AddFile("./folder/toto.zip", "content");
+        mockFileSystem.AddFile("/storage/emulated/0/save.srm", "content");
 
-        Assert.Equal(2, matcher.GetAllPaths().Length);
+        Assert.Equal(3, matcher.GetAllPaths("", []).Length);
 
         Assert.Equal(
             [
@@ -125,6 +126,15 @@ public class MatcherUtilTests
             ],
             matcher.SearchPaths([
                 Path.Combine(Directory.GetCurrentDirectory(), "folder/toto.zip")
+            ])
+        );
+
+        Assert.Equal(
+            [
+                "/storage/emulated/0/save.srm"
+            ],
+            matcher.SearchPaths([
+                "/storage/emulated/0/*.srm"
             ])
         );
 

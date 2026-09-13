@@ -17,7 +17,7 @@ public class BackupServiceTests
 
         mockFileSystem = new(new Dictionary<string, MockFileData>(), Directory.GetCurrentDirectory());
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllFiles];
+        fileIOService.Matcher.GetAllPaths = (rootDir, globs) => [.. mockFileSystem.AllFiles];
     }
 
     private (BackupService backupService, Mock<ISavesLoadersService> mockSaveService, Mock<ISessionService> mockSessionService)

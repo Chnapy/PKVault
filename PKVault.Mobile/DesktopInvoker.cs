@@ -11,8 +11,6 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
 {
     public async Task<DesktopFetchResponse> Fetch(string url, DesktopFetchRequestInit? requestInit)
     {
-        Console.WriteLine($"FETCH {url} {JsonSerializer.Serialize(requestInit)}");
-
         await SetupTask;
         using var scope = ServiceProvider.CreateScope();
         var coreRouter = scope.ServiceProvider.GetRequiredService<CoreRouter>();
@@ -125,6 +123,12 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
 
                                 var folder = await folderPicker.PickSingleFolderAsync();
                                 results = [folder.Path];
+#elif ANDROID
+                                var directoryService = ServiceProvider.GetRequiredService<IDirectoryPicker>();
+                                var directory = await directoryService.PickDirectoryAsync();
+                                Log.Debug($"DIRECTORY={directory}");
+                                if (directory != null)
+                                    results = [directory];
 #endif
                             }
                             else if (request.multiselect)
@@ -134,9 +138,17 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                             }
                             else
                             {
+#if ANDROID
+                                var directoryService = ServiceProvider.GetRequiredService<IDirectoryPicker>();
+                                var file = await directoryService.PickFileAsync();
+                                Log.Debug($"FILE={file}");
+                                if (file != null)
+                                    results = [file];
+#else
                                 var file = await FilePicker.Default.PickAsync();
                                 if (file != null)
                                     results = [file.FullPath];
+#endif
                             }
 
                             return new(
