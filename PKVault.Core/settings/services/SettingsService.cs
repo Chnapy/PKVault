@@ -229,7 +229,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         }
 
         if (GetRuntimeSystem() == RuntimeSystem.ANDROID)
-            return Directory.GetCurrentDirectory();
+            return AppDomain.CurrentDomain.BaseDirectory;
 
         var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
         var exeDirectory = exePath != null ? Path.GetDirectoryName(exePath) : null;
@@ -273,7 +273,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         var canUploadSaves = !isDesktop;
         var canDeleteSaves = !isDesktop;
         var canOpenFolder = isDesktop && runtimeSystem != RuntimeSystem.ANDROID;
-        var canUseDesktopFileExplorer = isDesktop && runtimeSystem != RuntimeSystem.ANDROID;
+        var canUseDesktopFileExplorer = isDesktop;// && runtimeSystem != RuntimeSystem.ANDROID;
 
         return new(
             BuildID,

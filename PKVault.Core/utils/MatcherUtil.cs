@@ -6,14 +6,17 @@ namespace PKVault.Core;
 // TODO complete refacto for testability
 public class MatcherUtil
 {
-    public Func<string[]>? GetAllPaths = null;
+    public Func<string, string[], string[]?> GetAllPaths = (rootDir, globs) => null;
 
     public List<string> SearchPaths(string?[] globsNullable)
     {
         List<string> globs = [.. globsNullable
             .OfType<string>()
-            .Select(glob => glob.Trim())
+            .Select(glob => NormalizePath(glob.Trim()))
             .Where(glob => glob.Length > 0 && glob[0] != '!')
+            .Select(glob => glob.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
+                ? NormalizePath(Path.Combine(".", glob[(Directory.GetCurrentDirectory().Length + 1)..]))
+                : glob)
         ];
 
         if (globs.Count == 0)
@@ -28,10 +31,6 @@ public class MatcherUtil
 
         // network globs on Windows, ex: "\\192.168.1.8\data"
         var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
-
-        var absoluteGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length <= 1 || glob[1] != ':');
-        var absoluteMatches = ExecuteMatcher(absoluteGlobs, excludeGlobs, "/");
-        var absoluteResults = absoluteMatches.Select(path => Path.Combine("/", path));
 
         var driveGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
         var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct();
@@ -50,15 +49,50 @@ public class MatcherUtil
             return results;
         });
 
-        var relativeGlobs = globs.FindAll(glob => !IsAbsolute(glob));
-        var relativeMatches = ExecuteMatcher(relativeGlobs, excludeGlobs,
-            Directory.GetCurrentDirectory().TrimEnd(['/', '\\']) + '/'
-        );
-        var relativeResults = relativeMatches.Select(path => path.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
-            ? path
-            : NormalizePath(Path.Combine(".", path)));
+        var relativeGlobs = globs
+            .Where(glob => !driveGlobs.Contains(glob))
+            .Select(glob =>
+            {
+                if (!IsAbsolute(glob))
+                    return (Base: NormalizePath(Directory.GetCurrentDirectory()), RelativeGlob: glob);
 
-        string[] results = [.. absoluteResults, .. driveResults, .. relativeResults, .. networkGlobs];
+                var globParts = glob.Split('/');
+                var baseStr = "/";
+                for (var i = 0; i < globParts.Length - 1; i++)
+                {
+                    var part = globParts[i];
+                    if (part.Contains('*'))
+                        break;
+
+                    baseStr = Path.Combine(baseStr, part);
+                }
+                baseStr = NormalizePath(baseStr);
+                glob = glob[(baseStr.Length + 1)..];
+
+                return (Base: baseStr, RelativeGlob: glob);
+            })
+            .GroupBy(e => e.Base);
+
+        var relativeResults = relativeGlobs.SelectMany(globsGroup =>
+        {
+            var globBase = globsGroup.First().Base;
+            var globs = globsGroup.Select(g => g.RelativeGlob);
+
+            var relativeMatches = ExecuteMatcher(globs, excludeGlobs,
+                globBase.TrimEnd(['/', '\\']) + '/'
+            );
+
+            return relativeMatches.Select(path => path.StartsWith(globBase)
+                ? path
+                : NormalizePath(Path.Combine(
+                    globBase == NormalizePath(Directory.GetCurrentDirectory())
+                        ? "."
+                        : globBase,
+                    path
+                )));
+        });
+
+        string[] results = [.. driveResults, .. relativeResults, .. networkGlobs];
         return results
             .Select(NormalizePath)
             .Select(path => path.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
@@ -118,31 +152,29 @@ public class MatcherUtil
             matcher.AddExclude(glob);
         }
 
-        var directoryInfo = GetMatcherDirectory(rootDir);
+        var directoryInfo = GetMatcherDirectory(rootDir, globs.ToArray());
 
         var matches = matcher.Execute(directoryInfo);
         return [.. matches.Files.Select(file => NormalizePath(file.Path))];
     }
 
-    private DirectoryInfoBase GetMatcherDirectory(string rootDir)
+    private DirectoryInfoBase GetMatcherDirectory(string rootDir, string[] globs)
     {
-        if (GetAllPaths != null)
-        {
-            var testFiles = GetAllPaths()
-                .Select(NormalizePath)
-                .Select(glob =>
+        var testFiles = GetAllPaths(rootDir, globs)?
+            .Select(NormalizePath)
+            .Select(glob =>
+            {
+                if (IsAbsolute(rootDir) && glob.StartsWith(rootDir) && glob.Length > rootDir.Length)
                 {
-                    if (IsAbsolute(rootDir) && glob.StartsWith(rootDir) && glob.Length > rootDir.Length)
-                    {
-                        return NormalizePath(Path.Combine(".", glob[rootDir.Length..]));
-                    }
+                    return NormalizePath(Path.Combine(".", glob[rootDir.Length..]));
+                }
 
-                    return glob;
-                })
-                .Where(glob => glob.Length > 0);
+                return glob;
+            })
+            .Where(glob => glob.Length > 0);
 
+        if (testFiles != null)
             return new InMemoryDirectoryInfo(rootDir, testFiles);
-        }
 
         return new DirectoryInfoWrapper(new DirectoryInfo(rootDir));
     }

@@ -1,6 +1,9 @@
 ﻿using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Handlers;
 using Microsoft.Maui.LifecycleEvents;
+using PKVault.Core;
 using Serilog;
 
 namespace PKVault.Mobile;
@@ -34,7 +37,7 @@ public static class MauiProgram
 
 		Directory.SetCurrentDirectory(FileSystem.Current.AppDataDirectory);
 
-		Core.Program.Initialize(loggerConfig);
+		Program.Initialize(loggerConfig);
 
 		var builder = MauiApp.CreateBuilder();
 		builder
@@ -46,16 +49,30 @@ public static class MauiProgram
 				// });
 				builder.AddEvent("Destroying", () =>
 				{
-					Core.Program.Dispose();
+					Program.Dispose();
 				});
 			});
-		// .ConfigureFonts(fonts =>
-		// {
-		// 	fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-		// 	fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-		// });
 
-		Core.Program.ConfigureServices(builder.Services);
+		Program.ConfigureServices(builder.Services);
+
+#if ANDROID
+		HybridWebViewHandler.Mapper.AppendToMapping("CustomFileChooser", (handler, view) =>
+		{
+			if (handler.PlatformView is Android.Webkit.WebView webView)
+				webView.SetWebChromeClient(new FileChooserClient());
+		});
+		builder.Services.AddSingleton<IDirectoryPicker, AndroidDirectoryPicker>();
+		builder.Services.AddSingleton(sp => new SafTreeMapper(
+			Android.App.Application.Context
+		));
+		builder.Services.RemoveAll<IFileIOService>();
+		builder.Services.AddSingleton<IFileIOService>(sp =>
+		{
+			var inner = new FileIOService(sp.GetRequiredService<System.IO.Abstractions.IFileSystem>());
+			var mapper = sp.GetRequiredService<SafTreeMapper>();
+			return new AndroidFileIOService(inner, mapper);
+		});
+#endif
 
 #if DEBUG
 		builder.Services.AddHybridWebViewDeveloperTools();

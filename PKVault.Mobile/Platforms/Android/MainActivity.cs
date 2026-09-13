@@ -1,4 +1,5 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using AndroidX.Activity;
@@ -34,22 +35,24 @@ public class MainActivity : MauiAppCompatActivity
 
         OnBackPressedDispatcher.AddCallback(this, new BackPressedCallback());
     }
-}
 
-public class BackPressedCallback : OnBackPressedCallback
-{
-    public BackPressedCallback() : base(true)
+    protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
-    }
+        base.OnActivityResult(requestCode, resultCode, data);
 
-    public override void HandleOnBackPressed()
-    {
-        if (MainPage.HybridWebView == null)
-            return;
-
-        if (MainPage.HybridWebView.Handler?.PlatformView is Android.Webkit.WebView nativeWebView && nativeWebView.CanGoBack())
+        if (requestCode == FileChooserClient.FileChooserRequestCode)
         {
-            nativeWebView.GoBack();
+            var results = Android.Webkit.WebChromeClient.FileChooserParams.ParseResult((int)resultCode, data);
+            FileChooserClient.PendingFilePathCallback?.OnReceiveValue(results);
+            FileChooserClient.PendingFilePathCallback = null;
+        }
+        else if (requestCode == AndroidDirectoryPicker.DirectoryPickerRequestCode
+            || requestCode == AndroidDirectoryPicker.FilePickerRequestCode
+        )
+        {
+            var uri = resultCode == Result.Ok ? data?.Data : null;
+            AndroidDirectoryPicker.PendingPickTask?.TrySetResult(uri);
+            AndroidDirectoryPicker.PendingPickTask = null;
         }
     }
 }

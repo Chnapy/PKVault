@@ -26,7 +26,7 @@ public class PkmVariantLoaderTests : IAsyncDisposable
         dbPath = $"db-PkmVersionLoaderTests-{testId}.db";
 
         fileIOService = new FileIOService(mockFileSystem);
-        fileIOService.Matcher.GetAllPaths = () => [.. mockFileSystem.AllFiles];
+        fileIOService.Matcher.GetAllPaths = (rootDir, globs) => [.. mockFileSystem.AllFiles];
 
         sessionService = new();
         dbSeedingService = new(fileIOService);
