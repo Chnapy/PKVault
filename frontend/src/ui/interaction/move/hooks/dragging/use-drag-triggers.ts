@@ -1,4 +1,4 @@
-import { useDrag, type Vector2 } from '@use-gesture/react';
+import { useDrag, type EventTypes, type Handler, type Vector2 } from '@use-gesture/react';
 import React from 'react';
 import { useSelectContextNullable } from '../../../select/context/use-select-context';
 import { useMoveContext } from '../../context/use-move-context';
@@ -86,7 +86,7 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
 
     const startDragByDrag = (e: PossibleEvent | undefined, position: Vector2) => startDrag(e, 'drag', position, undefined);
 
-    const drag = useDrag(({ initial, movement, active, event, cancel }) => {
+    const onDrag: Handler<'drag', EventTypes[ 'drag' ]> = ({ initial, movement, active, event, cancel }) => {
         // console.log(entityId, 'move', { movement, initial });
 
         const position: Vector2 = [
@@ -119,11 +119,26 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
                 break;
         }
         cancel();
-    }, {
+    };
+
+    const dragMouse = useDrag(onDrag, {
         enabled,
         delay: 400,
         pointer: {
             // required to avoid drag-end trigger onClick
+            capture: false,
+
+            keys: false,
+            lock: false,
+            touch: false,
+            mouse: false,
+        },
+    });
+
+    const dragTouch = useDrag(onDrag, {
+        enabled,
+        delay: 400,
+        pointer: {
             capture: false,
 
             keys: false,
@@ -133,7 +148,10 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
         },
     });
 
-    const dragListeners = drag();
+    const dragListeners = {
+        ...dragMouse(),
+        ...dragTouch(),
+    };
 
     const useDragFn = <P>(params?: P) => {
         const filteredIds = useFilterStartDragIds(
