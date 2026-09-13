@@ -28,10 +28,30 @@ public class DbSeedingService(IFileIOService fileIOService) : IDbSeedingService
             .AsNoTracking()
             .ToListAsync(cancelToken);
 
+        // drop orphaned PkmFile rows
+        var referencedFilepaths = (await db.Set<PkmVariantEntity>()
+            .AsNoTracking()
+            .Select(variant => variant.Filepath)
+            .ToListAsync(cancelToken))
+            .ToHashSet();
+
+        var orphanedPkmFiles = pkmFiles
+            .Where(pkmFile => !referencedFilepaths.Contains(pkmFile.Filepath))
+            .ToList();
+
+        if (orphanedPkmFiles.Count > 0)
+        {
+            Log.Warning($"Removing {orphanedPkmFiles.Count} orphaned PkmFile DB row(s), no longer referenced by any pkm variant");
+            pkmFilesDb.RemoveRange(orphanedPkmFiles);
+        }
+
+        var pkmFilesToLoad = pkmFiles
+            .Where(pkmFile => referencedFilepaths.Contains(pkmFile.Filepath));
+
         var updatedPkmFiles = new List<PkmFileEntity>(pkmFiles.Count);
         // less performant than Task.WhenAll (1000pkm: 500ms vs 400ms)
         // but avoids CPU spikes
-        foreach (var pkmFile in pkmFiles)
+        foreach (var pkmFile in pkmFilesToLoad)
         {
             updatedPkmFiles.Add(
                 await PkmFileLoader.LoadPkmFile(fileIOService, pkmFile, checkBeforeLoad: false)
