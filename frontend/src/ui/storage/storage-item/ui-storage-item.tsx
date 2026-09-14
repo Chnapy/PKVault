@@ -1,4 +1,4 @@
-import { Checkbox } from '@mantine/core';
+import { Checkbox, useMatches, type MantineSize } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import React from 'react';
 import type { MoveParams } from '../../../storage/move/move-container-fns';
@@ -120,6 +120,11 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
         refRoot,
     );
 
+    const checkboxSize = useMatches<MantineSize>({
+        base: 'xs',
+        sm: 'sm',
+    });
+
     React.useEffect(() => {
         if (selected)
             dragging.ref.current?.scrollIntoView({
@@ -154,7 +159,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
             {(controlProps('select').onClick || checked) && <WithControlsIcons className={classes.checkbox} placement='out' icons={controlIcons('select')}>
                 <Checkbox
-                    size='sm'
+                    size={checkboxSize}
                     checked={checked}
                     {...controlProps('select')}
                 />

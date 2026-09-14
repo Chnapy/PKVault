@@ -161,7 +161,7 @@ export const StoragePanelItems: React.FC = () => {
             style={{
                 position: 'absolute',
                 left: '50%',
-                top: 245,
+                top: `calc(var(--sprite-species-size-multiplier) * ${96 * 2.5}px)`,
                 transform: 'translate(-50%,-50%)',
                 pointerEvents: 'none',
             }}

@@ -67,7 +67,10 @@ public class MatcherUtil
                     baseStr = Path.Combine(baseStr, part);
                 }
                 baseStr = NormalizePath(baseStr);
+
                 glob = glob[(baseStr.Length + 1)..];
+                if (string.IsNullOrWhiteSpace(glob))
+                    glob = "**";
 
                 return (Base: baseStr, RelativeGlob: glob);
             })

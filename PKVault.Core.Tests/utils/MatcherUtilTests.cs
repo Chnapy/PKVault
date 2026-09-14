@@ -138,5 +138,14 @@ public class MatcherUtilTests
             ])
         );
 
+        Assert.Equal(
+            [
+                "/storage/emulated/0/save.srm"
+            ],
+            matcher.SearchPaths([
+                "/storage/emulated/0/"
+            ])
+        );
+
     }
 }

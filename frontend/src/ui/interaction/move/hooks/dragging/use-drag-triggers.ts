@@ -89,6 +89,9 @@ export const useDragTriggers = <C>(entityId: string, containerValue: C, isCurren
     const onDrag: Handler<'drag', EventTypes[ 'drag' ]> = ({ initial, movement, active, event, cancel }) => {
         // console.log(entityId, 'move', { movement, initial });
 
+        if (movement[0] + movement[1] === 0)
+            return;
+
         const position: Vector2 = [
             initial[ 0 ] + movement[ 0 ],
             initial[ 1 ] + movement[ 1 ],
