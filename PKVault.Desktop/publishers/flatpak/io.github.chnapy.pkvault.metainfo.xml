@@ -105,23 +105,23 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.0/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
       <caption>Collection view</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.0/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
       <caption>Dark mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.0/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
       <caption>Pokémon edit</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.0/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
       <caption>Pokédex</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.2.2/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.0/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
       <caption>Saves view</caption>
     </screenshot>
   </screenshots>
@@ -141,6 +141,19 @@
   </developer>
 
   <releases>
+    <release version="2.3.0" date="2026-09-14">
+      <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.3.0</url>
+      <description>
+        <ul>
+          <li>This release was mainly focused on Android and macOS new export.</li>
+          <li>Add translations: Italian.</li>
+          <li>Fix save files conflicts when OT, TID and SID are the same.</li>
+          <li>Fix synchronization broken when baby pkm evolved in save file.</li>
+          <li>Fix some ribbons not displayed.</li>
+          <li>Fix error on pkm loading when it has illegal marking.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.2.2" date="2026-09-01">
       <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.2.2</url>
       <description>
