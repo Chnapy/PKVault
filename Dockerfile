@@ -259,13 +259,22 @@ COPY --from=frontend-publish /app/dist ./PKVault.Mobile/Resources/Raw/wwwroot
 # mobile publish android
 FROM mobile-builder AS mobile-publish-android
 
+ARG RID
+ENV RID=${RID:-android-x64}
+
 RUN apt-get update && apt-get install -y wget tar && rm -rf /var/lib/apt/lists/*
 
 ENV ANDROID_HOME=/tmp/android-sdk
 ENV JAVA_HOME=/tmp/microsoft-jdk
 
-RUN mkdir -p $JAVA_HOME && \
-    wget -qO- https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-linux-x64.tar.gz | \
+RUN set -eux; \
+    case "${RID}" in \
+      android-x64)    JDK_ARCH="x64" ;; \
+      android-arm64)  JDK_ARCH="aarch64" ;; \
+      *) echo "Unsupported RID: ${RID}"; exit 1 ;; \
+    esac; \
+    mkdir -p $JAVA_HOME && \
+    wget -qO- "https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-linux-${JDK_ARCH}.tar.gz" | \
     tar -xzf - -C $JAVA_HOME --strip-components=1
 
 RUN dotnet workload install maui-android
@@ -274,11 +283,13 @@ RUN dotnet tool restore
 
 RUN USER=root USERNAME=root dotnet build "PKVault.Mobile/PKVault.Mobile.csproj" -t:InstallAndroidDependencies -f net10.0-android \
     -p:JavaSdkDirectory=$JAVA_HOME \
-    -p:AndroidSdkDirectory=$ANDROID_HOME
+    -p:AndroidSdkDirectory=$ANDROID_HOME \
+    -p:RuntimeIdentifier=$RID
 
 RUN USER=root USERNAME=root dotnet publish "PKVault.Mobile/PKVault.Mobile.csproj" -f net10.0-android -c Release -o /app/publish \
     -p:JavaSdkDirectory=$JAVA_HOME \
-    -p:AndroidSdkDirectory=$ANDROID_HOME
+    -p:AndroidSdkDirectory=$ANDROID_HOME \
+    -p:RuntimeIdentifier=$RID
 
 RUN ls -la /app/publish
 

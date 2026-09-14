@@ -251,7 +251,7 @@ jobs:
 
       - name: Build Android mobile image & extract app bundle
         run: |
-          docker build . --target mobile-android --build-arg RID=linux-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
+          docker build . --target mobile-android --build-arg RID=android-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
           docker create --name tmp-mobile-android tmp-mobile-android
 
           docker cp tmp-mobile-android:/app/pkvault.apk pkvault-${{ env.VERSION }}-${{ matrix.arch }}.apk
