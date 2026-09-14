@@ -1,4 +1,4 @@
-import { EmptyState, Tabs } from '@mantine/core';
+import { EmptyState, Tabs, useMatches } from '@mantine/core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from "react";
 import { useBackupDelete, useBackupGetAll, useBackupRestore } from '../../data/sdk/backup/backup.gen';
@@ -10,6 +10,7 @@ import { UIBackupList } from '../../ui/settings/backups/ui-backup-list';
 import { UIBackupsTabList } from '../../ui/settings/backups/ui-backups-tab-list';
 import { renderDate, renderTime } from '../../util/render-date-time';
 import { BackupLineForm } from './backup-line-form';
+import type { BackupDTO } from '../../data/sdk/model';
 
 export const SettingsBackupRight: React.FC = () => {
     const { t } = useTranslate();
@@ -37,6 +38,15 @@ export const SettingsBackupRight: React.FC = () => {
     const days = [ ...new Set(sortedBackups.map(backup => backup.createdAtDateStr)) ];
 
     const [ selectedDay, setSelectedDay ] = React.useState(days[ 0 ]);
+
+    const getItemChildren = useMatches({
+        base: (_: BackupDTO): React.ReactNode => null,
+        sm: (backup: BackupDTO) => <BackupLineForm
+            createdAt={backup.createdAt}
+            name={backup.name}
+            disabled={settings?.demoMode}
+        />,
+    });
 
     return <UIBackupList
         header={<UIBackupsTabList
@@ -73,11 +83,7 @@ export const SettingsBackupRight: React.FC = () => {
                 onDelete={() => backupDeleteMutation.mutateAsync({ params: { createdAt: backup.createdAt } })}
                 disabled={settings?.demoMode}
             >
-                <BackupLineForm
-                    createdAt={backup.createdAt}
-                    name={backup.name}
-                    disabled={settings?.demoMode}
-                />
+                {getItemChildren(backup)}
             </UIBackupItem>)}
     </UIBackupList>;
 };

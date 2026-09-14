@@ -1,4 +1,5 @@
 import React from 'react';
+import { DesktopMessageType } from '../../data/sdk/model';
 import { useSettingsGet, useSettingsGetSaveGlobsResults } from '../../data/sdk/settings/settings.gen';
 import { UIGlobsInputItem, type UIGlobsInputItemProps } from '../../ui/form/globs-input/ui-globs-input-item';
 import { UIPathButton } from '../../ui/form/globs-input/ui-path-button';
@@ -51,10 +52,10 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
         hasError={hasError}
         hasWarning={hasWarning}
         isLoading={isLoading}
-        openFolder={desktopMessage && (() => desktopMessage.openFile({
-            type: 'open-folder',
-            isDirectory,
-            path: value,
+        openFolder={desktopMessage.openFile && (() => desktopMessage.openFile!({
+            type: DesktopMessageType.OPEN_FOLDER,
+            directoryOnly: isDirectory,
+            basePath: value,
         }))}
     >
         {props => {
@@ -67,7 +68,7 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
                     uploadPath={uploadPath ?? ''}
                 />;
 
-            if (desktopMessage)
+            if (desktopMessage.fileExplore)
                 return <UIPathButton
                     {...props}
                     value={value}
@@ -81,15 +82,15 @@ export const GlobsInputItem: React.FC<GlobsInputItemProps> = ({ name, value, onC
 
                         const desktopInfos = getDesktopFileTypeInfos(isExclude ? 'exclude' : isDirectory ? 'folder' : 'file');
 
-                        const response = await desktopMessage.fileExplore({
-                            type: 'file-explore',
+                        const response = await desktopMessage.fileExplore!({
+                            type: DesktopMessageType.FILE_EXPLORE,
                             id: desktopInfos.id,
                             directoryOnly: desktopInfos.directoryOnly,
                             basePath,
                             multiselect: false,
                         });
 
-                        const newValue = desktopInfos.getFinalPaths(response.values)[ 0 ];
+                        const newValue = desktopInfos.getFinalPaths(response?.values ?? [])[ 0 ];
                         if (!newValue)
                             return;
 

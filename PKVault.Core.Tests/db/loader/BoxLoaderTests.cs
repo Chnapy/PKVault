@@ -12,6 +12,8 @@ public class BoxLoaderTests : IAsyncDisposable
 
     public BoxLoaderTests()
     {
+        Program.Initialize();
+
         var testId = Guid.NewGuid().ToString();
         dbPath = $"db-{testId}.db";
 

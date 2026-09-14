@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity Name="PKVault" Publisher="CN=chnapy" Version="2.2.2.0" />
+
+  <mp:PhoneIdentity PhoneProductId="372E125F-0FBD-4A5E-9E1F-776A34BA9F4B" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>PKVault</DisplayName>
+    <PublisherDisplayName>Richard Haddad</PublisherDisplayName>
+    <Logo>Resources\Images\Windows\logo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+        DisplayName="PKVault"
+        Description="Centralize all your Pokémon games in one place."
+        Square150x150Logo="Resources\Images\Windows\medium.png"
+        Square44x44Logo="Resources\Images\Windows\icon.png"
+        BackgroundColor="#B6634E">
+        <uap:DefaultTile Wide310x150Logo="Resources\Images\Windows\wide.png" Square310x310Logo="Resources\Images\Windows\large.png"  ShortName="PKVault" Square71x71Logo="Resources\Images\Windows\small.png">
+        </uap:DefaultTile >
+        <uap:SplashScreen Image="Resources\Images\Windows\splash.png"  BackgroundColor="#934E3D"/>
+        <uap:LockScreen BadgeLogo="Resources\Images\Windows\badge.png" Notification="badgeAndTileText"/>
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <Capability Name="internetClient"/>
+  </Capabilities>
+
+</Package>

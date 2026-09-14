@@ -1,6 +1,7 @@
 import { Button } from '@mantine/core';
 import type React from 'react';
 import { WithControlsIcons, type WithControlsIconsProps } from '../../interaction/controls/icons/with-controls-icons';
+import { UIPathLine } from '../../path/ui-path-line';
 import { getPathIcon } from './util/get-path-icon';
 
 export type UIPathButtonProps = {
@@ -14,7 +15,12 @@ export type UIPathButtonProps = {
 export const UIPathButton: React.FC<UIPathButtonProps> = ({ value, pkvaultPath, uploadPath, icons, ...btnProps }) => {
     const icon = getPathIcon(value, false, pkvaultPath, uploadPath);
 
-    return <WithControlsIcons placement='out' icons={icons} style={{ flexGrow: 1, lineBreak: 'anywhere' }}>
+    return <WithControlsIcons placement='out' icons={icons} style={{
+        flexGrow: 1,
+        lineBreak: 'anywhere',
+        flexShrink: 1,
+        overflow: 'hidden',
+    }}>
         <Button
             justify='flex-start'
             size='compact-md'
@@ -28,7 +34,9 @@ export const UIPathButton: React.FC<UIPathButtonProps> = ({ value, pkvaultPath, 
             }}
             {...btnProps}
         >
-            {value}
+            <UIPathLine>
+                {value}
+            </UIPathLine>
         </Button>
     </WithControlsIcons>;
 };

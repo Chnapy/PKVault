@@ -28,7 +28,7 @@
 
     <AssemblyName>PKVault</AssemblyName>
     <ApplicationTitle>PKVault</ApplicationTitle>
-    <ApplicationId>com.chnapy.pkvault</ApplicationId>
+    <ApplicationId>io.github.chnapy.pkvault</ApplicationId>
     <ApplicationIcon>Resources/wwwroot/icon.ico</ApplicationIcon>
     <Product>PKVault</Product>
     <Description>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</Description>

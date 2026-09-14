@@ -202,13 +202,14 @@ jobs:
           echo "TAG=${{ needs.version.outputs.tag }}" >> $GITHUB_ENV
           echo "VERSION=${{ needs.version.outputs.version }}" >> $GITHUB_ENV
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          mkdir -p _export
 
       - name: Build Windows desktop image & extract executable
         run: |
           docker build . --target desktop --build-arg RID=win-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-win
           docker create --name tmp-desktop-win tmp-desktop-win
 
-          docker cp tmp-desktop-win:/app/PKVault.exe PKVault-${{ env.VERSION }}.exe
+          docker cp tmp-desktop-win:/app/PKVault.exe _export/PKVault-${{ env.VERSION }}-${{ matrix.arch }}.exe
 
           docker rm tmp-desktop-win
           docker rmi tmp-desktop-win
@@ -220,17 +221,13 @@ jobs:
           docker build . --target desktop-linux --build-arg RID=linux-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} --build-arg BUILD_DATE=${{ env.BUILD_DATE }} -t tmp-desktop-linux
           docker create --name tmp-desktop-linux tmp-desktop-linux
 
-          docker cp tmp-desktop-linux:/app/PKVault pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
-          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
+          docker cp tmp-desktop-linux:/app/PKVault _export/pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
 
-          docker cp tmp-desktop-linux:/app/PKVault.AppImage pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
-          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
+          docker cp tmp-desktop-linux:/app/PKVault.AppImage _export/pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
 
-          docker cp tmp-desktop-linux:/app/PKVault.deb pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
-          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
+          docker cp tmp-desktop-linux:/app/PKVault.deb _export/pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
 
-          docker cp tmp-desktop-linux:/app/PKVault.flatpak pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
-          chmod +x pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
+          docker cp tmp-desktop-linux:/app/PKVault.flatpak _export/pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
 
           docker rm tmp-desktop-linux
           docker rmi tmp-desktop-linux
@@ -242,10 +239,23 @@ jobs:
           docker build . --target desktop-macos --build-arg RID=osx-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-macos
           docker create --name tmp-desktop-macos tmp-desktop-macos
 
-          docker cp tmp-desktop-macos:/app/pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip
+          docker cp tmp-desktop-macos:/app/pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip _export/pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip
 
           docker rm tmp-desktop-macos
           docker rmi tmp-desktop-macos
+
+          ls -la .
+
+      - name: Build Android mobile image & extract app bundle
+        if: ${{ matrix.arch == 'x64' }}
+        run: |
+          docker build . --target mobile-android --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
+          docker create --name tmp-mobile-android tmp-mobile-android
+
+          docker cp tmp-mobile-android:/app/pkvault.apk _export/pkvault-${{ env.VERSION }}.apk
+
+          docker rm tmp-mobile-android
+          docker rmi tmp-mobile-android
 
           ls -la .
 
@@ -253,13 +263,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: desktop-${{ matrix.arch }}
-          path: |
-            PKVault-${{ env.VERSION }}-${{ matrix.arch }}.exe
-            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.linux
-            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
-            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.flatpak
-            pkvault-${{ env.VERSION }}-${{ matrix.arch }}.deb
-            pkvault-${{ env.VERSION }}-osx-${{ matrix.arch }}.app.zip
+          path: ./_export/
           if-no-files-found: error
           retention-days: 1
 

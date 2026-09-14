@@ -1,4 +1,4 @@
-import { Card, Group, Modal, Text } from '@mantine/core';
+import { Card, Group, Modal, Splitter, Text, useMatches } from '@mantine/core';
 import { InfoIcon } from 'lucide-react';
 import React from 'react';
 import { Route } from '../routes/__root';
@@ -85,16 +85,26 @@ const HelpDialogInner: React.FC = () => {
 
     const finalSelectedPath = `/docs/${language}/${selectedEndPath}`;
 
-    return <FocusScope id='help-dialog' focusOnMount>
-        <div
-            {...controlProps('back')}
-            style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                height: '100%',
-                gap: 8,
-            }}
-        >
+    const getResponsiveContent = useMatches({
+        base: () => <Splitter w='100%' h='calc(100vh - 160px)'>
+            <Splitter.Pane defaultSize='10px' max='200px' min='10px'>
+                <HelpDialogMenu
+                    finalSelectedPath={finalSelectedPath}
+                />
+            </Splitter.Pane>
+
+            <Splitter.Pane defaultSize={100}>
+                <Card h='stretch' style={{ flexGrow: 1, overflowY: 'scroll' }}>
+                    <HelpDialogContent
+                        selectedEndPath={selectedEndPath}
+                        finalSelectedPath={finalSelectedPath}
+                        anchor={helpAnchor}
+                        slugs={[ ...menuItem.slugs ]}
+                    />
+                </Card>
+            </Splitter.Pane>
+        </Splitter>,
+        sm: () => <>
             <div
                 style={{
                     position: 'sticky',
@@ -116,6 +126,20 @@ const HelpDialogInner: React.FC = () => {
                     slugs={[ ...menuItem.slugs ]}
                 />
             </Card>
+        </>,
+    });
+
+    return <FocusScope id='help-dialog' focusOnMount>
+        <div
+            {...controlProps('back')}
+            style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                height: '100%',
+                gap: 8,
+            }}
+        >
+            {getResponsiveContent()}
         </div>
     </FocusScope>;
 };

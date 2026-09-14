@@ -2,7 +2,7 @@
     --frame-border-width: 4px;
 
     position: relative;
-    height: 100vh;
+    height: 100%;
     border-width: var(--frame-border-width);
     border-style: solid;
     border-color: var(--mantine-color-primary-6);

@@ -4,6 +4,11 @@ using PKVault.Core.OpenApi;
 
 public class CoreRouterTests
 {
+    public CoreRouterTests()
+    {
+        Program.Initialize();
+    }
+
     [Fact]
     public void NoRoutesDuplicates()
     {

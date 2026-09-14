@@ -1,10 +1,11 @@
+import React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import type { ControlsWithFalsy } from '../../controls/provider/controls-context';
 import type { UseDraggingReturn } from '../../move/hooks/use-dragging';
 import type { UseDroppableReturn } from '../../move/hooks/use-droppable';
 
 type Params = {
-    dragging?: Pick<UseDraggingReturn, 'isDragging' | 'stopDrag' | 'onPointerDown'>;
+    dragging?: Pick<UseDraggingReturn, 'isDragging' | 'stopDrag' | 'onPointerDown' | 'onTouchStart'>;
     draggingMove?: ReturnType<UseDraggingReturn[ 'useDrag' ]>;
     draggingMoveAttached?: ReturnType<UseDraggingReturn[ 'useDrag' ]>;
     droppable?: Pick<UseDroppableReturn, 'isDroppable' | 'stopDrag' | 'onDrop' | 'canDrop'>;
@@ -49,7 +50,7 @@ export const useDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
                 mouse: {
                     type: 'mouse',
                     values: [ 'drag' ],
-                    listeners: [ 'onPointerDown' ],
+                    listeners: [ 'onPointerDown', 'onTouchStart' ],
                 },
                 keyboard: {
                     type: 'keyboard',
@@ -63,7 +64,10 @@ export const useDragControls = ({ dragging, draggingMove, draggingMoveAttached, 
             action: (e, trigger) => {
                 switch (trigger) {
                     case 'mouse': {
-                        dragging.onPointerDown?.(e);
+                        if ((e as Partial<React.BaseSyntheticEvent>).type === 'touchstart')
+                            dragging.onTouchStart?.(e);
+                        else
+                            dragging.onPointerDown?.(e);
                         break;
                     }
                     default: {

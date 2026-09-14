@@ -1,6 +1,7 @@
 import React from 'react';
 import { GameVersion } from '../data/sdk/model';
 import { useSettingsGet } from '../data/sdk/settings/settings.gen';
+import { withErrorCatcher } from '../error/with-error-catcher';
 import { getGameInfos } from '../pokedex/details/util/get-game-infos';
 import { useTranslate } from '../translate/i18n';
 import { iconResources } from '../ui/icon/resources/icon-resources';
@@ -19,7 +20,7 @@ const imgsToPrefetch = [
  * Display splash screen until whole data is loaded without error.
  * If first start, ask for app language.
  */
-export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const SplashMain: React.FC<React.PropsWithChildren> = withErrorCatcher('default', ({ children }) => {
     const [ appStartTime ] = React.useState(() => Date.now());
 
     const settingsQuery = useSettingsGet();
@@ -36,6 +37,9 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
             i18n.changeLanguage(language);
         }
     }, [ shouldUpdateLanguage, i18n, language ]);
+
+    if (settingsQuery.error instanceof Error)
+        throw settingsQuery.error;
 
     const prefetchNode = <div aria-description='prefetch' style={{ width: 0, height: 0 }}>
         {imgsToPrefetch.map(url => <ImgPrefetch
@@ -55,4 +59,4 @@ export const SplashMain: React.FC<React.PropsWithChildren> = ({ children }) => {
 
         {prefetchNode}
     </SplashData>;
-};
+});

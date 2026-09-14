@@ -1,4 +1,4 @@
-import { Button, Combobox, Group, Loader, useCombobox, type ElementProps } from '@mantine/core';
+import { Button, Combobox, Group, Loader, useCombobox, useMatches, type ElementProps } from '@mantine/core';
 import { AlertTriangleIcon, ChevronDownIcon, FileIcon, SearchIcon } from 'lucide-react';
 import React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
@@ -22,10 +22,16 @@ export const UIGlobsFileList: React.FC<UIGlobsFileListProps> = ({
 
     const combobox = useCombobox();
 
+    const width = useMatches({
+        base: 'calc(100vw - 10px)',
+        sm: undefined
+    });
+
     return <Combobox
         store={combobox}
         floatingHeight="viewport"
         position='bottom-end'
+        width={width}
     >
         <Combobox.Target>
             <WithControlsIcons placement='out' icons={icons}>
@@ -37,7 +43,7 @@ export const UIGlobsFileList: React.FC<UIGlobsFileListProps> = ({
                     loading={isLoading}
                     leftSection={<FileIcon />}
                     rightSection={hasWarning ? <AlertTriangleIcon /> : <ChevronDownIcon />}
-                    miw={80}
+                    miw={70}
                     styles={{
                         label: {
                             flexGrow: 1,

@@ -26,7 +26,7 @@ public class PkmFileLoader : IPkmFileLoader
 
     public static async Task<PkmFileEntity> LoadPkmFile(IFileIOService fileIOService, PkmFileEntity pkmFile, bool checkBeforeLoad)
     {
-        var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFile.Filepath);
+        var filepath = Path.Combine(Directory.GetCurrentDirectory(), pkmFile.Filepath);
 
         try
         {
@@ -47,7 +47,7 @@ public class PkmFileLoader : IPkmFileLoader
 
             pkmFile.Data = await fileIOService.ReadBytes(filepath);
             pkmFile.Error = null;
-            
+
             // optimistic check, to avoid multiple file access
             (TooSmall, TooBig) = fileIOService.CheckGameFile(pkmFile.Data.Length);
 
@@ -115,7 +115,7 @@ public class PkmFileLoader : IPkmFileLoader
         var error = pkm.LoadError;
 
         var entity = await GetAttachedEntity(filepath);
-        
+
         entity.Data = data;
         entity.Error = error;
         entity.Updated = updated;
@@ -163,7 +163,7 @@ public class PkmFileLoader : IPkmFileLoader
 
         pkmFilesToDelete.ForEach(pkmFileToDelete =>
         {
-            var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFileToDelete.Filepath);
+            var filepath = Path.Combine(Directory.GetCurrentDirectory(), pkmFileToDelete.Filepath);
             fileIOService.Delete(filepath);
         });
 
@@ -176,7 +176,7 @@ public class PkmFileLoader : IPkmFileLoader
 
         pkmFilesToUpdate.ForEach(pkmFileToUpdate =>
         {
-            var filepath = Path.Combine(SettingsService.GetAppDirectory(), pkmFileToUpdate.Filepath);
+            var filepath = Path.Combine(Directory.GetCurrentDirectory(), pkmFileToUpdate.Filepath);
             fileIOService.WriteBytes(filepath, pkmFileToUpdate.Data);
         });
 

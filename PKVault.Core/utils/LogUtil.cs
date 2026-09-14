@@ -12,12 +12,12 @@ public class LogUtil
 {
     public static readonly LogLevel DBLogLevel = LogLevel.Warning;
 
-    public static void Initialize()
+    public static void Initialize(LoggerConfiguration? config = null)
     {
-        var logDirectoryPath = Path.Combine(SettingsService.GetAppDirectory(), "logs");
+        var logDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "logs");
         var logFilepath = Path.Combine(logDirectoryPath, $"pkvault-.log");
 
-        Log.Logger = new LoggerConfiguration()
+        Log.Logger = (config ?? new LoggerConfiguration())
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -28,8 +28,8 @@ public class LogUtil
             // .Enrich.WithThreadName()
             .WriteTo.Console(
                 restrictedToMinimumLevel: LogEventLevel.Verbose
-                // theme: AnsiConsoleTheme.Code
-                // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+            // theme: AnsiConsoleTheme.Code
+            // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
             .WriteTo.File(logFilepath,
                 rollingInterval: RollingInterval.Day,
@@ -37,7 +37,7 @@ public class LogUtil
                 retainedFileCountLimit: EnvUtil.LOG_FILE_COUNT_LIMIT ?? 10,
                 fileSizeLimitBytes: 10_485_760, // 10MB
                 flushToDiskInterval: TimeSpan.FromSeconds(5)
-                // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+            // outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
             .CreateLogger();
     }
@@ -56,20 +56,20 @@ public static class LoggerExtension
     {
         return new Operation(
             log: (logLevel, message, args) => logger.Write((LogEventLevel)logLevel, message, args),
-            messageTemplate, 
-            args, 
+            messageTemplate,
+            args,
             LogLevel.Information,
             TimeSpan.FromMilliseconds(150)
         ).Begin();
     }
-    
+
     [MessageTemplateFormatMethod("messageTemplate")]
     public static IDisposable Time(this Microsoft.Extensions.Logging.ILogger logger, string messageTemplate, params object[] args)
     {
         return new Operation(
             log: (logLevel, message, args) => logger.Log(logLevel, message, args),
-            messageTemplate, 
-            args, 
+            messageTemplate,
+            args,
             LogLevel.Information,
             TimeSpan.FromMilliseconds(150)
         ).Begin();
@@ -126,8 +126,8 @@ public class Operation(
     {
         log(
             completionLevel,
-            GetBeginMessage(messageTemplate), 
-            [..args, "started"]
+            GetBeginMessage(messageTemplate),
+            [.. args, "started"]
         );
         return this;
     }
@@ -162,7 +162,7 @@ public class Operation(
 
         log(
             level,
-            $"{GetEndMessage(messageTemplate)} {{{nameof(Properties.Outcome)}}} in {{{nameof(Properties.Elapsed)}:0.0}} ms", 
+            $"{GetEndMessage(messageTemplate)} {{{nameof(Properties.Outcome)}}} in {{{nameof(Properties.Elapsed)}:0.0}} ms",
             [.. args, outcome, elapsed]
         );
 

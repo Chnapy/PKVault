@@ -1,4 +1,4 @@
-import { getSingleElementChild, Menu, Paper } from '@mantine/core';
+import { getSingleElementChild, Menu, Paper, useMatches } from '@mantine/core';
 import React from 'react';
 import type { FocusScopeId } from '../../../focus/provider/focus-context';
 import { popoverContext, type PopoverContext } from './context/popover-context';
@@ -25,6 +25,16 @@ export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setO
 
     const [ scopeId ] = React.useState((): FocusScopeId => `menu_${Math.random()}`);
 
+    const dropdownStyle = useMatches<React.CSSProperties>({
+        base: {
+            left: 4,
+            right: 4,
+            top: 62 + 4,
+            width: 'initial',
+        },
+        sm: {},
+    });
+
     const targetEl = getSingleElementChild(target);
     if (targetEl
         && targetEl.props && typeof targetEl.props === 'object'
@@ -44,7 +54,14 @@ export const MenuWithControls: React.FC<MenuWithControlsProps> = ({ opened, setO
                 {target}
             </Menu.Target>
 
-            <Menu.Dropdown component={Paper} {...dropdownProps}>
+            <Menu.Dropdown
+                component={Paper}
+                {...dropdownProps}
+                style={{
+                    ...dropdownStyle,
+                    ...dropdownProps?.style,
+                }}
+            >
                 <PopoverDropdownWithControls scopeId={scopeId} focusOnMount={focusOnMount}>
                     {dropdown}
                 </PopoverDropdownWithControls>

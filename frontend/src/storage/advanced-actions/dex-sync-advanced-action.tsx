@@ -110,7 +110,6 @@ export const DexSyncAdvancedAction: React.FC<{
       searchable
       comboboxProps={{
         withinPortal: false,
-        position: 'left-start',
         floatingHeight: "viewport"
       }}
       floatingHeight="viewport"

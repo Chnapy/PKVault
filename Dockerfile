@@ -7,6 +7,7 @@ WORKDIR /src
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
+COPY [".config", ".config"]
 COPY ["Directory.Build.props", "."]
 COPY ["PKVault.Core/PKVault.Core.csproj", "PKVault.Core/"]
 
@@ -21,9 +22,6 @@ FROM core-builder AS backend-builder
 
 WORKDIR /src
 
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-
-COPY ["Directory.Build.props", "."]
 COPY ["PKVault.Backend/PKVault.Backend.csproj", "PKVault.Backend/"]
 
 RUN dotnet restore "PKVault.Backend/PKVault.Backend.csproj"
@@ -35,7 +33,6 @@ RUN dotnet build "PKVault.Backend/PKVault.Backend.csproj"
 # core test
 FROM core-builder AS core-test
 
-COPY ["Directory.Build.props", "."]
 COPY ["PKVault.Core.Tests/PKVault.Core.Tests.csproj", "PKVault.Core.Tests/"]
 
 RUN dotnet restore "PKVault.Core.Tests/PKVault.Core.Tests.csproj"
@@ -248,6 +245,48 @@ COPY --from=desktop-publish-linux-flatpak /app/publish-final/ /tmp/flatpak/
 RUN mkdir -p /app && \
   cp /tmp/raw/* /tmp/appimage/* /tmp/deb/* /tmp/flatpak/* /app/ && \
   ls -la /app/
+
+# mobile builder
+FROM core-builder AS mobile-builder
+
+WORKDIR /src
+
+# COPY ["PKVault.Mobile/PKVault.Mobile.csproj", "PKVault.Mobile/"]
+
+COPY ./PKVault.Mobile ./PKVault.Mobile
+COPY --from=frontend-publish /app/dist ./PKVault.Mobile/Resources/Raw/wwwroot
+
+# mobile publish android
+FROM mobile-builder AS mobile-publish-android
+
+RUN apt-get update && apt-get install -y wget tar && rm -rf /var/lib/apt/lists/*
+
+ENV ANDROID_HOME=/tmp/android-sdk
+ENV JAVA_HOME=/tmp/microsoft-jdk
+
+RUN mkdir -p $JAVA_HOME && \
+    wget -qO- https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-linux-x64.tar.gz | \
+    tar -xzf - -C $JAVA_HOME --strip-components=1
+
+RUN dotnet workload install maui-android
+
+RUN dotnet tool restore
+
+RUN USER=root USERNAME=root dotnet build "PKVault.Mobile/PKVault.Mobile.csproj" -t:InstallAndroidDependencies -f net10.0-android \
+    -p:JavaSdkDirectory=$JAVA_HOME \
+    -p:AndroidSdkDirectory=$ANDROID_HOME
+
+RUN USER=root USERNAME=root dotnet publish "PKVault.Mobile/PKVault.Mobile.csproj" -f net10.0-android -c Release -o /app/publish \
+    -p:JavaSdkDirectory=$JAVA_HOME \
+    -p:AndroidSdkDirectory=$ANDROID_HOME
+
+RUN ls -la /app/publish
+
+FROM alpine:latest AS mobile-android
+
+COPY --from=mobile-publish-android /app/publish/io.github.chnapy.pkvault-Signed.apk /app/pkvault.apk
+
+RUN ls -la /app
 
 # monolith: backend & frontend
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS monolith

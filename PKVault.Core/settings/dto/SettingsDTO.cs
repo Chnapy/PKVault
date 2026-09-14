@@ -12,8 +12,14 @@ public record SettingsDTO(
     string AppDirectory,
     string SettingsPath,
     string UserId,
+    bool IsDesktop,
+    string? UpdateUrl,
     bool CanUpdateSettings,
     bool CanScanSaves,
+    bool CanUploadSaves,
+    bool CanDeleteSaves,
+    bool CanOpenFolder,
+    bool CanUseDesktopFileExplorer,
     bool DemoMode,
     SettingsMutableDTO SettingsMutable
 )
@@ -52,7 +58,7 @@ public record SettingsDTO(
     }
 
     private static string NormalizeSafePath(string path) => MatcherUtil.NormalizePath(Path.Combine(
-        SettingsService.GetAppDirectory(),
+        Directory.GetCurrentDirectory(),
         path
     ));
 }
@@ -78,6 +84,7 @@ public enum RuntimeSystem
     LINUX,
     STEAMDECK,
     MACOS,
+    ANDROID,
 }
 
 public enum SourceProvider

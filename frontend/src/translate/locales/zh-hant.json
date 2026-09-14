@@ -254,6 +254,7 @@
   "settings.sub.controls-label": "變更分類",
   "settings.sub.external": "外部 PKM",
   "settings.sub.main": "主要設定",
+  "settings.system.android": "Android",
   "settings.system.linux": "Linux 桌面版",
   "settings.system.macos": "macOS 桌面版",
   "settings.system.steamdeck": "Steam Deck",

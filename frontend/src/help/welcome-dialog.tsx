@@ -66,7 +66,7 @@ const WelcomeDialogInner: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
     const finalSelectedPath = `/docs/${language}/${selectedEndPath}`;
 
-    return <FocusScope id='welcome-dialog' focusOnMount>
+    return <FocusScope id='welcome-dialog' focusOnMount restoreMode='none'>
         <Stack {...controlProps('back')}>
             <Card>
                 {t('welcome.head.1')}

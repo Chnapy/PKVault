@@ -5,27 +5,32 @@ using PKVault.Core;
 
 public class PkmConvertServiceTests
 {
-    private static readonly byte[] pikachuForwardBytes = File.ReadAllBytes("./assets/pikachu-front.pk1");
+    public PkmConvertServiceTests()
+    {
+        Program.Initialize();
+    }
+
+    private static readonly byte[] pikachuForwardBytes = File.ReadAllBytes(Path.Combine(Program.InitialCurrentDirectory, "./assets/pikachu-front.pk1"));
     private static readonly Dictionary<string, object> pikachuForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/pikachu-front-expected.json")
+        File.ReadAllText(Path.Combine(Program.InitialCurrentDirectory, "./assets/pikachu-front-expected.json"))
     )!;
 
-    private static readonly byte[] pikachuBackwardBytes = File.ReadAllBytes("./assets/pikachu-back.pa9");
+    private static readonly byte[] pikachuBackwardBytes = File.ReadAllBytes(Path.Combine(Program.InitialCurrentDirectory, "./assets/pikachu-back.pa9"));
     private static readonly Dictionary<string, object> pikachuBackwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/pikachu-back-expected.json")
+        File.ReadAllText(Path.Combine(Program.InitialCurrentDirectory, "./assets/pikachu-back-expected.json"))
     )!;
 
-    private static readonly byte[] bizarreForwardBytes = File.ReadAllBytes("./assets/bizarre-front.pk2");
+    private static readonly byte[] bizarreForwardBytes = File.ReadAllBytes(Path.Combine(Program.InitialCurrentDirectory, "./assets/bizarre-front.pk2"));
     private static readonly Dictionary<string, object> bizarreForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/bizarre-front-expected.json")
+        File.ReadAllText(Path.Combine(Program.InitialCurrentDirectory, "./assets/bizarre-front-expected.json"))
     )!;
     private static readonly Dictionary<string, object> bizarreVariantBackwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/bizarre-variant-back-expected.json")
+        File.ReadAllText(Path.Combine(Program.InitialCurrentDirectory, "./assets/bizarre-variant-back-expected.json"))
     )!;
 
-    private static readonly byte[] mukForwardBytes = File.ReadAllBytes("./assets/muk-front.pk3");
+    private static readonly byte[] mukForwardBytes = File.ReadAllBytes(Path.Combine(Program.InitialCurrentDirectory, "./assets/muk-front.pk3"));
     private static readonly Dictionary<string, object> mukForwardExpectedData = JsonSerializer.Deserialize<Dictionary<string, object>>(
-        File.ReadAllText("./assets/muk-front-expected.json")
+        File.ReadAllText(Path.Combine(Program.InitialCurrentDirectory, "./assets/muk-front-expected.json"))
     )!;
 
     private static bool pkFolderCleaned = false;
@@ -36,7 +41,9 @@ public class PkmConvertServiceTests
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
             BuildID: default, RuntimeSystem: RuntimeSystem.LINUX, SourceProvider: SourceProvider.GithubRelease, FlatpakMigrated: false,
             Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
-            CanUpdateSettings: false, CanScanSaves: false, DemoMode: false, SettingsMutable: new(
+            IsDesktop: false, UpdateUrl: null, CanUpdateSettings: false, CanScanSaves: false, DemoMode: false,
+            CanUploadSaves: true, CanDeleteSaves: true, CanOpenFolder: true, CanUseDesktopFileExplorer: true,
+            SettingsMutable: new(
                 DB_PATH: "", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "", BACKUP_PATH: "",
                 LANGUAGE: "fr", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false
             )

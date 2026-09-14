@@ -5,24 +5,24 @@ namespace PKVault.Core;
 
 public interface ICoreResponse
 {
-    int? StatusCode { get; }
-    string? ContentType { get; }
-    Dictionary<string, StringValues>? Header { get; }
+    int StatusCode { get; }
+    string ContentType { get; }
+    Dictionary<string, string> Header { get; }
 }
 
 public record CoreJSONResponse(
     object? Data,
-    int? StatusCode = null,
-    string? ContentType = null,
-    Dictionary<string, StringValues>? Header = null
+    int StatusCode,
+    string ContentType,
+    Dictionary<string, string> Header
 ) : ICoreResponse;
 
 public record CoreFileResponse(
     CoreFile File,
-    int? StatusCode = null,
-    string? ContentType = null,
-    DateTimeOffset? LastModified = null,
-    Dictionary<string, StringValues>? Header = null
+    int StatusCode,
+    string ContentType,
+    Dictionary<string, string> Header,
+    DateTimeOffset? LastModified = null
 ) : ICoreResponse;
 
 public record CoreFile(

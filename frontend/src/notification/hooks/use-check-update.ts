@@ -34,6 +34,7 @@ export const useCheckUpdate = (): string | undefined => {
                 draft: boolean;
                 prerelease: boolean;
             }> | undefined>(res => res.json()),
+        enabled: !!settingsQuery.data?.data.updateUrl,
     });
 
     if (!updateQuery.data?.name || !settingsQuery.data) {
