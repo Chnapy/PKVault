@@ -159,7 +159,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         : null;
     public Dictionary<string, byte>? Ribbons => Format > 2 && Pkm is not PB7
         ? RibbonInfo.GetRibbonInfo(Pkm)
-            .Where(ribbon => ribbon.HasRibbon)
+            .Where(ribbon => ribbon.HasRibbon || (ribbon.Type == RibbonValueType.Byte && ribbon.RibbonCount > 0))
             .ToDictionary(
                 p => p.Name,
                 p => p.Type == RibbonValueType.Byte

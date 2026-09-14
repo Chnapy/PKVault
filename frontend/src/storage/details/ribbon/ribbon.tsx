@@ -11,11 +11,12 @@ export const Ribbon: React.FC<RibbonProps> = ({ name, count }) => {
     const staticData = useStaticData();
 
     const ribbon = staticData.ribbons[ name ];
-    if (!ribbon)
+    const spriteKey = ribbon?.sprites[ count ];
+    if (!spriteKey)
         return null;
 
     return <UIRibbon
-        spriteKey={ribbon.spriteKey}
+        spriteKey={spriteKey}
         name={ribbon.name}
         count={count}
     />;

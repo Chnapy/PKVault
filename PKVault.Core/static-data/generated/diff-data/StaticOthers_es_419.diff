@@ -1,2 +1,1545 @@
 --- This file displays changes of StaticOthers_es-419 compressed file from previous changes
 
+--- ..\PKVault.Core\static-data\generated\diff-data\StaticOthers_es_419.diff
++++ ..\PKVault.Core\static-data\generated\diff-data\StaticOthers_es_419.diff
+@@ -45844,823 +45844,1212 @@
+   "ribbons": {
+     "RibbonAbility": {
+       "key": "RibbonAbility",
+-      "spriteKey": "ribbonability",
+-      "name": "Habilidad"
++      "name": "Habilidad",
++      "sprites": {
++        "1": "ribbonability"
++      }
+     },
+     "RibbonAbilityDouble": {
+       "key": "RibbonAbilityDouble",
+-      "spriteKey": "ribbonabilitydouble",
+-      "name": "Doble Habilidad"
++      "name": "Doble Habilidad",
++      "sprites": {
++        "1": "ribbonabilitydouble"
++      }
+     },
+     "RibbonAbilityGreat": {
+       "key": "RibbonAbilityGreat",
+-      "spriteKey": "ribbonabilitygreat",
+-      "name": "Gran Habilidad"
++      "name": "Gran Habilidad",
++      "sprites": {
++        "1": "ribbonabilitygreat"
++      }
+     },
+     "RibbonAbilityMulti": {
+       "key": "RibbonAbilityMulti",
+-      "spriteKey": "ribbonabilitymulti",
+-      "name": "Habilidad Múltiple"
++      "name": "Habilidad Múltiple",
++      "sprites": {
++        "1": "ribbonabilitymulti"
++      }
+     },
+     "RibbonAbilityPair": {
+       "key": "RibbonAbilityPair",
+-      "spriteKey": "ribbonabilitypair",
+-      "name": "Habilidad Par"
++      "name": "Habilidad Par",
++      "sprites": {
++        "1": "ribbonabilitypair"
++      }
+     },
+     "RibbonAbilityWorld": {
+       "key": "RibbonAbilityWorld",
+-      "spriteKey": "ribbonabilityworld",
+-      "name": "Hablildad Mundial"
++      "name": "Hablildad Mundial",
++      "sprites": {
++        "1": "ribbonabilityworld"
++      }
+     },
+     "RibbonAlert": {
+       "key": "RibbonAlert",
+-      "spriteKey": "ribbonalert",
+-      "name": "Alerta"
++      "name": "Alerta",
++      "sprites": {
++        "1": "ribbonalert"
++      }
+     },
+     "RibbonArtist": {
+       "key": "RibbonArtist",
+-      "spriteKey": "ribbonartist",
+-      "name": "Artista"
++      "name": "Artista",
++      "sprites": {
++        "1": "ribbonartist"
++      }
+     },
+     "RibbonBattlerExpert": {
+       "key": "RibbonBattlerExpert",
+-      "spriteKey": "ribbonbattlerexpert",
+-      "name": "As del Combate"
++      "name": "As del Combate",
++      "sprites": {
++        "1": "ribbonbattlerexpert"
++      }
+     },
+     "RibbonBattleRoyale": {
+       "key": "RibbonBattleRoyale",
+-      "spriteKey": "ribbonbattleroyale",
+-      "name": "Maestro Batalla Royale"
++      "name": "Maestro Batalla Royale",
++      "sprites": {
++        "1": "ribbonbattleroyale"
++      }
+     },
+     "RibbonBattlerSkillful": {
+       "key": "RibbonBattlerSkillful",
+-      "spriteKey": "ribbonbattlerskillful",
+-      "name": "Figura del Combate"
++      "name": "Figura del Combate",
++      "sprites": {
++        "1": "ribbonbattlerskillful"
++      }
+     },
+     "RibbonBattleTreeGreat": {
+       "key": "RibbonBattleTreeGreat",
+-      "spriteKey": "ribbonbattletreegreat",
+-      "name": "As del Árbol"
++      "name": "As del Árbol",
++      "sprites": {
++        "1": "ribbonbattletreegreat"
++      }
+     },
+     "RibbonBattleTreeMaster": {
+       "key": "RibbonBattleTreeMaster",
+-      "spriteKey": "ribbonbattletreemaster",
+-      "name": "Maestro del Árbol"
++      "name": "Maestro del Árbol",
++      "sprites": {
++        "1": "ribbonbattletreemaster"
++      }
+     },
+     "RibbonBestFriends": {
+       "key": "RibbonBestFriends",
+-      "spriteKey": "ribbonbestfriends",
+-      "name": "Amistad"
++      "name": "Amistad",
++      "sprites": {
++        "1": "ribbonbestfriends"
++      }
+     },
+     "RibbonBirthday": {
+       "key": "RibbonBirthday",
+-      "spriteKey": "ribbonbirthday",
+-      "name": "Cumpleaños"
++      "name": "Cumpleaños",
++      "sprites": {
++        "1": "ribbonbirthday"
++      }
+     },
+     "RibbonCareless": {
+       "key": "RibbonCareless",
+-      "spriteKey": "ribboncareless",
+-      "name": "Descuido"
++      "name": "Descuido",
++      "sprites": {
++        "1": "ribboncareless"
++      }
+     },
+     "RibbonChampionAlola": {
+       "key": "RibbonChampionAlola",
+-      "spriteKey": "ribbonchampionalola",
+-      "name": "Campeón de Alola"
++      "name": "Campeón de Alola",
++      "sprites": {
++        "1": "ribbonchampionalola"
++      }
+     },
+     "RibbonChampionBattle": {
+       "key": "RibbonChampionBattle",
+-      "spriteKey": "ribbonchampionbattle",
+-      "name": "Campeón de Torneo"
++      "name": "Campeón de Torneo",
++      "sprites": {
++        "1": "ribbonchampionbattle"
++      }
+     },
+     "RibbonChampionG3": {
+       "key": "RibbonChampionG3",
+-      "spriteKey": "ribbonchampiong3",
+-      "name": "Campeón (Gen3)"
++      "name": "Campeón (Gen3)",
++      "sprites": {
++        "1": "ribbonchampiong3"
++      }
+     },
+     "RibbonChampionG6Hoenn": {
+       "key": "RibbonChampionG6Hoenn",
+-      "spriteKey": "ribbonchampiong6hoenn",
+-      "name": "Campeón de Hoenn (ROZA)"
++      "name": "Campeón de Hoenn (ROZA)",
++      "sprites": {
++        "1": "ribbonchampiong6hoenn"
++      }
+     },
+     "RibbonChampionGalar": {
+       "key": "RibbonChampionGalar",
+-      "spriteKey": "ribbonchampiongalar",
+-      "name": "Campeón de Galar"
++      "name": "Campeón de Galar",
++      "sprites": {
++        "1": "ribbonchampiongalar"
++      }
+     },
+     "RibbonChampionKalos": {
+       "key": "RibbonChampionKalos",
+-      "spriteKey": "ribbonchampionkalos",
+-      "name": "Campeón de Kalos"
++      "name": "Campeón de Kalos",
++      "sprites": {
++        "1": "ribbonchampionkalos"
++      }
+     },
+     "RibbonChampionNational": {
+       "key": "RibbonChampionNational",
+-      "spriteKey": "ribbonchampionnational",
+-      "name": "Campeón Nacional"
++      "name": "Campeón Nacional",
++      "sprites": {
++        "1": "ribbonchampionnational"
++      }
+     },
+     "RibbonChampionPaldea": {
+       "key": "RibbonChampionPaldea",
+-      "spriteKey": "ribbonchampionpaldea",
+-      "name": "Campeón de Paldea"
++      "name": "Campeón de Paldea",
++      "sprites": {
++        "1": "ribbonchampionpaldea"
++      }
+     },
+     "RibbonChampionRegional": {
+       "key": "RibbonChampionRegional",
+-      "spriteKey": "ribbonchampionregional",
+-      "name": "Campeón de Área"
++      "name": "Campeón de Área",
++      "sprites": {
++        "1": "ribbonchampionregional"
++      }
+     },
+     "RibbonChampionSinnoh": {
+       "key": "RibbonChampionSinnoh",
+-      "spriteKey": "ribbonchampionsinnoh",
+-      "name": "Campeón de Sinnoh"
++      "name": "Campeón de Sinnoh",
++      "sprites": {
++        "1": "ribbonchampionsinnoh"
++      }
+     },
+     "RibbonChampionWorld": {
+       "key": "RibbonChampionWorld",
+-      "spriteKey": "ribbonchampionworld",
+-      "name": "Campeón Mundial"
++      "name": "Campeón Mundial",
++      "sprites": {
++        "1": "ribbonchampionworld"
++      }
+     },
+     "RibbonClassic": {
+       "key": "RibbonClassic",
+-      "spriteKey": "ribbonclassic",
+-      "name": "Clásica"
++      "name": "Clásica",
++      "sprites": {
++        "1": "ribbonclassic"
++      }
+     },
+     "RibbonContestStar": {
+       "key": "RibbonContestStar",
+-      "spriteKey": "ribbonconteststar",
+-      "name": "Estelar de Concursos"
++      "name": "Estelar de Concursos",
++      "sprites": {
++        "1": "ribbonconteststar"
++      }
+     },
+     "RibbonCountG3Beauty": {
+       "key": "RibbonCountG3Beauty",
+-      "spriteKey": "ribbong3beauty",
+-      "name": "Belleza"
++      "name": "Belleza",
++      "sprites": {
++        "1": "ribbong3beauty",
++        "2": "ribbong3beautysuper",
++        "3": "ribbong3beautyhyper",
++        "4": "ribbong3beautymaster"
++      }
+     },
+     "RibbonCountG3Cool": {
+       "key": "RibbonCountG3Cool",
+-      "spriteKey": "ribbong3cool",
+-      "name": "Carisma"
++      "name": "Carisma",
++      "sprites": {
++        "1": "ribbong3cool",
++        "2": "ribbong3coolsuper",
++        "3": "ribbong3coolhyper",
++        "4": "ribbong3coolmaster"
++      }
+     },
+     "RibbonCountG3Cute": {
+       "key": "RibbonCountG3Cute",
+-      "spriteKey": "ribbong3cute",
+-      "name": "Dulzura"
++      "name": "Dulzura",
++      "sprites": {
++        "1": "ribbong3cute",
++        "2": "ribbong3cutesuper",
++        "3": "ribbong3cutehyper",
++        "4": "ribbong3cutemaster"
++      }
+     },
+     "RibbonCountG3Smart": {
+       "key": "RibbonCountG3Smart",
+-      "spriteKey": "ribbong3smart",
+-      "name": "Ingenio"
++      "name": "Ingenio",
++      "sprites": {
++        "1": "ribbong3smart",
++        "2": "ribbong3smartsuper",
++        "3": "ribbong3smarthyper",
++        "4": "ribbong3smartmaster"
++      }
+     },
+     "RibbonCountG3Tough": {
+       "key": "RibbonCountG3Tough",
+-      "spriteKey": "ribbong3tough",
+-      "name": "Solidez"
++      "name": "Solidez",
++      "sprites": {
++        "1": "ribbong3tough",
++        "2": "ribbong3toughsuper",
++        "3": "ribbong3toughhyper",
++        "4": "ribbong3toughmaster"
++      }
+     },
+     "RibbonCountMemoryBattle": {
+       "key": "RibbonCountMemoryBattle",
+-      "spriteKey": "ribboncountmemorybattle",
+-      "name": "Recuerdo de Combate"
++      "name": "Recuerdo de Combate",
++      "sprites": {
++        "1": "ribboncountmemorybattle",
++        "2": "ribboncountmemorybattle",
++        "3": "ribboncountmemorybattle",
++        "4": "ribboncountmemorybattle",
++        "5": "ribboncountmemorybattle",
++        "6": "ribboncountmemorybattle",
++        "7": "ribboncountmemorybattle",
++        "8": "ribboncountmemorybattle2"
++      }
+     },
+     "RibbonCountMemoryContest": {
+       "key": "RibbonCountMemoryContest",
+-      "spriteKey": "ribboncountmemorycontest",
+-      "name": "Recuerdo de Concurso"
++      "name": "Recuerdo de Concurso",
++      "sprites": {
++        "1": "ribboncountmemorycontest",
++        "2": "ribboncountmemorycontest",
++        "3": "ribboncountmemorycontest",
++        "4": "ribboncountmemorycontest",
++        "5": "ribboncountmemorycontest",
++        "6": "ribboncountmemorycontest",
++        "7": "ribboncountmemorycontest",
++        "8": "ribboncountmemorycontest",
++        "9": "ribboncountmemorycontest",
++        "10": "ribboncountmemorycontest",
++        "11": "ribboncountmemorycontest",
++        "12": "ribboncountmemorycontest",
++        "13": "ribboncountmemorycontest",
++        "14": "ribboncountmemorycontest",
++        "15": "ribboncountmemorycontest",
++        "16": "ribboncountmemorycontest",
++        "17": "ribboncountmemorycontest",
++        "18": "ribboncountmemorycontest",
++        "19": "ribboncountmemorycontest",
++        "20": "ribboncountmemorycontest",
++        "21": "ribboncountmemorycontest",
++        "22": "ribboncountmemorycontest",
++        "23": "ribboncountmemorycontest",
++        "24": "ribboncountmemorycontest",
++        "25": "ribboncountmemorycontest",
++        "26": "ribboncountmemorycontest",
++        "27": "ribboncountmemorycontest",
++        "28": "ribboncountmemorycontest",
++        "29": "ribboncountmemorycontest",
++        "30": "ribboncountmemorycontest",
++        "31": "ribboncountmemorycontest",
++        "32": "ribboncountmemorycontest",
++        "33": "ribboncountmemorycontest",
++        "34": "ribboncountmemorycontest",
++        "35": "ribboncountmemorycontest",
++        "36": "ribboncountmemorycontest",
++        "37": "ribboncountmemorycontest",
++        "38": "ribboncountmemorycontest",
++        "39": "ribboncountmemorycontest",
++        "40": "ribboncountmemorycontest2"
++      }
+     },
+     "RibbonCountry": {
+       "key": "RibbonCountry",
+-      "spriteKey": "ribboncountry",
+-      "name": "Campo"
++      "name": "Campo",
++      "sprites": {
++        "1": "ribboncountry"
++      }
+     },
+     "RibbonDowncast": {
+       "key": "RibbonDowncast",
+-      "spriteKey": "ribbondowncast",
+-      "name": "Abatimiento"
++      "name": "Abatimiento",
++      "sprites": {
++        "1": "ribbondowncast"
++      }
+     },
+     "RibbonEarth": {
+       "key": "RibbonEarth",
+-      "spriteKey": "ribbonearth",
+-      "name": "Planeta"
++      "name": "Planeta",
++      "sprites": {
++        "1": "ribbonearth"
++      }
+     },
+     "RibbonEffort": {
+       "key": "RibbonEffort",
+-      "spriteKey": "ribboneffort",
+-      "name": "Esfuerzo"
++      "name": "Esfuerzo",
++      "sprites": {
++        "1": "ribboneffort"
++      }
+     },
+     "RibbonEvent": {
+       "key": "RibbonEvent",
+-      "spriteKey": "ribbonevent",
+-      "name": "Evento"
++      "name": "Evento",
++      "sprites": {
++        "1": "ribbonevent"
++      }
+     },
+     "RibbonFootprint": {
+       "key": "RibbonFootprint",
+-      "spriteKey": "ribbonfootprint",
+-      "name": "Huella"
++      "name": "Huella",
++      "sprites": {
++        "1": "ribbonfootprint"
++      }
+     },
+     "RibbonG3Beauty": {
+       "key": "RibbonG3Beauty",
+-      "spriteKey": "ribbong3beauty",
+-      "name": "Belleza (G3)"
++      "name": "Belleza (G3)",
++      "sprites": {
++        "1": "ribbong3beauty"
++      }
+     },
+     "RibbonG3BeautyHyper": {
+       "key": "RibbonG3BeautyHyper",
+-      "spriteKey": "ribbong3beautyhyper",
+-      "name": "Belleza avanzado"
++      "name": "Belleza avanzado",
++      "sprites": {
++        "1": "ribbong3beautyhyper"
++      }
+     },
+     "RibbonG3BeautyMaster": {
+       "key": "RibbonG3BeautyMaster",
+-      "spriteKey": "ribbong3beautymaster",
+-      "name": "Belleza experto"
++      "name": "Belleza experto",
++      "sprites": {
++        "1": "ribbong3beautymaster"
++      }
+     },
+     "RibbonG3BeautySuper": {
+       "key": "RibbonG3BeautySuper",
+-      "spriteKey": "ribbong3beautysuper",
+-      "name": "Belleza alto"
++      "name": "Belleza alto",
++      "sprites": {
++        "1": "ribbong3beautysuper"
++      }
+     },
+     "RibbonG3Cool": {
+       "key": "RibbonG3Cool",
+-      "spriteKey": "ribbong3cool",
+-      "name": "Carisma (G3)"
++      "name": "Carisma (G3)",
++      "sprites": {
++        "1": "ribbong3cool"
++      }
+     },
+     "RibbonG3CoolHyper": {
+       "key": "RibbonG3CoolHyper",
+-      "spriteKey": "ribbong3coolhyper",
+-      "name": "Carisma avanzado"
++      "name": "Carisma avanzado",
++      "sprites": {
++        "1": "ribbong3coolhyper"
++      }
+     },
+     "RibbonG3CoolMaster": {
+       "key": "RibbonG3CoolMaster",
+-      "spriteKey": "ribbong3coolmaster",
+-      "name": "Carisma experto"
++      "name": "Carisma experto",
++      "sprites": {
++        "1": "ribbong3coolmaster"
++      }
+     },
+     "RibbonG3CoolSuper": {
+       "key": "RibbonG3CoolSuper",
+-      "spriteKey": "ribbong3coolsuper",
+-      "name": "Carisma alto"
++      "name": "Carisma alto",
++      "sprites": {
++        "1": "ribbong3coolsuper"
++      }
+     },
+     "RibbonG3Cute": {
+       "key": "RibbonG3Cute",
+-      "spriteKey": "ribbong3cute",
+-      "name": "Dulzura (G3)"
++      "name": "Dulzura (G3)",
++      "sprites": {
++        "1": "ribbong3cute"
++      }
+     },
+     "RibbonG3CuteHyper": {
+       "key": "RibbonG3CuteHyper",
+-      "spriteKey": "ribbong3cutehyper",
+-      "name": "Dulzura avanzado"
++      "name": "Dulzura avanzado",
++      "sprites": {
++        "1": "ribbong3cutehyper"
++      }
+     },
+     "RibbonG3CuteMaster": {
+       "key": "RibbonG3CuteMaster",
+-      "spriteKey": "ribbong3cutemaster",
+-      "name": "Dulzura experto"
++      "name": "Dulzura experto",
++      "sprites": {
++        "1": "ribbong3cutemaster"
++      }
+     },
+     "RibbonG3CuteSuper": {
+       "key": "RibbonG3CuteSuper",
+-      "spriteKey": "ribbong3cutesuper",
+-      "name": "Dulzura alto"
++      "name": "Dulzura alto",
++      "sprites": {
++        "1": "ribbong3cutesuper"
++      }
+     },
+     "RibbonG3Smart": {
+       "key": "RibbonG3Smart",
+-      "spriteKey": "ribbong3smart",
+-      "name": "Ingenio (G3)"
++      "name": "Ingenio (G3)",
++      "sprites": {
++        "1": "ribbong3smart"
++      }
+     },
+     "RibbonG3SmartHyper": {
+       "key": "RibbonG3SmartHyper",
+-      "spriteKey": "ribbong3smarthyper",
+-      "name": "Ingenio avanzado"
++      "name": "Ingenio avanzado",
++      "sprites": {
++        "1": "ribbong3smarthyper"
++      }
+     },
+     "RibbonG3SmartMaster": {
+       "key": "RibbonG3SmartMaster",
+-      "spriteKey": "ribbong3smartmaster",
+-      "name": "Ingenio experto"
++      "name": "Ingenio experto",
++      "sprites": {
++        "1": "ribbong3smartmaster"
++      }
+     },
+     "RibbonG3SmartSuper": {
+       "key": "RibbonG3SmartSuper",
+-      "spriteKey": "ribbong3smartsuper",
+-      "name": "Ingenio alto"
++      "name": "Ingenio alto",
++      "sprites": {
++        "1": "ribbong3smartsuper"
++      }
+     },
+     "RibbonG3Tough": {
+       "key": "RibbonG3Tough",
+-      "spriteKey": "ribbong3tough",
+-      "name": "Solidez (G3)"
++      "name": "Solidez (G3)",
++      "sprites": {
++        "1": "ribbong3tough"
++      }
+     },
+     "RibbonG3ToughHyper": {
+       "key": "RibbonG3ToughHyper",
+-      "spriteKey": "ribbong3toughhyper",
+-      "name": "Solidez avanzado"
++      "name": "Solidez avanzado",
++      "sprites": {
++        "1": "ribbong3toughhyper"
++      }
+     },
+     "RibbonG3ToughMaster": {
+       "key": "RibbonG3ToughMaster",
+-      "spriteKey": "ribbong3toughmaster",
+-      "name": "Solidez experto"
++      "name": "Solidez experto",
++      "sprites": {
++        "1": "ribbong3toughmaster"
++      }
+     },
+     "RibbonG3ToughSuper": {
+       "key": "RibbonG3ToughSuper",
+-      "spriteKey": "ribbong3toughsuper",
+-      "name": "Solidez alto"
++      "name": "Solidez alto",
++      "sprites": {
++        "1": "ribbong3toughsuper"
++      }
+     },
+     "RibbonG4Beauty": {
+       "key": "RibbonG4Beauty",
+-      "spriteKey": "ribbong4beauty",
+-      "name": "Belleza (G4)"
++      "name": "Belleza (G4)",
++      "sprites": {
++        "1": "ribbong4beauty"
++      }
+     },
+     "RibbonG4BeautyGreat": {
+       "key": "RibbonG4BeautyGreat",
+-      "spriteKey": "ribbong4beautygreat",
+-      "name": "Belleza difícil"
++      "name": "Belleza difícil",
++      "sprites": {
++        "1": "ribbong4beautygreat"
++      }
+     },
+     "RibbonG4BeautyMaster": {
+       "key": "RibbonG4BeautyMaster",
+-      "spriteKey": "ribbong4beautymaster",
+-      "name": "Belleza experto"
++      "name": "Belleza experto",
++      "sprites": {
++        "1": "ribbong4beautymaster"
++      }
+     },
+     "RibbonG4BeautyUltra": {
+       "key": "RibbonG4BeautyUltra",
+-      "spriteKey": "ribbong4beautyultra",
+-      "name": "Belleza superior"
++      "name": "Belleza superior",
++      "sprites": {
++        "1": "ribbong4beautyultra"
++      }
+     },
+     "RibbonG4Cool": {
+       "key": "RibbonG4Cool",
+-      "spriteKey": "ribbong4cool",
+-      "name": "Carisma (G4)"
++      "name": "Carisma (G4)",
++      "sprites": {
++        "1": "ribbong4cool"
++      }
+     },
+     "RibbonG4CoolGreat": {
+       "key": "RibbonG4CoolGreat",
+-      "spriteKey": "ribbong4coolgreat",
+-      "name": "Carisma difícil"
++      "name": "Carisma difícil",
++      "sprites": {
++        "1": "ribbong4coolgreat"
++      }
+     },
+     "RibbonG4CoolMaster": {
+       "key": "RibbonG4CoolMaster",
+-      "spriteKey": "ribbong4coolmaster",
+-      "name": "Carisma experto"
++      "name": "Carisma experto",
++      "sprites": {
++        "1": "ribbong4coolmaster"
++      }
+     },
+     "RibbonG4CoolUltra": {
+       "key": "RibbonG4CoolUltra",
+-      "spriteKey": "ribbong4coolultra",
+-      "name": "Carisma superior"
++      "name": "Carisma superior",
++      "sprites": {
++        "1": "ribbong4coolultra"
++      }
+     },
+     "RibbonG4Cute": {
+       "key": "RibbonG4Cute",
+-      "spriteKey": "ribbong4cute",
+-      "name": "Dulzura (G4)"
++      "name": "Dulzura (G4)",
++      "sprites": {
++        "1": "ribbong4cute"
++      }
+     },
+     "RibbonG4CuteGreat": {
+       "key": "RibbonG4CuteGreat",
+-      "spriteKey": "ribbong4cutegreat",
+-      "name": "Dulzura difícil"
++      "name": "Dulzura difícil",
++      "sprites": {
++        "1": "ribbong4cutegreat"
++      }
+     },
+     "RibbonG4CuteMaster": {
+       "key": "RibbonG4CuteMaster",
+-      "spriteKey": "ribbong4cutemaster",
+-      "name": "Dulzura experto"
++      "name": "Dulzura experto",
++      "sprites": {
++        "1": "ribbong4cutemaster"
++      }
+     },
+     "RibbonG4CuteUltra": {
+       "key": "RibbonG4CuteUltra",
+-      "spriteKey": "ribbong4cuteultra",
+-      "name": "Dulzura superior"
++      "name": "Dulzura superior",
++      "sprites": {
++        "1": "ribbong4cuteultra"
++      }
+     },
+     "RibbonG4Smart": {
+       "key": "RibbonG4Smart",
+-      "spriteKey": "ribbong4smart",
+-      "name": "Ingenio (G4)"
++      "name": "Ingenio (G4)",
++      "sprites": {
++        "1": "ribbong4smart"
++      }
+     },
+     "RibbonG4SmartGreat": {
+       "key": "RibbonG4SmartGreat",
+-      "spriteKey": "ribbong4smartgreat",
+-      "name": "Ingenio difícil"
++      "name": "Ingenio difícil",
++      "sprites": {
++        "1": "ribbong4smartgreat"
++      }
+     },
+     "RibbonG4SmartMaster": {
+       "key": "RibbonG4SmartMaster",
+-      "spriteKey": "ribbong4smartmaster",
+-      "name": "Ingenio experto"
++      "name": "Ingenio experto",
++      "sprites": {
++        "1": "ribbong4smartmaster"
++      }
+     },
+     "RibbonG4SmartUltra": {
+       "key": "RibbonG4SmartUltra",
+-      "spriteKey": "ribbong4smartultra",
+-      "name": "Ingenio superior"
++      "name": "Ingenio superior",
++      "sprites": {
++        "1": "ribbong4smartultra"
++      }
+     },
+     "RibbonG4Tough": {
+       "key": "RibbonG4Tough",
+-      "spriteKey": "ribbong4tough",
+-      "name": "Solidez (G4)"
++      "name": "Solidez (G4)",
++      "sprites": {
++        "1": "ribbong4tough"
++      }
+     },
+     "RibbonG4ToughGreat": {
+       "key": "RibbonG4ToughGreat",
+-      "spriteKey": "ribbong4toughgreat",
+-      "name": "Solidez difícil"
++      "name": "Solidez difícil",
++      "sprites": {
++        "1": "ribbong4toughgreat"
++      }
+     },
+     "RibbonG4ToughMaster": {
+       "key": "RibbonG4ToughMaster",
+-      "spriteKey": "ribbong4toughmaster",
+-      "name": "Solidez experto"
++      "name": "Solidez experto",
++      "sprites": {
++        "1": "ribbong4toughmaster"
++      }
+     },
+     "RibbonG4ToughUltra": {
+       "key": "RibbonG4ToughUltra",
+-      "spriteKey": "ribbong4toughultra",
+-      "name": "Solidez superior"
++      "name": "Solidez superior",
++      "sprites": {
++        "1": "ribbong4toughultra"
++      }
+     },
+     "RibbonGorgeous": {
+       "key": "RibbonGorgeous",
+-      "spriteKey": "ribbongorgeous",
+-      "name": "Maravilla"
++      "name": "Maravilla",
++      "sprites": {
++        "1": "ribbongorgeous"
++      }
+     },
+     "RibbonGorgeousRoyal": {
+       "key": "RibbonGorgeousRoyal",
+-      "spriteKey": "ribbongorgeousroyal",
+-      "name": "Realeza Maravilla"
++      "name": "Realeza Maravilla",
++      "sprites": {
++        "1": "ribbongorgeousroyal"
++      }
+     },
+     "RibbonHisui": {
+       "key": "RibbonHisui",
+-      "spriteKey": "ribbonhisui",
+-      "name": "Hisui"
++      "name": "Hisui",
++      "sprites": {
++        "1": "ribbonhisui"
++      }
+     },
+     "RibbonLegend": {
+       "key": "RibbonLegend",
+-      "spriteKey": "ribbonlegend",
+-      "name": "Leyenda"
++      "name": "Leyenda",
++      "sprites": {
++        "1": "ribbonlegend"
++      }
+     },
+     "RibbonMarkAbsentMinded": {
+       "key": "RibbonMarkAbsentMinded",
+-      "spriteKey": "ribbonmarkabsentminded",
+-      "name": "Emblema Despreocupación"
++      "name": "Emblema Despreocupación",
++      "sprites": {
++        "1": "ribbonmarkabsentminded"
++      }
+     },
+     "RibbonMarkAlpha": {
+       "key": "RibbonMarkAlpha",
+-      "spriteKey": "ribbonmarkalpha",
+-      "name": "Emblema Alfa"
++      "name": "Emblema Alfa",
++      "sprites": {
++        "1": "ribbonmarkalpha"
++      }
+     },
+     "RibbonMarkAngry": {
+       "key": "RibbonMarkAngry",
+-      "spriteKey": "ribbonmarkangry",
+-      "name": "Emblema Ira"
++      "name": "Emblema Ira",
++      "sprites": {
++        "1": "ribbonmarkangry"
++      }
+     },
+     "RibbonMarkBlizzard": {
+       "key": "RibbonMarkBlizzard",
+-      "spriteKey": "ribbonmarkblizzard",
+-      "name": "Emblema Nevasca"
++      "name": "Emblema Nevasca",
++      "sprites": {
++        "1": "ribbonmarkblizzard"
++      }
+     },
+     "RibbonMarkCalmness": {
+       "key": "RibbonMarkCalmness",
+-      "spriteKey": "ribbonmarkcalmness",
+-      "name": "Emblema Compostura"
++      "name": "Emblema Compostura",
++      "sprites": {
++        "1": "ribbonmarkcalmness"
++      }
+     },
+     "RibbonMarkCharismatic": {
+       "key": "RibbonMarkCharismatic",
+-      "spriteKey": "ribbonmarkcharismatic",
+-      "name": "Emblema Carisma"
++      "name": "Emblema Carisma",
++      "sprites": {
++        "1": "ribbonmarkcharismatic"
++      }
+     },
+     "RibbonMarkCloudy": {
+       "key": "RibbonMarkCloudy",
+-      "spriteKey": "ribbonmarkcloudy",
+-      "name": "Emblema Nube"
++      "name": "Emblema Nube",
++      "sprites": {
++        "1": "ribbonmarkcloudy"
++      }
+     },
+     "RibbonMarkCrafty": {
+       "key": "RibbonMarkCrafty",
+-      "spriteKey": "ribbonmarkcrafty",
+-      "name": "Emblema Astucia"
++      "name": "Emblema Astucia",
++      "sprites": {
++        "1": "ribbonmarkcrafty"
++      }
+     },
+     "RibbonMarkCurry": {
+       "key": "RibbonMarkCurry",
+-      "spriteKey": "ribbonmarkcurry",
+-      "name": "Emblema Curry"
++      "name": "Emblema Curry",
++      "sprites": {
++        "1": "ribbonmarkcurry"
++      }
+     },
+     "RibbonMarkDawn": {
+       "key": "RibbonMarkDawn",
+-      "spriteKey": "ribbonmarkdawn",
+-      "name": "Emblema Alba"
++      "name": "Emblema Alba",
++      "sprites": {
++        "1": "ribbonmarkdawn"
++      }
+     },
+     "RibbonMarkDestiny": {
+       "key": "RibbonMarkDestiny",
+-      "spriteKey": "ribbonmarkdestiny",
+-      "name": "Emblema Destino"
++      "name": "Emblema Destino",
++      "sprites": {
++        "1": "ribbonmarkdestiny"
++      }
+     },
+     "RibbonMarkDry": {
+       "key": "RibbonMarkDry",
+-      "spriteKey": "ribbonmarkdry",
+-      "name": "Emblema Sequedad"
++      "name": "Emblema Sequedad",
++      "sprites": {
++        "1": "ribbonmarkdry"
++      }
+     },
+     "RibbonMarkDusk": {
+       "key": "RibbonMarkDusk",
+-      "spriteKey": "ribbonmarkdusk",
+-      "name": "Emblema Ocaso"
++      "name": "Emblema Ocaso",
++      "sprites": {
++        "1": "ribbonmarkdusk"
++      }
+     },
+     "RibbonMarkExcited": {
+       "key": "RibbonMarkExcited",
+-      "spriteKey": "ribbonmarkexcited",
+-      "name": "Emblema Ilusión"
++      "name": "Emblema Ilusión",
++      "sprites": {
++        "1": "ribbonmarkexcited"
++      }
+     },
+     "RibbonMarkFerocious": {
+       "key": "RibbonMarkFerocious",
+-      "spriteKey": "ribbonmarkferocious",
+-      "name": "Emblema Impulsividad"
++      "name": "Emblema Impulsividad",
++      "sprites": {
++        "1": "ribbonmarkferocious"
++      }
+     },
+     "RibbonMarkFishing": {
+       "key": "RibbonMarkFishing",
+-      "spriteKey": "ribbonmarkfishing",
+-      "name": "Emblema Pesca"
++      "name": "Emblema Pesca",
++      "sprites": {
++        "1": "ribbonmarkfishing"
++      }
+     },
+     "RibbonMarkFlustered": {
+       "key": "RibbonMarkFlustered",
+-      "spriteKey": "ribbonmarkflustered",
+-      "name": "Emblema Desconcierto"
++      "name": "Emblema Desconcierto",
++      "sprites": {
++        "1": "ribbonmarkflustered"
++      }
+     },
+     "RibbonMarkGourmand": {
+       "key": "RibbonMarkGourmand",
+-      "spriteKey": "ribbonmarkgourmand",
+-      "name": "Emblema Gourmet"
++      "name": "Emblema Gourmet",
++      "sprites": {
++        "1": "ribbonmarkgourmand"
++      }
+     },
+     "RibbonMarkHumble": {
+       "key": "RibbonMarkHumble",
+-      "spriteKey": "ribbonmarkhumble",
+-      "name": "Emblema Modestia"
++      "name": "Emblema Modestia",
++      "sprites": {
++        "1": "ribbonmarkhumble"
++      }
+     },
+     "RibbonMarkIntellectual": {
+       "key": "RibbonMarkIntellectual",
+-      "spriteKey": "ribbonmarkintellectual",
+-      "name": "Emblema Intelecto"
++      "name": "Emblema Intelecto",
++      "sprites": {
++        "1": "ribbonmarkintellectual"
++      }
+     },
+     "RibbonMarkIntense": {
+       "key": "RibbonMarkIntense",
+-      "spriteKey": "ribbonmarkintense",
+-      "name": "Emblema Pasión"
++      "name": "Emblema Pasión",
++      "sprites": {
++        "1": "ribbonmarkintense"
++      }
+     },
+     "RibbonMarkItemfinder": {
+       "key": "RibbonMarkItemfinder",
+-      "spriteKey": "ribbonmarkitemfinder",
+-      "name": "Emblema Recolección"
++      "name": "Emblema Recolección",
++      "sprites": {
++        "1": "ribbonmarkitemfinder"
++      }
+     },
+     "RibbonMarkJittery": {
+       "key": "RibbonMarkJittery",
+-      "spriteKey": "ribbonmarkjittery",
+-      "name": "Emblema Nerviosismo"
++      "name": "Emblema Nerviosismo",
++      "sprites": {
++        "1": "ribbonmarkjittery"
++      }
+     },
+     "RibbonMarkJoyful": {
+       "key": "RibbonMarkJoyful",
+-      "spriteKey": "ribbonmarkjoyful",
+-      "name": "Emblema Felicidad"
++      "name": "Emblema Felicidad",
++      "sprites": {
++        "1": "ribbonmarkjoyful"
++      }
+     },
+     "RibbonMarkJumbo": {
+       "key": "RibbonMarkJumbo",
+-      "spriteKey": "ribbonmarkjumbo",
+-      "name": "Emblema Enormidad"
++      "name": "Emblema Enormidad",
++      "sprites": {
++        "1": "ribbonmarkjumbo"
++      }
+     },
+     "RibbonMarkKindly": {
+       "key": "RibbonMarkKindly",
+-      "spriteKey": "ribbonmarkkindly",
+-      "name": "Emblema Amabilidad"
++      "name": "Emblema Amabilidad",
++      "sprites": {
++        "1": "ribbonmarkkindly"
++      }
+     },
+     "RibbonMarkLunchtime": {
+       "key": "RibbonMarkLunchtime",
+-      "spriteKey": "ribbonmarklunchtime",
+-      "name": "Emblema Almuerzo"
++      "name": "Emblema Almuerzo",
++      "sprites": {
++        "1": "ribbonmarklunchtime"
++      }
+     },
+     "RibbonMarkMightiest": {
+       "key": "RibbonMarkMightiest",
+-      "spriteKey": "ribbonmarkmightiest",
+-      "name": "Emblema Imbatibilidad"
++      "name": "Emblema Imbatibilidad",
++      "sprites": {
++        "1": "ribbonmarkmightiest"
++      }
+     },
+     "RibbonMarkMini": {
+       "key": "RibbonMarkMini",
+-      "spriteKey": "ribbonmarkmini",
+-      "name": "Emblema Miniatura"
++      "name": "Emblema Miniatura",
++      "sprites": {
++        "1": "ribbonmarkmini"
++      }
+     },
+     "RibbonMarkMisty": {
+       "key": "RibbonMarkMisty",
+-      "spriteKey": "ribbonmarkmisty",
+-      "name": "Emblema Bruma"
++      "name": "Emblema Bruma",
++      "sprites": {
++        "1": "ribbonmarkmisty"
++      }
+     },
+     "RibbonMarkPartner": {
+       "key": "RibbonMarkPartner",
+-      "spriteKey": "ribbonmarkpartner",
+-      "name": "Emblema Compañerismo"
++      "name": "Emblema Compañerismo",
++      "sprites": {
++        "1": "ribbonmarkpartner"
++      }
+     },
+     "RibbonMarkPeeved": {
+       "key": "RibbonMarkPeeved",
+-      "spriteKey": "ribbonmarkpeeved",
+-      "name": "Emblema Mal Humor"
++      "name": "Emblema Mal Humor",
++      "sprites": {
++        "1": "ribbonmarkpeeved"
++      }
+     },
+     "RibbonMarkPrideful": {
+       "key": "RibbonMarkPrideful",
+-      "spriteKey": "ribbonmarkprideful",
+-      "name": "Emblema Confianza"
++      "name": "Emblema Confianza",
++      "sprites": {
++        "1": "ribbonmarkprideful"
++      }
+     },
+     "RibbonMarkPumpedUp": {
+       "key": "RibbonMarkPumpedUp",
+-      "spriteKey": "ribbonmarkpumpedup",
+-      "name": "Emblema Motivación"
++      "name": "Emblema Motivación",
++      "sprites": {
++        "1": "ribbonmarkpumpedup"
++      }
+     },
+     "RibbonMarkRainy": {
+       "key": "RibbonMarkRainy",
+-      "spriteKey": "ribbonmarkrainy",
+-      "name": "Emblema Lluvia"
++      "name": "Emblema Lluvia",
++      "sprites": {
++        "1": "ribbonmarkrainy"
++      }
+     },
+     "RibbonMarkRare": {
+       "key": "RibbonMarkRare",
+-      "spriteKey": "ribbonmarkrare",
+-      "name": "Emblema Introspección"
++      "name": "Emblema Introspección",
++      "sprites": {
++        "1": "ribbonmarkrare"
++      }
+     },
+     "RibbonMarkRowdy": {
+       "key": "RibbonMarkRowdy",
+-      "spriteKey": "ribbonmarkrowdy",
+-      "name": "Emblema Travesura"
++      "name": "Emblema Travesura",
++      "sprites": {
++        "1": "ribbonmarkrowdy"
++      }
+     },
+     "RibbonMarkSandstorm": {
+       "key": "RibbonMarkSandstorm",
+-      "spriteKey": "ribbonmarksandstorm",
+-      "name": "Emblema Polvareda"
++      "name": "Emblema Polvareda",
++      "sprites": {
++        "1": "ribbonmarksandstorm"
++      }
+     },
+     "RibbonMarkScowling": {
+       "key": "RibbonMarkScowling",
+-      "spriteKey": "ribbonmarkscowling",
+-      "name": "Emblema Intimidación"
++      "name": "Emblema Intimidación",
++      "sprites": {
++        "1": "ribbonmarkscowling"
++      }
+     },
+     "RibbonMarkSleepyTime": {
+       "key": "RibbonMarkSleepyTime",
+-      "spriteKey": "ribbonmarksleepytime",
+-      "name": "Emblema Noche"
++      "name": "Emblema Noche",
++      "sprites": {
++        "1": "ribbonmarksleepytime"
++      }
+     },
+     "RibbonMarkSlump": {
+       "key": "RibbonMarkSlump",
+-      "spriteKey": "ribbonmarkslump",
+-      "name": "Emblema Extenuación"
++      "name": "Emblema Extenuación",
++      "sprites": {
++        "1": "ribbonmarkslump"
++      }
+     },
+     "RibbonMarkSmiley": {
+       "key": "RibbonMarkSmiley",
+-      "spriteKey": "ribbonmarksmiley",
+-      "name": "Emblema Sonrisa"
++      "name": "Emblema Sonrisa",
++      "sprites": {
++        "1": "ribbonmarksmiley"
++      }
+     },
+     "RibbonMarkSnowy": {
+       "key": "RibbonMarkSnowy",
+-      "spriteKey": "ribbonmarksnowy",
+-      "name": "Emblema Nieve"
++      "name": "Emblema Nieve",
++      "sprites": {
++        "1": "ribbonmarksnowy"
++      }
+     },
+     "RibbonMarkStormy": {
+       "key": "RibbonMarkStormy",
+-      "spriteKey": "ribbonmarkstormy",
+-      "name": "Emblema Tormenta"
++      "name": "Emblema Tormenta",
++      "sprites": {
++        "1": "ribbonmarkstormy"
++      }
+     },
+     "RibbonMarkTeary": {
+       "key": "RibbonMarkTeary",
+-      "spriteKey": "ribbonmarkteary",
+-      "name": "Emblema Llanto"
++      "name": "Emblema Llanto",
++      "sprites": {
++        "1": "ribbonmarkteary"
++      }
+     },
+     "RibbonMarkThorny": {
+       "key": "RibbonMarkThorny",
+-      "spriteKey": "ribbonmarkthorny",
+-      "name": "Emblema Altanería"
++      "name": "Emblema Altanería",
++      "sprites": {
++        "1": "ribbonmarkthorny"
++      }
+     },
+     "RibbonMarkTitan": {
+       "key": "RibbonMarkTitan",
+-      "spriteKey": "ribbonmarktitan",
+-      "name": "Emblema Dominio"
++      "name": "Emblema Dominio",
++      "sprites": {
++        "1": "ribbonmarktitan"
++      }
+     },
+     "RibbonMarkUncommon": {
+       "key": "RibbonMarkUncommon",
+-      "spriteKey": "ribbonmarkuncommon",
+-      "name": "Emblema Familiaridad"
++      "name": "Emblema Familiaridad",
++      "sprites": {
++        "1": "ribbonmarkuncommon"
++      }
+     },
+     "RibbonMarkUnsure": {
+       "key": "RibbonMarkUnsure",
+-      "spriteKey": "ribbonmarkunsure",
+-      "name": "Emblema Inseguridad"
++      "name": "Emblema Inseguridad",
++      "sprites": {
++        "1": "ribbonmarkunsure"
++      }
+     },
+     "RibbonMarkUpbeat": {
+       "key": "RibbonMarkUpbeat",
+-      "spriteKey": "ribbonmarkupbeat",
+-      "name": "Emblema Buen Humor"
++      "name": "Emblema Buen Humor",
++      "sprites": {
++        "1": "ribbonmarkupbeat"
++      }
+     },
+     "RibbonMarkVigor": {
+       "key": "RibbonMarkVigor",
+-      "spriteKey": "ribbonmarkvigor",
+-      "name": "Emblema Vigor"
++      "name": "Emblema Vigor",
++      "sprites": {
++        "1": "ribbonmarkvigor"
++      }
+     },
+     "RibbonMarkZeroEnergy": {
+       "key": "RibbonMarkZeroEnergy",
+-      "spriteKey": "ribbonmarkzeroenergy",
+-      "name": "Emblema Desgano"
++      "name": "Emblema Desgano",
++      "sprites": {
++        "1": "ribbonmarkzeroenergy"
++      }
+     },
+     "RibbonMarkZonedOut": {
+       "key": "RibbonMarkZonedOut",
+-      "spriteKey": "ribbonmarkzonedout",
+-      "name": "Emblema Distracción"
++      "name": "Emblema Distracción",
++      "sprites": {
++        "1": "ribbonmarkzonedout"
++      }
+     },
+     "RibbonMasterBeauty": {
+       "key": "RibbonMasterBeauty",
+-      "spriteKey": "ribbonmasterbeauty",
+-      "name": "Belleza experto"
++      "name": "Belleza experto",
++      "sprites": {
++        "1": "ribbonmasterbeauty"
++      }
+     },
+     "RibbonMasterCleverness": {
+       "key": "RibbonMasterCleverness",
+-      "spriteKey": "ribbonmastercleverness",
+-      "name": "Ingenio experto"
++      "name": "Ingenio experto",
++      "sprites": {
++        "1": "ribbonmastercleverness"
++      }
+     },
+     "RibbonMasterCoolness": {
+       "key": "RibbonMasterCoolness",
+-      "spriteKey": "ribbonmastercoolness",
+-      "name": "Carisma experto"
++      "name": "Carisma experto",
++      "sprites": {
++        "1": "ribbonmastercoolness"
++      }
+     },
+     "RibbonMasterCuteness": {
+       "key": "RibbonMasterCuteness",
+-      "spriteKey": "ribbonmastercuteness",
+-      "name": "Dulzura experto"
++      "name": "Dulzura experto",
++      "sprites": {
++        "1": "ribbonmastercuteness"
++      }
+     },
+     "RibbonMasterRank": {
+       "key": "RibbonMasterRank",
+-      "spriteKey": "ribbonmasterrank",
+-      "name": "Rango Maestro"
++      "name": "Rango Maestro",
++      "sprites": {
++        "1": "ribbonmasterrank"
++      }
+     },
+     "RibbonMasterToughness": {
+       "key": "RibbonMasterToughness",
+-      "spriteKey": "ribbonmastertoughness",
+-      "name": "Solidez experto"
++      "name": "Solidez experto",
++      "sprites": {
++        "1": "ribbonmastertoughness"
++      }
+     },
+     "RibbonNational": {
+       "key": "RibbonNational",
+-      "spriteKey": "ribbonnational",
+-      "name": "Nacional"
++      "name": "Nacional",
++      "sprites": {
++        "1": "ribbonnational"
++      }
+     },
+     "RibbonOnceInALifetime": {
+       "key": "RibbonOnceInALifetime",
+-      "spriteKey": "ribbononceinalifetime",
+-      "name": "Excepcionalidad"
++      "name": "Excepcionalidad",
++      "sprites": {
++        "1": "ribbononceinalifetime"
++      }
+     },
+     "RibbonPartner": {
+       "key": "RibbonPartner",
+-      "spriteKey": "ribbonpartner",
+-      "name": "Camarada"
++      "name": "Camarada",
++      "sprites": {
++        "1": "ribbonpartner"
++      }
+     },
+     "RibbonPremier": {
+       "key": "RibbonPremier",
+-      "spriteKey": "ribbonpremier",
+-      "name": "Principal"
++      "name": "Principal",
++      "sprites": {
++        "1": "ribbonpremier"
++      }
+     },
+     "RibbonRecord": {
+       "key": "RibbonRecord",
+-      "spriteKey": "ribbonrecord",
+-      "name": "Récord"
++      "name": "Récord",
++      "sprites": {
++        "1": "ribbonrecord"
++      }
+     },
+     "RibbonRelax": {
+       "key": "RibbonRelax",
+-      "spriteKey": "ribbonrelax",
+-      "name": "Relax"
++      "name": "Relax",
++      "sprites": {
++        "1": "ribbonrelax"
++      }
+     },
+     "RibbonRoyal": {
+       "key": "RibbonRoyal",
+-      "spriteKey": "ribbonroyal",
+-      "name": "Realeza"
++      "name": "Realeza",
++      "sprites": {
++        "1": "ribbonroyal"
++      }
+     },
+     "RibbonShock": {
+       "key": "RibbonShock",
+-      "spriteKey": "ribbonshock",
+-      "name": "Impacto"
++      "name": "Impacto",
++      "sprites": {
++        "1": "ribbonshock"
++      }
+     },
+     "RibbonSmile": {
+       "key": "RibbonSmile",
+-      "spriteKey": "ribbonsmile",
+-      "name": "Sonrisa"
++      "name": "Sonrisa",
++      "sprites": {
++        "1": "ribbonsmile"
++      }
+     },
+     "RibbonSnooze": {
+       "key": "RibbonSnooze",
+-      "spriteKey": "ribbonsnooze",
+-      "name": "Cabezada"
++      "name": "Cabezada",
++      "sprites": {
++        "1": "ribbonsnooze"
++      }
+     },
+     "RibbonSouvenir": {
+       "key": "RibbonSouvenir",
+-      "spriteKey": "ribbonsouvenir",
+-      "name": "Recuerdo"
++      "name": "Recuerdo",
++      "sprites": {
++        "1": "ribbonsouvenir"
++      }
+     },
+     "RibbonSpecial": {
+       "key": "RibbonSpecial",
+-      "spriteKey": "ribbonspecial",
+-      "name": "Especial"
++      "name": "Especial",
++      "sprites": {
++        "1": "ribbonspecial"
++      }
+     },
+     "RibbonTowerMaster": {
+       "key": "RibbonTowerMaster",
+-      "spriteKey": "ribbontowermaster",
+-      "name": "Maestro de la Torre"
++      "name": "Maestro de la Torre",
++      "sprites": {
++        "1": "ribbontowermaster"
++      }
+     },
+     "RibbonTraining": {
+       "key": "RibbonTraining",
+-      "spriteKey": "ribbontraining",
+-      "name": "Ejercicio"
++      "name": "Ejercicio",
++      "sprites": {
++        "1": "ribbontraining"
++      }
+     },
+     "RibbonTwinklingStar": {
+       "key": "RibbonTwinklingStar",
+-      "spriteKey": "ribbontwinklingstar",
+-      "name": "Estrella Resplandeciente"
++      "name": "Estrella Resplandeciente",
++      "sprites": {
++        "1": "ribbontwinklingstar"
++      }
+     },
+     "RibbonVictory": {
+       "key": "RibbonVictory",
+-      "spriteKey": "ribbonvictory",
+-      "name": "Victoria"
++      "name": "Victoria",
++      "sprites": {
++        "1": "ribbonvictory"
++      }
+     },
+     "RibbonWinning": {
+       "key": "RibbonWinning",
+-      "spriteKey": "ribbonwinning",
+-      "name": "Ganador"
++      "name": "Ganador",
++      "sprites": {
++        "1": "ribbonwinning"
++      }
+     },
+     "RibbonWishing": {
+       "key": "RibbonWishing",
+-      "spriteKey": "ribbonwishing",
+-      "name": "Deseo"
++      "name": "Deseo",
++      "sprites": {
++        "1": "ribbonwishing"
++      }
+     },
+     "RibbonWorld": {
+       "key": "RibbonWorld",
+-      "spriteKey": "ribbonworld",
+-      "name": "Mundo"
++      "name": "Mundo",
++      "sprites": {
++        "1": "ribbonworld"
++      }
+     }
+   },
+   "languages": {

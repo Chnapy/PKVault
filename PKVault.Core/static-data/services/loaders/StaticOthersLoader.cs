@@ -83,8 +83,8 @@ public record StaticPokedex(
 
 public record StaticRibbon(
     string Key,
-    string SpriteKey,
-    string Name
+    string Name,
+    Dictionary<byte, string> Sprites
 );
 
 public enum MoveCategory

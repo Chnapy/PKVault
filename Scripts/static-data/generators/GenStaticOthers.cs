@@ -510,15 +510,72 @@ public class GenStaticOthers(
             .Where(e => e.IsValid)
             .Select(e => BlankSaveFile.Get(e).BlankPKM)
             .SelectMany(RibbonInfo.GetRibbonInfo)
-            .Select(ribbon => ribbon.Name)
+            .Select(r =>
+            {
+                if (r.Type == RibbonValueType.Boolean)
+                    return (
+                        r.Name,
+                        MaxCount: 0,
+                        RibbonCount: 0
+                    );
+
+                return (
+                    r.Name,
+                    r.MaxCount,
+                    r.RibbonCount
+                );
+            })
             .Distinct()
             .Order()
-            .Select(name => new StaticRibbon(
-                Key: name,
-                SpriteKey: name.Replace("CountG3", "G3").ToLowerInvariant(),
-                Name: ribbonsTxt.GetName(name)
-            ))
+            .Select(r =>
+            {
+                Dictionary<byte, string> sprites = [];
+
+                if (r.MaxCount == 0)
+                {
+                    sprites.Add(1, GetRibbonSprite(r.Name));
+                }
+                else
+                {
+                    for (byte i = 1; i <= r.MaxCount; i++)
+                    {
+                        sprites.Add(i, GetRibbonSprite(r.Name, r.MaxCount, i));
+                    }
+                }
+
+                return new StaticRibbon(
+                    Key: r.Name,
+                    Name: ribbonsTxt.GetName(r.Name),
+                    Sprites: sprites
+                );
+            })
             .ToDictionary(p => p.Key);
+    }
+
+    private static string GetRibbonSprite(string name)
+    {
+        return name.Replace("CountG3", "G3").ToLowerInvariant();
+    }
+
+    private static string GetRibbonSprite(string name, int max, int value)
+    {
+        if (max != 4) // Memory
+        {
+            var sprite = name.ToLowerInvariant();
+            if (value >= max)
+                return sprite + "2";
+            return sprite;
+        }
+
+        // Count ribbons
+        string n = name.Replace("Count", string.Empty).ToLowerInvariant();
+        return value switch
+        {
+            2 => n + "super",
+            3 => n + "hyper",
+            4 => n + "master",
+            _ => n,
+        };
     }
 
     private Dictionary<byte, string> GetStaticLanguages()
@@ -571,7 +628,7 @@ public class GenStaticOthers(
 
         List<string> names = [];
 
-        foreach(var name in pokeapiVersions
+        foreach (var name in pokeapiVersions
             .OfType<PokeApi.Models.Version>()
             .Select(ver => PokeApiService.GetNameForLang(ver.Names, lang)))
         {

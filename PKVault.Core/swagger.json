@@ -2660,18 +2660,21 @@
         "additionalProperties": false,
         "required": [
           "key",
-          "spriteKey",
-          "name"
+          "name",
+          "sprites"
         ],
         "properties": {
           "key": {
             "type": "string"
           },
-          "spriteKey": {
-            "type": "string"
-          },
           "name": {
             "type": "string"
+          },
+          "sprites": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         }
       },

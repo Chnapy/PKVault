@@ -1,2 +1,1545 @@
 --- This file displays changes of StaticOthers_zh-hant compressed file from previous changes
 
+--- ..\PKVault.Core\static-data\generated\diff-data\StaticOthers_zh_hant.diff
++++ ..\PKVault.Core\static-data\generated\diff-data\StaticOthers_zh_hant.diff
+@@ -45844,823 +45844,1212 @@
+   "ribbons": {
+     "RibbonAbility": {
+       "key": "RibbonAbility",
+-      "spriteKey": "ribbonability",
+-      "name": "才能獎章"
++      "name": "才能獎章",
++      "sprites": {
++        "1": "ribbonability"
++      }
+     },
+     "RibbonAbilityDouble": {
+       "key": "RibbonAbilityDouble",
+-      "spriteKey": "ribbonabilitydouble",
+-      "name": "雙人才能獎章"
++      "name": "雙人才能獎章",
++      "sprites": {
++        "1": "ribbonabilitydouble"
++      }
+     },
+     "RibbonAbilityGreat": {
+       "key": "RibbonAbilityGreat",
+-      "spriteKey": "ribbonabilitygreat",
+-      "name": "超級才能獎章"
++      "name": "超級才能獎章",
++      "sprites": {
++        "1": "ribbonabilitygreat"
++      }
+     },
+     "RibbonAbilityMulti": {
+       "key": "RibbonAbilityMulti",
+-      "spriteKey": "ribbonabilitymulti",
+-      "name": "多人才能獎章"
++      "name": "多人才能獎章",
++      "sprites": {
++        "1": "ribbonabilitymulti"
++      }
+     },
+     "RibbonAbilityPair": {
+       "key": "RibbonAbilityPair",
+-      "spriteKey": "ribbonabilitypair",
+-      "name": "組隊雙打才能獎章"
++      "name": "組隊雙打才能獎章",
++      "sprites": {
++        "1": "ribbonabilitypair"
++      }
+     },
+     "RibbonAbilityWorld": {
+       "key": "RibbonAbilityWorld",
+-      "spriteKey": "ribbonabilityworld",
+-      "name": "世界才能獎章"
++      "name": "世界才能獎章",
++      "sprites": {
++        "1": "ribbonabilityworld"
++      }
+     },
+     "RibbonAlert": {
+       "key": "RibbonAlert",
+-      "spriteKey": "ribbonalert",
+-      "name": "振奮獎章"
++      "name": "振奮獎章",
++      "sprites": {
++        "1": "ribbonalert"
++      }
+     },
+     "RibbonArtist": {
+       "key": "RibbonArtist",
+-      "spriteKey": "ribbonartist",
+-      "name": "肖像獎章"
++      "name": "肖像獎章",
++      "sprites": {
++        "1": "ribbonartist"
++      }
+     },
+     "RibbonBattlerExpert": {
+       "key": "RibbonBattlerExpert",
+-      "spriteKey": "ribbonbattlerexpert",
+-      "name": "大師對戰獎章"
++      "name": "大師對戰獎章",
++      "sprites": {
++        "1": "ribbonbattlerexpert"
++      }
+     },
+     "RibbonBattleRoyale": {
+       "key": "RibbonBattleRoyale",
+-      "spriteKey": "ribbonbattleroyale",
+-      "name": "皇家大師獎章"
++      "name": "皇家大師獎章",
++      "sprites": {
++        "1": "ribbonbattleroyale"
++      }
+     },
+     "RibbonBattlerSkillful": {
+       "key": "RibbonBattlerSkillful",
+-      "spriteKey": "ribbonbattlerskillful",
+-      "name": "高手對戰獎章"
++      "name": "高手對戰獎章",
++      "sprites": {
++        "1": "ribbonbattlerskillful"
++      }
+     },
+     "RibbonBattleTreeGreat": {
+       "key": "RibbonBattleTreeGreat",
+-      "spriteKey": "ribbonbattletreegreat",
+-      "name": "高手對戰樹獎章"
++      "name": "高手對戰樹獎章",
++      "sprites": {
++        "1": "ribbonbattletreegreat"
++      }
+     },
+     "RibbonBattleTreeMaster": {
+       "key": "RibbonBattleTreeMaster",
+-      "spriteKey": "ribbonbattletreemaster",
+-      "name": "大師對戰樹獎章"
++      "name": "大師對戰樹獎章",
++      "sprites": {
++        "1": "ribbonbattletreemaster"
++      }
+     },
+     "RibbonBestFriends": {
+       "key": "RibbonBestFriends",
+-      "spriteKey": "ribbonbestfriends",
+-      "name": "好友獎章"
++      "name": "好友獎章",
++      "sprites": {
++        "1": "ribbonbestfriends"
++      }
+     },
+     "RibbonBirthday": {
+       "key": "RibbonBirthday",
+-      "spriteKey": "ribbonbirthday",
+-      "name": "生日獎章"
++      "name": "生日獎章",
++      "sprites": {
++        "1": "ribbonbirthday"
++      }
+     },
+     "RibbonCareless": {
+       "key": "RibbonCareless",
+-      "spriteKey": "ribboncareless",
+-      "name": "大意獎章"
++      "name": "大意獎章",
++      "sprites": {
++        "1": "ribboncareless"
++      }
+     },
+     "RibbonChampionAlola": {
+       "key": "RibbonChampionAlola",
+-      "spriteKey": "ribbonchampionalola",
+-      "name": "阿羅拉冠軍獎章"
++      "name": "阿羅拉冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionalola"
++      }
+     },
+     "RibbonChampionBattle": {
+       "key": "RibbonChampionBattle",
+-      "spriteKey": "ribbonchampionbattle",
+-      "name": "對戰冠軍獎章"
++      "name": "對戰冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionbattle"
++      }
+     },
+     "RibbonChampionG3": {
+       "key": "RibbonChampionG3",
+-      "spriteKey": "ribbonchampiong3",
+-      "name": "冠軍獎章 (3代)"
++      "name": "冠軍獎章 (3代)",
++      "sprites": {
++        "1": "ribbonchampiong3"
++      }
+     },
+     "RibbonChampionG6Hoenn": {
+       "key": "RibbonChampionG6Hoenn",
+-      "spriteKey": "ribbonchampiong6hoenn",
+-      "name": "豐緣冠軍獎章 (ORAS)"
++      "name": "豐緣冠軍獎章 (ORAS)",
++      "sprites": {
++        "1": "ribbonchampiong6hoenn"
++      }
+     },
+     "RibbonChampionGalar": {
+       "key": "RibbonChampionGalar",
+-      "spriteKey": "ribbonchampiongalar",
+-      "name": "伽勒爾冠軍獎章"
++      "name": "伽勒爾冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampiongalar"
++      }
+     },
+     "RibbonChampionKalos": {
+       "key": "RibbonChampionKalos",
+-      "spriteKey": "ribbonchampionkalos",
+-      "name": "卡洛斯冠軍獎章"
++      "name": "卡洛斯冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionkalos"
++      }
+     },
+     "RibbonChampionNational": {
+       "key": "RibbonChampionNational",
+-      "spriteKey": "ribbonchampionnational",
+-      "name": "國家冠軍獎章"
++      "name": "國家冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionnational"
++      }
+     },
+     "RibbonChampionPaldea": {
+       "key": "RibbonChampionPaldea",
+-      "spriteKey": "ribbonchampionpaldea",
+-      "name": "帕底亞冠軍獎章"
++      "name": "帕底亞冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionpaldea"
++      }
+     },
+     "RibbonChampionRegional": {
+       "key": "RibbonChampionRegional",
+-      "spriteKey": "ribbonchampionregional",
+-      "name": "地區冠軍獎章"
++      "name": "地區冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionregional"
++      }
+     },
+     "RibbonChampionSinnoh": {
+       "key": "RibbonChampionSinnoh",
+-      "spriteKey": "ribbonchampionsinnoh",
+-      "name": "神奧冠軍獎章"
++      "name": "神奧冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionsinnoh"
++      }
+     },
+     "RibbonChampionWorld": {
+       "key": "RibbonChampionWorld",
+-      "spriteKey": "ribbonchampionworld",
+-      "name": "世界冠軍獎章"
++      "name": "世界冠軍獎章",
++      "sprites": {
++        "1": "ribbonchampionworld"
++      }
+     },
+     "RibbonClassic": {
+       "key": "RibbonClassic",
+-      "spriteKey": "ribbonclassic",
+-      "name": "經典獎章"
++      "name": "經典獎章",
++      "sprites": {
++        "1": "ribbonclassic"
++      }
+     },
+     "RibbonContestStar": {
+       "key": "RibbonContestStar",
+-      "spriteKey": "ribbonconteststar",
+-      "name": "華麗大賽之星獎章"
++      "name": "華麗大賽之星獎章",
++      "sprites": {
++        "1": "ribbonconteststar"
++      }
+     },
+     "RibbonCountG3Beauty": {
+       "key": "RibbonCountG3Beauty",
+-      "spriteKey": "ribbong3beauty",
+-      "name": "美麗獎章"
++      "name": "美麗獎章",
++      "sprites": {
++        "1": "ribbong3beauty",
++        "2": "ribbong3beautysuper",
++        "3": "ribbong3beautyhyper",
++        "4": "ribbong3beautymaster"
++      }
+     },
+     "RibbonCountG3Cool": {
+       "key": "RibbonCountG3Cool",
+-      "spriteKey": "ribbong3cool",
+-      "name": "帥氣獎章"
++      "name": "帥氣獎章",
++      "sprites": {
++        "1": "ribbong3cool",
++        "2": "ribbong3coolsuper",
++        "3": "ribbong3coolhyper",
++        "4": "ribbong3coolmaster"
++      }
+     },
+     "RibbonCountG3Cute": {
+       "key": "RibbonCountG3Cute",
+-      "spriteKey": "ribbong3cute",
+-      "name": "可愛獎章"
++      "name": "可愛獎章",
++      "sprites": {
++        "1": "ribbong3cute",
++        "2": "ribbong3cutesuper",
++        "3": "ribbong3cutehyper",
++        "4": "ribbong3cutemaster"
++      }
+     },
+     "RibbonCountG3Smart": {
+       "key": "RibbonCountG3Smart",
+-      "spriteKey": "ribbong3smart",
+-      "name": "聰明獎章"
++      "name": "聰明獎章",
++      "sprites": {
++        "1": "ribbong3smart",
++        "2": "ribbong3smartsuper",
++        "3": "ribbong3smarthyper",
++        "4": "ribbong3smartmaster"
++      }
+     },
+     "RibbonCountG3Tough": {
+       "key": "RibbonCountG3Tough",
+-      "spriteKey": "ribbong3tough",
+-      "name": "強壯獎章"
++      "name": "強壯獎章",
++      "sprites": {
++        "1": "ribbong3tough",
++        "2": "ribbong3toughsuper",
++        "3": "ribbong3toughhyper",
++        "4": "ribbong3toughmaster"
++      }
+     },
+     "RibbonCountMemoryBattle": {
+       "key": "RibbonCountMemoryBattle",
+-      "spriteKey": "ribboncountmemorybattle",
+-      "name": "對戰回憶獎章"
++      "name": "對戰回憶獎章",
++      "sprites": {
++        "1": "ribboncountmemorybattle",
++        "2": "ribboncountmemorybattle",
++        "3": "ribboncountmemorybattle",
++        "4": "ribboncountmemorybattle",
++        "5": "ribboncountmemorybattle",
++        "6": "ribboncountmemorybattle",
++        "7": "ribboncountmemorybattle",
++        "8": "ribboncountmemorybattle2"
++      }
+     },
+     "RibbonCountMemoryContest": {
+       "key": "RibbonCountMemoryContest",
+-      "spriteKey": "ribboncountmemorycontest",
+-      "name": "華麗大賽回憶獎章"
++      "name": "華麗大賽回憶獎章",
++      "sprites": {
++        "1": "ribboncountmemorycontest",
++        "2": "ribboncountmemorycontest",
++        "3": "ribboncountmemorycontest",
++        "4": "ribboncountmemorycontest",
++        "5": "ribboncountmemorycontest",
++        "6": "ribboncountmemorycontest",
++        "7": "ribboncountmemorycontest",
++        "8": "ribboncountmemorycontest",
++        "9": "ribboncountmemorycontest",
++        "10": "ribboncountmemorycontest",
++        "11": "ribboncountmemorycontest",
++        "12": "ribboncountmemorycontest",
++        "13": "ribboncountmemorycontest",
++        "14": "ribboncountmemorycontest",
++        "15": "ribboncountmemorycontest",
++        "16": "ribboncountmemorycontest",
++        "17": "ribboncountmemorycontest",
++        "18": "ribboncountmemorycontest",
++        "19": "ribboncountmemorycontest",
++        "20": "ribboncountmemorycontest",
++        "21": "ribboncountmemorycontest",
++        "22": "ribboncountmemorycontest",
++        "23": "ribboncountmemorycontest",
++        "24": "ribboncountmemorycontest",
++        "25": "ribboncountmemorycontest",
++        "26": "ribboncountmemorycontest",
++        "27": "ribboncountmemorycontest",
++        "28": "ribboncountmemorycontest",
++        "29": "ribboncountmemorycontest",
++        "30": "ribboncountmemorycontest",
++        "31": "ribboncountmemorycontest",
++        "32": "ribboncountmemorycontest",
++        "33": "ribboncountmemorycontest",
++        "34": "ribboncountmemorycontest",
++        "35": "ribboncountmemorycontest",
++        "36": "ribboncountmemorycontest",
++        "37": "ribboncountmemorycontest",
++        "38": "ribboncountmemorycontest",
++        "39": "ribboncountmemorycontest",
++        "40": "ribboncountmemorycontest2"
++      }
+     },
+     "RibbonCountry": {
+       "key": "RibbonCountry",
+-      "spriteKey": "ribboncountry",
+-      "name": "地區獎章"
++      "name": "地區獎章",
++      "sprites": {
++        "1": "ribboncountry"
++      }
+     },
+     "RibbonDowncast": {
+       "key": "RibbonDowncast",
+-      "spriteKey": "ribbondowncast",
+-      "name": "失望獎章"
++      "name": "失望獎章",
++      "sprites": {
++        "1": "ribbondowncast"
++      }
+     },
+     "RibbonEarth": {
+       "key": "RibbonEarth",
+-      "spriteKey": "ribbonearth",
+-      "name": "地球獎章"
++      "name": "地球獎章",
++      "sprites": {
++        "1": "ribbonearth"
++      }
+     },
+     "RibbonEffort": {
+       "key": "RibbonEffort",
+-      "spriteKey": "ribboneffort",
+-      "name": "努力獎章"
++      "name": "努力獎章",
++      "sprites": {
++        "1": "ribboneffort"
++      }
+     },
+     "RibbonEvent": {
+       "key": "RibbonEvent",
+-      "spriteKey": "ribbonevent",
+-      "name": "活動獎章"
++      "name": "活動獎章",
++      "sprites": {
++        "1": "ribbonevent"
++      }
+     },
+     "RibbonFootprint": {
+       "key": "RibbonFootprint",
+-      "spriteKey": "ribbonfootprint",
+-      "name": "腳印獎章"
++      "name": "腳印獎章",
++      "sprites": {
++        "1": "ribbonfootprint"
++      }
+     },
+     "RibbonG3Beauty": {
+       "key": "RibbonG3Beauty",
+-      "spriteKey": "ribbong3beauty",
+-      "name": "美麗獎章 (3代)"
++      "name": "美麗獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3beauty"
++      }
+     },
+     "RibbonG3BeautyHyper": {
+       "key": "RibbonG3BeautyHyper",
+-      "spriteKey": "ribbong3beautyhyper",
+-      "name": "美麗高級獎章 (3代)"
++      "name": "美麗高級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3beautyhyper"
++      }
+     },
+     "RibbonG3BeautyMaster": {
+       "key": "RibbonG3BeautyMaster",
+-      "spriteKey": "ribbong3beautymaster",
+-      "name": "美麗大師獎章 (3代)"
++      "name": "美麗大師獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3beautymaster"
++      }
+     },
+     "RibbonG3BeautySuper": {
+       "key": "RibbonG3BeautySuper",
+-      "spriteKey": "ribbong3beautysuper",
+-      "name": "美麗超級獎章 (3代)"
++      "name": "美麗超級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3beautysuper"
++      }
+     },
+     "RibbonG3Cool": {
+       "key": "RibbonG3Cool",
+-      "spriteKey": "ribbong3cool",
+-      "name": "帥氣獎章 (3代)"
++      "name": "帥氣獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3cool"
++      }
+     },
+     "RibbonG3CoolHyper": {
+       "key": "RibbonG3CoolHyper",
+-      "spriteKey": "ribbong3coolhyper",
+-      "name": "帥氣高級獎章 (3代)"
++      "name": "帥氣高級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3coolhyper"
++      }
+     },
+     "RibbonG3CoolMaster": {
+       "key": "RibbonG3CoolMaster",
+-      "spriteKey": "ribbong3coolmaster",
+-      "name": "帥氣大師獎章 (3代)"
++      "name": "帥氣大師獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3coolmaster"
++      }
+     },
+     "RibbonG3CoolSuper": {
+       "key": "RibbonG3CoolSuper",
+-      "spriteKey": "ribbong3coolsuper",
+-      "name": "帥氣超級獎章 (3代)"
++      "name": "帥氣超級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3coolsuper"
++      }
+     },
+     "RibbonG3Cute": {
+       "key": "RibbonG3Cute",
+-      "spriteKey": "ribbong3cute",
+-      "name": "可愛獎章 (3代)"
++      "name": "可愛獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3cute"
++      }
+     },
+     "RibbonG3CuteHyper": {
+       "key": "RibbonG3CuteHyper",
+-      "spriteKey": "ribbong3cutehyper",
+-      "name": "可愛高級獎章 (3代)"
++      "name": "可愛高級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3cutehyper"
++      }
+     },
+     "RibbonG3CuteMaster": {
+       "key": "RibbonG3CuteMaster",
+-      "spriteKey": "ribbong3cutemaster",
+-      "name": "可愛大師獎章 (3代)"
++      "name": "可愛大師獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3cutemaster"
++      }
+     },
+     "RibbonG3CuteSuper": {
+       "key": "RibbonG3CuteSuper",
+-      "spriteKey": "ribbong3cutesuper",
+-      "name": "可愛超級獎章 (3代)"
++      "name": "可愛超級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3cutesuper"
++      }
+     },
+     "RibbonG3Smart": {
+       "key": "RibbonG3Smart",
+-      "spriteKey": "ribbong3smart",
+-      "name": "聰明獎章 (3代)"
++      "name": "聰明獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3smart"
++      }
+     },
+     "RibbonG3SmartHyper": {
+       "key": "RibbonG3SmartHyper",
+-      "spriteKey": "ribbong3smarthyper",
+-      "name": "聰明高級獎章 (3代)"
++      "name": "聰明高級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3smarthyper"
++      }
+     },
+     "RibbonG3SmartMaster": {
+       "key": "RibbonG3SmartMaster",
+-      "spriteKey": "ribbong3smartmaster",
+-      "name": "聰明大師獎章 (3代)"
++      "name": "聰明大師獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3smartmaster"
++      }
+     },
+     "RibbonG3SmartSuper": {
+       "key": "RibbonG3SmartSuper",
+-      "spriteKey": "ribbong3smartsuper",
+-      "name": "聰明超級獎章 (3代)"
++      "name": "聰明超級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3smartsuper"
++      }
+     },
+     "RibbonG3Tough": {
+       "key": "RibbonG3Tough",
+-      "spriteKey": "ribbong3tough",
+-      "name": "強壯獎章 (3代)"
++      "name": "強壯獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3tough"
++      }
+     },
+     "RibbonG3ToughHyper": {
+       "key": "RibbonG3ToughHyper",
+-      "spriteKey": "ribbong3toughhyper",
+-      "name": "強壯高級獎章 (3代)"
++      "name": "強壯高級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3toughhyper"
++      }
+     },
+     "RibbonG3ToughMaster": {
+       "key": "RibbonG3ToughMaster",
+-      "spriteKey": "ribbong3toughmaster",
+-      "name": "強壯大師獎章 (3代)"
++      "name": "強壯大師獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3toughmaster"
++      }
+     },
+     "RibbonG3ToughSuper": {
+       "key": "RibbonG3ToughSuper",
+-      "spriteKey": "ribbong3toughsuper",
+-      "name": "強壯超級獎章 (3代)"
++      "name": "強壯超級獎章 (3代)",
++      "sprites": {
++        "1": "ribbong3toughsuper"
++      }
+     },
+     "RibbonG4Beauty": {
+       "key": "RibbonG4Beauty",
+-      "spriteKey": "ribbong4beauty",
+-      "name": "美麗獎章 (4代)"
++      "name": "美麗獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4beauty"
++      }
+     },
+     "RibbonG4BeautyGreat": {
+       "key": "RibbonG4BeautyGreat",
+-      "spriteKey": "ribbong4beautygreat",
+-      "name": "美麗上級獎章 (4代)"
++      "name": "美麗上級獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4beautygreat"
++      }
+     },
+     "RibbonG4BeautyMaster": {
+       "key": "RibbonG4BeautyMaster",
+-      "spriteKey": "ribbong4beautymaster",
+-      "name": "美麗大師獎章 (4代)"
++      "name": "美麗大師獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4beautymaster"
++      }
+     },
+     "RibbonG4BeautyUltra": {
+       "key": "RibbonG4BeautyUltra",
+-      "spriteKey": "ribbong4beautyultra",
+-      "name": "美麗究極獎章 (4代)"
++      "name": "美麗究極獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4beautyultra"
++      }
+     },
+     "RibbonG4Cool": {
+       "key": "RibbonG4Cool",
+-      "spriteKey": "ribbong4cool",
+-      "name": "帥氣獎章 (4代)"
++      "name": "帥氣獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4cool"
++      }
+     },
+     "RibbonG4CoolGreat": {
+       "key": "RibbonG4CoolGreat",
+-      "spriteKey": "ribbong4coolgreat",
+-      "name": "帥氣上級獎章 (4代)"
++      "name": "帥氣上級獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4coolgreat"
++      }
+     },
+     "RibbonG4CoolMaster": {
+       "key": "RibbonG4CoolMaster",
+-      "spriteKey": "ribbong4coolmaster",
+-      "name": "帥氣大師獎章 (4代)"
++      "name": "帥氣大師獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4coolmaster"
++      }
+     },
+     "RibbonG4CoolUltra": {
+       "key": "RibbonG4CoolUltra",
+-      "spriteKey": "ribbong4coolultra",
+-      "name": "帥氣究極獎章 (4代)"
++      "name": "帥氣究極獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4coolultra"
++      }
+     },
+     "RibbonG4Cute": {
+       "key": "RibbonG4Cute",
+-      "spriteKey": "ribbong4cute",
+-      "name": "可愛獎章 (4代)"
++      "name": "可愛獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4cute"
++      }
+     },
+     "RibbonG4CuteGreat": {
+       "key": "RibbonG4CuteGreat",
+-      "spriteKey": "ribbong4cutegreat",
+-      "name": "可愛上級獎章 (4代)"
++      "name": "可愛上級獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4cutegreat"
++      }
+     },
+     "RibbonG4CuteMaster": {
+       "key": "RibbonG4CuteMaster",
+-      "spriteKey": "ribbong4cutemaster",
+-      "name": "可愛大師獎章 (4代)"
++      "name": "可愛大師獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4cutemaster"
++      }
+     },
+     "RibbonG4CuteUltra": {
+       "key": "RibbonG4CuteUltra",
+-      "spriteKey": "ribbong4cuteultra",
+-      "name": "可愛究極獎章 (4代)"
++      "name": "可愛究極獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4cuteultra"
++      }
+     },
+     "RibbonG4Smart": {
+       "key": "RibbonG4Smart",
+-      "spriteKey": "ribbong4smart",
+-      "name": "聰明獎章 (4代)"
++      "name": "聰明獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4smart"
++      }
+     },
+     "RibbonG4SmartGreat": {
+       "key": "RibbonG4SmartGreat",
+-      "spriteKey": "ribbong4smartgreat",
+-      "name": "聰明上級獎章 (4代)"
++      "name": "聰明上級獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4smartgreat"
++      }
+     },
+     "RibbonG4SmartMaster": {
+       "key": "RibbonG4SmartMaster",
+-      "spriteKey": "ribbong4smartmaster",
+-      "name": "聰明大師獎章 (4代)"
++      "name": "聰明大師獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4smartmaster"
++      }
+     },
+     "RibbonG4SmartUltra": {
+       "key": "RibbonG4SmartUltra",
+-      "spriteKey": "ribbong4smartultra",
+-      "name": "聰明究極獎章 (4代)"
++      "name": "聰明究極獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4smartultra"
++      }
+     },
+     "RibbonG4Tough": {
+       "key": "RibbonG4Tough",
+-      "spriteKey": "ribbong4tough",
+-      "name": "強壯獎章 (4代)"
++      "name": "強壯獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4tough"
++      }
+     },
+     "RibbonG4ToughGreat": {
+       "key": "RibbonG4ToughGreat",
+-      "spriteKey": "ribbong4toughgreat",
+-      "name": "強壯上級獎章 (4代)"
++      "name": "強壯上級獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4toughgreat"
++      }
+     },
+     "RibbonG4ToughMaster": {
+       "key": "RibbonG4ToughMaster",
+-      "spriteKey": "ribbong4toughmaster",
+-      "name": "強壯大師獎章 (4代)"
++      "name": "強壯大師獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4toughmaster"
++      }
+     },
+     "RibbonG4ToughUltra": {
+       "key": "RibbonG4ToughUltra",
+-      "spriteKey": "ribbong4toughultra",
+-      "name": "強壯究極獎章 (4代)"
++      "name": "強壯究極獎章 (4代)",
++      "sprites": {
++        "1": "ribbong4toughultra"
++      }
+     },
+     "RibbonGorgeous": {
+       "key": "RibbonGorgeous",
+-      "spriteKey": "ribbongorgeous",
+-      "name": "豪華獎章"
++      "name": "豪華獎章",
++      "sprites": {
++        "1": "ribbongorgeous"
++      }
+     },
+     "RibbonGorgeousRoyal": {
+       "key": "RibbonGorgeousRoyal",
+-      "spriteKey": "ribbongorgeousroyal",
+-      "name": "豪華高貴獎章"
++      "name": "豪華高貴獎章",
++      "sprites": {
++        "1": "ribbongorgeousroyal"
++      }
+     },
+     "RibbonHisui": {
+       "key": "RibbonHisui",
+-      "spriteKey": "ribbonhisui",
+-      "name": "洗翠獎章"
++      "name": "洗翠獎章",
++      "sprites": {
++        "1": "ribbonhisui"
++      }
+     },
+     "RibbonLegend": {
+       "key": "RibbonLegend",
+-      "spriteKey": "ribbonlegend",
+-      "name": "傳說獎章"
++      "name": "傳說獎章",
++      "sprites": {
++        "1": "ribbonlegend"
++      }
+     },
+     "RibbonMarkAbsentMinded": {
+       "key": "RibbonMarkAbsentMinded",
+-      "spriteKey": "ribbonmarkabsentminded",
+-      "name": "無慮之證"
++      "name": "無慮之證",
++      "sprites": {
++        "1": "ribbonmarkabsentminded"
++      }
+     },
+     "RibbonMarkAlpha": {
+       "key": "RibbonMarkAlpha",
+-      "spriteKey": "ribbonmarkalpha",
+-      "name": "頭目之證"
++      "name": "頭目之證",
++      "sprites": {
++        "1": "ribbonmarkalpha"
++      }
+     },
+     "RibbonMarkAngry": {
+       "key": "RibbonMarkAngry",
+-      "spriteKey": "ribbonmarkangry",
+-      "name": "憤怒之證"
++      "name": "憤怒之證",
++      "sprites": {
++        "1": "ribbonmarkangry"
++      }
+     },
+     "RibbonMarkBlizzard": {
+       "key": "RibbonMarkBlizzard",
+-      "spriteKey": "ribbonmarkblizzard",
+-      "name": "暴雪之證"
++      "name": "暴雪之證",
++      "sprites": {
++        "1": "ribbonmarkblizzard"
++      }
+     },
+     "RibbonMarkCalmness": {
+       "key": "RibbonMarkCalmness",
+-      "spriteKey": "ribbonmarkcalmness",
+-      "name": "冷靜之證"
++      "name": "冷靜之證",
++      "sprites": {
++        "1": "ribbonmarkcalmness"
++      }
+     },
+     "RibbonMarkCharismatic": {
+       "key": "RibbonMarkCharismatic",
+-      "spriteKey": "ribbonmarkcharismatic",
+-      "name": "領袖之證"
++      "name": "領袖之證",
++      "sprites": {
++        "1": "ribbonmarkcharismatic"
++      }
+     },
+     "RibbonMarkCloudy": {
+       "key": "RibbonMarkCloudy",
+-      "spriteKey": "ribbonmarkcloudy",
+-      "name": "陰雲之證"
++      "name": "陰雲之證",
++      "sprites": {
++        "1": "ribbonmarkcloudy"
++      }
+     },
+     "RibbonMarkCrafty": {
+       "key": "RibbonMarkCrafty",
+-      "spriteKey": "ribbonmarkcrafty",
+-      "name": "狡猾之證"
++      "name": "狡猾之證",
++      "sprites": {
++        "1": "ribbonmarkcrafty"
++      }
+     },
+     "RibbonMarkCurry": {
+       "key": "RibbonMarkCurry",
+-      "spriteKey": "ribbonmarkcurry",
+-      "name": "咖喱之證"
++      "name": "咖喱之證",
++      "sprites": {
++        "1": "ribbonmarkcurry"
++      }
+     },
+     "RibbonMarkDawn": {
+       "key": "RibbonMarkDawn",
+-      "spriteKey": "ribbonmarkdawn",
+-      "name": "拂曉之證"
++      "name": "拂曉之證",
++      "sprites": {
++        "1": "ribbonmarkdawn"
++      }
+     },
+     "RibbonMarkDestiny": {
+       "key": "RibbonMarkDestiny",
+-      "spriteKey": "ribbonmarkdestiny",
+-      "name": "命運之證"
++      "name": "命運之證",
++      "sprites": {
++        "1": "ribbonmarkdestiny"
++      }
+     },
+     "RibbonMarkDry": {
+       "key": "RibbonMarkDry",
+-      "spriteKey": "ribbonmarkdry",
+-      "name": "乾燥之證"
++      "name": "乾燥之證",
++      "sprites": {
++        "1": "ribbonmarkdry"
++      }
+     },
+     "RibbonMarkDusk": {
+       "key": "RibbonMarkDusk",
+-      "spriteKey": "ribbonmarkdusk",
+-      "name": "黃昏之證"
++      "name": "黃昏之證",
++      "sprites": {
++        "1": "ribbonmarkdusk"
++      }
+     },
+     "RibbonMarkExcited": {
+       "key": "RibbonMarkExcited",
+-      "spriteKey": "ribbonmarkexcited",
+-      "name": "期待之證"
++      "name": "期待之證",
++      "sprites": {
++        "1": "ribbonmarkexcited"
++      }
+     },
+     "RibbonMarkFerocious": {
+       "key": "RibbonMarkFerocious",
+-      "spriteKey": "ribbonmarkferocious",
+-      "name": "本能之證"
++      "name": "本能之證",
++      "sprites": {
++        "1": "ribbonmarkferocious"
++      }
+     },
+     "RibbonMarkFishing": {
+       "key": "RibbonMarkFishing",
+-      "spriteKey": "ribbonmarkfishing",
+-      "name": "上鉤之證"
++      "name": "上鉤之證",
++      "sprites": {
++        "1": "ribbonmarkfishing"
++      }
+     },
+     "RibbonMarkFlustered": {
+       "key": "RibbonMarkFlustered",
+-      "spriteKey": "ribbonmarkflustered",
+-      "name": "動搖之證"
++      "name": "動搖之證",
++      "sprites": {
++        "1": "ribbonmarkflustered"
++      }
+     },
+     "RibbonMarkGourmand": {
+       "key": "RibbonMarkGourmand",
+-      "spriteKey": "ribbonmarkgourmand",
+-      "name": "美食之證"
++      "name": "美食之證",
++      "sprites": {
++        "1": "ribbonmarkgourmand"
++      }
+     },
+     "RibbonMarkHumble": {
+       "key": "RibbonMarkHumble",
+-      "spriteKey": "ribbonmarkhumble",
+-      "name": "木訥之證"
++      "name": "木訥之證",
++      "sprites": {
++        "1": "ribbonmarkhumble"
++      }
+     },
+     "RibbonMarkIntellectual": {
+       "key": "RibbonMarkIntellectual",
+-      "spriteKey": "ribbonmarkintellectual",
+-      "name": "理性之證"
++      "name": "理性之證",
++      "sprites": {
++        "1": "ribbonmarkintellectual"
++      }
+     },
+     "RibbonMarkIntense": {
+       "key": "RibbonMarkIntense",
+-      "spriteKey": "ribbonmarkintense",
+-      "name": "熱情之證"
++      "name": "熱情之證",
++      "sprites": {
++        "1": "ribbonmarkintense"
++      }
+     },
+     "RibbonMarkItemfinder": {
+       "key": "RibbonMarkItemfinder",
+-      "spriteKey": "ribbonmarkitemfinder",
+-      "name": "撿拾之證"
++      "name": "撿拾之證",
++      "sprites": {
++        "1": "ribbonmarkitemfinder"
++      }
+     },
+     "RibbonMarkJittery": {
+       "key": "RibbonMarkJittery",
+-      "spriteKey": "ribbonmarkjittery",
+-      "name": "緊張之證"
++      "name": "緊張之證",
++      "sprites": {
++        "1": "ribbonmarkjittery"
++      }
+     },
+     "RibbonMarkJoyful": {
+       "key": "RibbonMarkJoyful",
+-      "spriteKey": "ribbonmarkjoyful",
+-      "name": "幸福之證"
++      "name": "幸福之證",
++      "sprites": {
++        "1": "ribbonmarkjoyful"
++      }
+     },
+     "RibbonMarkJumbo": {
+       "key": "RibbonMarkJumbo",
+-      "spriteKey": "ribbonmarkjumbo",
+-      "name": "大個子之證"
++      "name": "大個子之證",
++      "sprites": {
++        "1": "ribbonmarkjumbo"
++      }
+     },
+     "RibbonMarkKindly": {
+       "key": "RibbonMarkKindly",
+-      "spriteKey": "ribbonmarkkindly",
+-      "name": "優雅之證"
++      "name": "優雅之證",
++      "sprites": {
++        "1": "ribbonmarkkindly"
++      }
+     },
+     "RibbonMarkLunchtime": {
+       "key": "RibbonMarkLunchtime",
+-      "spriteKey": "ribbonmarklunchtime",
+-      "name": "正午之證"
++      "name": "正午之證",
++      "sprites": {
++        "1": "ribbonmarklunchtime"
++      }
+     },
+     "RibbonMarkMightiest": {
+       "key": "RibbonMarkMightiest",
+-      "spriteKey": "ribbonmarkmightiest",
+-      "name": "最強之證"
++      "name": "最強之證",
++      "sprites": {
++        "1": "ribbonmarkmightiest"
++      }
+     },
+     "RibbonMarkMini": {
+       "key": "RibbonMarkMini",
+-      "spriteKey": "ribbonmarkmini",
+-      "name": "小不點之證"
++      "name": "小不點之證",
++      "sprites": {
++        "1": "ribbonmarkmini"
++      }
+     },
+     "RibbonMarkMisty": {
+       "key": "RibbonMarkMisty",
+-      "spriteKey": "ribbonmarkmisty",
+-      "name": "濃霧之證"
++      "name": "濃霧之證",
++      "sprites": {
++        "1": "ribbonmarkmisty"
++      }
+     },
+     "RibbonMarkPartner": {
+       "key": "RibbonMarkPartner",
+-      "spriteKey": "ribbonmarkpartner",
+-      "name": "搭檔之證"
++      "name": "搭檔之證",
++      "sprites": {
++        "1": "ribbonmarkpartner"
++      }
+     },
+     "RibbonMarkPeeved": {
+       "key": "RibbonMarkPeeved",
+-      "spriteKey": "ribbonmarkpeeved",
+-      "name": "激動之證"
++      "name": "激動之證",
++      "sprites": {
++        "1": "ribbonmarkpeeved"
++      }
+     },
+     "RibbonMarkPrideful": {
+       "key": "RibbonMarkPrideful",
+-      "spriteKey": "ribbonmarkprideful",
+-      "name": "自信之證"
++      "name": "自信之證",
++      "sprites": {
++        "1": "ribbonmarkprideful"
++      }
+     },
+     "RibbonMarkPumpedUp": {
+       "key": "RibbonMarkPumpedUp",
+-      "spriteKey": "ribbonmarkpumpedup",
+-      "name": "昂揚之證"
++      "name": "昂揚之證",
++      "sprites": {
++        "1": "ribbonmarkpumpedup"
++      }
+     },
+     "RibbonMarkRainy": {
+       "key": "RibbonMarkRainy",
+-      "spriteKey": "ribbonmarkrainy",
+-      "name": "降雨之證"
++      "name": "降雨之證",
++      "sprites": {
++        "1": "ribbonmarkrainy"
++      }
+     },
+     "RibbonMarkRare": {
+       "key": "RibbonMarkRare",
+-      "spriteKey": "ribbonmarkrare",
+-      "name": "未知之證"
++      "name": "未知之證",
++      "sprites": {
++        "1": "ribbonmarkrare"
++      }
+     },
+     "RibbonMarkRowdy": {
+       "key": "RibbonMarkRowdy",
+-      "spriteKey": "ribbonmarkrowdy",
+-      "name": "淘氣之證"
++      "name": "淘氣之證",
++      "sprites": {
++        "1": "ribbonmarkrowdy"
++      }
+     },
+     "RibbonMarkSandstorm": {
+       "key": "RibbonMarkSandstorm",
+-      "spriteKey": "ribbonmarksandstorm",
+-      "name": "沙塵之證"
++      "name": "沙塵之證",
++      "sprites": {
++        "1": "ribbonmarksandstorm"
++      }
+     },
+     "RibbonMarkScowling": {
+       "key": "RibbonMarkScowling",
+-      "spriteKey": "ribbonmarkscowling",
+-      "name": "兇悍之證"
++      "name": "兇悍之證",
++      "sprites": {
++        "1": "ribbonmarkscowling"
++      }
+     },
+     "RibbonMarkSleepyTime": {
+       "key": "RibbonMarkSleepyTime",
+-      "spriteKey": "ribbonmarksleepytime",
+-      "name": "午夜之證"
++      "name": "午夜之證",
++      "sprites": {
++        "1": "ribbonmarksleepytime"
++      }
+     },
+     "RibbonMarkSlump": {
+       "key": "RibbonMarkSlump",
+-      "spriteKey": "ribbonmarkslump",
+-      "name": "不振之證"
++      "name": "不振之證",
++      "sprites": {
++        "1": "ribbonmarkslump"
++      }
+     },
+     "RibbonMarkSmiley": {
+       "key": "RibbonMarkSmiley",
+-      "spriteKey": "ribbonmarksmiley",
+-      "name": "微笑之證"
++      "name": "微笑之證",
++      "sprites": {
++        "1": "ribbonmarksmiley"
++      }
+     },
+     "RibbonMarkSnowy": {
+       "key": "RibbonMarkSnowy",
+-      "spriteKey": "ribbonmarksnowy",
+-      "name": "降雪之證"
++      "name": "降雪之證",
++      "sprites": {
++        "1": "ribbonmarksnowy"
++      }
+     },
+     "RibbonMarkStormy": {
+       "key": "RibbonMarkStormy",
+-      "spriteKey": "ribbonmarkstormy",
+-      "name": "落雷之證"
++      "name": "落雷之證",
++      "sprites": {
++        "1": "ribbonmarkstormy"
++      }
+     },
+     "RibbonMarkTeary": {
+       "key": "RibbonMarkTeary",
+-      "spriteKey": "ribbonmarkteary",
+-      "name": "悲傷之證"
++      "name": "悲傷之證",
++      "sprites": {
++        "1": "ribbonmarkteary"
++      }
+     },
+     "RibbonMarkThorny": {
+       "key": "RibbonMarkThorny",
+-      "spriteKey": "ribbonmarkthorny",
+-      "name": "不純之證"
++      "name": "不純之證",
++      "sprites": {
++        "1": "ribbonmarkthorny"
++      }
+     },
+     "RibbonMarkTitan": {
+       "key": "RibbonMarkTitan",
+-      "spriteKey": "ribbonmarktitan",
+-      "name": "寳主之證"
++      "name": "寳主之證",
++      "sprites": {
++        "1": "ribbonmarktitan"
++      }
+     },
+     "RibbonMarkUncommon": {
+       "key": "RibbonMarkUncommon",
+-      "spriteKey": "ribbonmarkuncommon",
+-      "name": "偶遇之證"
++      "name": "偶遇之證",
++      "sprites": {
++        "1": "ribbonmarkuncommon"
++      }
+     },
+     "RibbonMarkUnsure": {
+       "key": "RibbonMarkUnsure",
+-      "spriteKey": "ribbonmarkunsure",
+-      "name": "自卑之證"
++      "name": "自卑之證",
++      "sprites": {
++        "1": "ribbonmarkunsure"
++      }
+     },
+     "RibbonMarkUpbeat": {
+       "key": "RibbonMarkUpbeat",
+-      "spriteKey": "ribbonmarkupbeat",
+-      "name": "爽快之證"
++      "name": "爽快之證",
++      "sprites": {
++        "1": "ribbonmarkupbeat"
++      }
+     },
+     "RibbonMarkVigor": {
+       "key": "RibbonMarkVigor",
+-      "spriteKey": "ribbonmarkvigor",
+-      "name": "活力之證"
++      "name": "活力之證",
++      "sprites": {
++        "1": "ribbonmarkvigor"
++      }
+     },
+     "RibbonMarkZeroEnergy": {
+       "key": "RibbonMarkZeroEnergy",
+-      "spriteKey": "ribbonmarkzeroenergy",
+-      "name": "倦怠之證"
++      "name": "倦怠之證",
++      "sprites": {
++        "1": "ribbonmarkzeroenergy"
++      }
+     },
+     "RibbonMarkZonedOut": {
+       "key": "RibbonMarkZonedOut",
+-      "spriteKey": "ribbonmarkzonedout",
+-      "name": "疏忽之證"
++      "name": "疏忽之證",
++      "sprites": {
++        "1": "ribbonmarkzonedout"
++      }
+     },
+     "RibbonMasterBeauty": {
+       "key": "RibbonMasterBeauty",
+-      "spriteKey": "ribbonmasterbeauty",
+-      "name": "美麗大師獎章 (6代)"
++      "name": "美麗大師獎章 (6代)",
++      "sprites": {
++        "1": "ribbonmasterbeauty"
++      }
+     },
+     "RibbonMasterCleverness": {
+       "key": "RibbonMasterCleverness",
+-      "spriteKey": "ribbonmastercleverness",
+-      "name": "聰明大師獎章 (6代)"
++      "name": "聰明大師獎章 (6代)",
++      "sprites": {
++        "1": "ribbonmastercleverness"
++      }
+     },
+     "RibbonMasterCoolness": {
+       "key": "RibbonMasterCoolness",
+-      "spriteKey": "ribbonmastercoolness",
+-      "name": "帥氣大師獎章 (6代)"
++      "name": "帥氣大師獎章 (6代)",
++      "sprites": {
++        "1": "ribbonmastercoolness"
++      }
+     },
+     "RibbonMasterCuteness": {
+       "key": "RibbonMasterCuteness",
+-      "spriteKey": "ribbonmastercuteness",
+-      "name": "可愛大師獎章 (6代)"
++      "name": "可愛大師獎章 (6代)",
++      "sprites": {
++        "1": "ribbonmastercuteness"
++      }
+     },
+     "RibbonMasterRank": {
+       "key": "RibbonMasterRank",
+-      "spriteKey": "ribbonmasterrank",
+-      "name": "級別對戰大師獎章"
++      "name": "級別對戰大師獎章",
++      "sprites": {
++        "1": "ribbonmasterrank"
++      }
+     },
+     "RibbonMasterToughness": {
+       "key": "RibbonMasterToughness",
+-      "spriteKey": "ribbonmastertoughness",
+-      "name": "強壯大師獎章 (6代)"
++      "name": "強壯大師獎章 (6代)",
++      "sprites": {
++        "1": "ribbonmastertoughness"
++      }
+     },
+     "RibbonNational": {
+       "key": "RibbonNational",
+-      "spriteKey": "ribbonnational",
+-      "name": "國家獎章"
++      "name": "國家獎章",
++      "sprites": {
++        "1": "ribbonnational"
++      }
+     },
+     "RibbonOnceInALifetime": {
+       "key": "RibbonOnceInALifetime",
+-      "spriteKey": "ribbononceinalifetime",
+-      "name": "千載難逢獎章"
++      "name": "千載難逢獎章",
++      "sprites": {
++        "1": "ribbononceinalifetime"
++      }
+     },
+     "RibbonPartner": {
+       "key": "RibbonPartner",
+-      "spriteKey": "ribbonpartner",
+-      "name": "同伴獎章"
++      "name": "同伴獎章",
++      "sprites": {
++        "1": "ribbonpartner"
++      }
+     },
+     "RibbonPremier": {
+       "key": "RibbonPremier",
+-      "spriteKey": "ribbonpremier",
+-      "name": "紀念獎章"
++      "name": "紀念獎章",
++      "sprites": {
++        "1": "ribbonpremier"
++      }
+     },
+     "RibbonRecord": {
+       "key": "RibbonRecord",
+-      "spriteKey": "ribbonrecord",
+-      "name": "紀錄獎章"
++      "name": "紀錄獎章",
++      "sprites": {
++        "1": "ribbonrecord"
++      }
+     },
+     "RibbonRelax": {
+       "key": "RibbonRelax",
+-      "spriteKey": "ribbonrelax",
+-      "name": "爽快獎章"
++      "name": "爽快獎章",
++      "sprites": {
++        "1": "ribbonrelax"
++      }
+     },
+     "RibbonRoyal": {
+       "key": "RibbonRoyal",
+-      "spriteKey": "ribbonroyal",
+-      "name": "高貴獎章"
++      "name": "高貴獎章",
++      "sprites": {
++        "1": "ribbonroyal"
++      }
+     },
+     "RibbonShock": {
+       "key": "RibbonShock",
+-      "spriteKey": "ribbonshock",
+-      "name": "心跳獎章"
++      "name": "心跳獎章",
++      "sprites": {
++        "1": "ribbonshock"
++      }
+     },
+     "RibbonSmile": {
+       "key": "RibbonSmile",
+-      "spriteKey": "ribbonsmile",
+-      "name": "歡笑獎章"
++      "name": "歡笑獎章",
++      "sprites": {
++        "1": "ribbonsmile"
++      }
+     },
+     "RibbonSnooze": {
+       "key": "RibbonSnooze",
+-      "spriteKey": "ribbonsnooze",
+-      "name": "酣睡獎章"
++      "name": "酣睡獎章",
++      "sprites": {
++        "1": "ribbonsnooze"
++      }
+     },
+     "RibbonSouvenir": {
+       "key": "RibbonSouvenir",
+-      "spriteKey": "ribbonsouvenir",
+-      "name": "回憶獎章"
++      "name": "回憶獎章",
++      "sprites": {
++        "1": "ribbonsouvenir"
++      }
+     },
+     "RibbonSpecial": {
+       "key": "RibbonSpecial",
+-      "spriteKey": "ribbonspecial",
+-      "name": "特殊獎章"
++      "name": "特殊獎章",
++      "sprites": {
++        "1": "ribbonspecial"
++      }
+     },
+     "RibbonTowerMaster": {
+       "key": "RibbonTowerMaster",
+-      "spriteKey": "ribbontowermaster",
+-      "name": "對戰塔大師獎章"
++      "name": "對戰塔大師獎章",
++      "sprites": {
++        "1": "ribbontowermaster"
++      }
+     },
+     "RibbonTraining": {
+       "key": "RibbonTraining",
+-      "spriteKey": "ribbontraining",
+-      "name": "修行獎章"
++      "name": "修行獎章",
++      "sprites": {
++        "1": "ribbontraining"
++      }
+     },
+     "RibbonTwinklingStar": {
+       "key": "RibbonTwinklingStar",
+-      "spriteKey": "ribbontwinklingstar",
+-      "name": "閃亮之星獎章"
++      "name": "閃亮之星獎章",
++      "sprites": {
++        "1": "ribbontwinklingstar"
++      }
+     },
+     "RibbonVictory": {
+       "key": "RibbonVictory",
+-      "spriteKey": "ribbonvictory",
+-      "name": "勝利獎章"
++      "name": "勝利獎章",
++      "sprites": {
++        "1": "ribbonvictory"
++      }
+     },
+     "RibbonWinning": {
+       "key": "RibbonWinning",
+-      "spriteKey": "ribbonwinning",
+-      "name": "成功獎章"
++      "name": "成功獎章",
++      "sprites": {
++        "1": "ribbonwinning"
++      }
+     },
+     "RibbonWishing": {
+       "key": "RibbonWishing",
+-      "spriteKey": "ribbonwishing",
+-      "name": "許願獎章"
++      "name": "許願獎章",
++      "sprites": {
++        "1": "ribbonwishing"
++      }
+     },
+     "RibbonWorld": {
+       "key": "RibbonWorld",
+-      "spriteKey": "ribbonworld",
+-      "name": "世界獎章"
++      "name": "世界獎章",
++      "sprites": {
++        "1": "ribbonworld"
++      }
+     }
+   },
+   "languages": {
