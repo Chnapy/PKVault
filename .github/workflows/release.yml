@@ -209,7 +209,7 @@ jobs:
           docker build . --target desktop --build-arg RID=win-${{ matrix.arch }} --build-arg VERSION=${{ env.VERSION }} -t tmp-desktop-win
           docker create --name tmp-desktop-win tmp-desktop-win
 
-          docker cp tmp-desktop-win:/app/PKVault.exe _export/PKVault-${{ env.VERSION }}.exe
+          docker cp tmp-desktop-win:/app/PKVault.exe _export/PKVault-${{ env.VERSION }}-${{ matrix.arch }}.exe
 
           docker rm tmp-desktop-win
           docker rmi tmp-desktop-win
