@@ -26,6 +26,8 @@ dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program File
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
+		<RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net10.0-android'">android-arm64;android-x64</RuntimeIdentifiers>
+
 		<OutputType>Exe</OutputType>
 		<RootNamespace>PKVault.Mobile</RootNamespace>
 		<UseMaui>true</UseMaui>
