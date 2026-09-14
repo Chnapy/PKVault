@@ -434,7 +434,8 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
                     MarkingColor.None => MarkingColorUniversal.NotMarked,
                     MarkingColor.Blue => MarkingColorUniversal.MarkedBlue,
                     MarkingColor.Pink => MarkingColorUniversal.MarkedPink,
-                    _ => throw new NotImplementedException(),
+                    // may happen when marking is illegal
+                    _ => MarkingColorUniversal.Marked,
                 });
             }
             return [.. markings];
