@@ -249,7 +249,7 @@ jobs:
       - name: Build Android mobile image & extract app bundle
         if: ${{ matrix.arch == 'x64' }}
         run: |
-          docker build . --target mobile-android --build-arg --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
+          docker build . --target mobile-android --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
           docker create --name tmp-mobile-android tmp-mobile-android
 
           docker cp tmp-mobile-android:/app/pkvault.apk _export/pkvault-${{ env.VERSION }}.apk
