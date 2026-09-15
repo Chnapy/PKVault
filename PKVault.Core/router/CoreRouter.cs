@@ -252,6 +252,8 @@ public partial class CoreRouter
                     return p.DefaultValue;
                 if (Nullable.GetUnderlyingType(p.ParameterType) != null)
                     return null;
+                if (p.ParameterType.IsArray)
+                    return Array.CreateInstanceFromArrayType(p.ParameterType, 0);
                 throw new ArgumentException($"Missing required parameter: {p.Name}");
             }
 

@@ -11,6 +11,7 @@ import { getDesktopFileTypeInfos } from '../../ui/form/globs-input/util/get-desk
 import { GlobsInputItem } from './globs-input-item';
 import { GlobsInputResults } from './globs-input-results';
 import { useDesktopMessage } from './hooks/use-desktop-message';
+import { filterIsDefined } from '../../util/filter-is-defined';
 
 export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'>>
     & Pick<UIGlobsInputListProps, 'labelList' | 'labelAddFile' | 'labelAddFolder' | 'labelAddPath'>
@@ -19,10 +20,10 @@ export type GlobsInputListProps = Partial<Omit<UseFormRegisterReturn, 'onChange'
         value: string;
         onChange: (value: string) => void;
         limit: number;
-        children?: React.ReactNode;
+        extraValue?: string;
     };
 
-export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onChange, limit, disabled, children, ...rest }) => {
+export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onChange, limit, disabled, extraValue, ...rest }) => {
     const { t } = useTranslate();
 
     const settingsQuery = useSettingsGet();
@@ -74,12 +75,18 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
             style={{ flexGrow: 1 }}
         />}
         results={<GlobsInputResults
-            values={splittedValue}
+            values={[ extraValue, ...splittedValue ].filter(filterIsDefined)}
             limit={limit * 2}
         />}
         {...rest}
     >
-        {children}
+        {extraValue && <GlobsInputItem
+            name='extra-value'
+            value={extraValue}
+            disabled
+            limit={limit}
+        />}
+
         {splittedValue.map((value, i) => <GlobsInputItem key={i}
             name={`${name}-${i}`}
             value={value}
@@ -98,7 +105,7 @@ export const GlobsInputList: React.FC<GlobsInputListProps> = ({ name, value, onC
             data-item-last={(i === splittedValue.length - 1) || undefined}
         />)}
 
-        {splittedValue.length === 0 && !children && <EmptyState
+        {splittedValue.length === 0 && !extraValue && <EmptyState
             size='sm'
             icon={<PackageOpenIcon />}
             title={t('settings.form.saves.empty')}
