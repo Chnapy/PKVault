@@ -418,7 +418,7 @@ public class DataNormalizeAction(
                 if (oldSaves.Length == 0)
                     continue;
 
-                BankEntity.BankViewSave[] updatedSaves = [];
+                List<BankEntity.BankViewSave> updatedSaves = [];
 
                 for (int i = 0; i < oldSaves.Length; i++)
                 {
@@ -437,13 +437,13 @@ public class DataNormalizeAction(
                     if (matchLoaderBank == null)
                         continue;
 
-                    updatedSaves[i] = oldSave with
+                    updatedSaves.Add(oldSave with
                     {
                         SaveId = matchLoaderBank.Save.Id
-                    };
+                    });
                 }
 
-                bank_entity.View = new(boxes, updatedSaves);
+                bank_entity.View = new(boxes, updatedSaves.ToArray());
 
                 await bankLoader.UpdateEntity(bank_entity);
             }
