@@ -114,7 +114,7 @@ public class DataNormalizeAction(
             await MigrateVariantsFrom200(input);
         }
         // <= 2.2.2
-        if (currentVersion != null && GetVersionValue(currentVersion.Value) <= GetVersionValue("2.2.2"))
+        if (currentVersion != null && GetVersionValue(currentVersion.Value) <= GetVersionValue("2.3.0"))
         {
             await MigrateIdsFrom222();
         }
@@ -418,7 +418,7 @@ public class DataNormalizeAction(
                 if (oldSaves.Length == 0)
                     continue;
 
-                var updatedSaves = new BankEntity.BankViewSave[oldSaves.Length];
+                BankEntity.BankViewSave[] updatedSaves = [];
 
                 for (int i = 0; i < oldSaves.Length; i++)
                 {
