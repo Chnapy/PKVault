@@ -213,7 +213,7 @@ public class BackupService(
 
     private static DateTime DeserializeDateTime(string str)
     {
-        return DateTime.ParseExact(str, dateTimeFormat, CultureInfo.InvariantCulture);
+        return DateTime.ParseExact(str, dateTimeFormat, CultureInfo.InvariantCulture).ToUniversalTime();
     }
 
     private static string GetBackupFilename(DateTime createdAt, string name)
