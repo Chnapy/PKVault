@@ -60,9 +60,9 @@ dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program File
 		<ApplicationId>io.github.chnapy.pkvault</ApplicationId>
 
 		<!-- Versions -->
-		<!-- Should be integer equivalent of current version (2.3.1) -->
+		<!-- Should be integer equivalent of current version (2.3.2) -->
 		<!-- 2.3.0 = 1, 2.3.1 = 2, etc -->
-		<ApplicationVersion>2</ApplicationVersion>
+		<ApplicationVersion>3</ApplicationVersion>
 
 		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
 		<WindowsPackageType>None</WindowsPackageType>
