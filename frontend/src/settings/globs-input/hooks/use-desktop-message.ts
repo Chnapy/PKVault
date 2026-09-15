@@ -35,7 +35,7 @@ const external = window.external as External | undefined;
 
 const desktopResponseSchema = z.object({
     detail: z.object({
-        type: z.string()
+        type: z.number()    // DesktopMessageType
     })
 });
 
