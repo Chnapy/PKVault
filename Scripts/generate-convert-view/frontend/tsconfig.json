@@ -1,18 +1,8 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
-    "noImplicitAny": true,
-    "noEmitOnError": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "noUncheckedIndexedAccess": true,
-    "removeComments": true,
     "sourceMap": true,
-    "target": "esnext",
     "rootDir": ".",
-    "outDir": "public/js"
-  },
-  "include": [
-    "*.ts"
-  ]
+    "outDir": "../../bin/Debug/net10.0/generate-convert-view/frontend/public/js"
+  }
 }

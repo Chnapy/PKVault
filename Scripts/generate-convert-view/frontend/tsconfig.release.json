@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../../bin/Release/net10.0/generate-convert-view/frontend/public/js"
+  }
+}

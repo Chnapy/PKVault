@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "removeComments": true,
+    "target": "esnext",
+    "sourceMap": false
+  },
+  "include": [
+    "*.ts"
+  ]
+}

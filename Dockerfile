@@ -351,6 +351,11 @@ RUN dotnet restore "Scripts/Scripts.csproj"
 COPY frontend/public/imgs/sheets frontend/public/imgs/sheets
 COPY Scripts Scripts
 
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
+
 RUN dotnet run --project "Scripts/Scripts.csproj" -c Release gen-convert
 
-COPY Scripts/bin/Release/net10.0/generate-convert-view/frontend /app/publish
+RUN npx typescript -p Scripts/generate-convert-view/frontend/tsconfig.release.json
+
+RUN mkdir /app \
+  && mv Scripts/bin/Release/net10.0/generate-convert-view/frontend /app/publish
