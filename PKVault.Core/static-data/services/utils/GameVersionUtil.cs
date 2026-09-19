@@ -40,7 +40,7 @@ public class GameVersionUtil
     public class VersionChecker
     {
         private readonly ConcurrentDictionary<int, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
-        private readonly List<(GameVersion Version, SaveWrapper? Save)> allVersionBlankSaves;
+        public readonly List<(GameVersion Version, SaveWrapper? Save)> allVersionBlankSaves;
 
         public VersionChecker()
         {

@@ -3,6 +3,7 @@ using PKVault.Core;
 using Serilog;
 
 FileIOService.IsScriptsContext = true;
+SettingsDTO.IsScriptsContext = true;
 
 // Scripts\
 Directory.SetCurrentDirectory(Path.Combine(
@@ -14,7 +15,7 @@ Directory.SetCurrentDirectory(Path.Combine(
 PKVault.Core.Program.Initialize();
 
 var services = new ServiceCollection();
-PKVault.Core.Program.ConfigureMinimalServices(services);
+PKVault.Core.Program.ConfigureServices(services);
 services.AddSingleton<PokeApiService>();
 services.AddSingleton<GenStaticDataService>();
 
@@ -42,6 +43,13 @@ else if (args.Contains("gen-static-data"))
 
     var genStaticDataService = sp.GetRequiredService<GenStaticDataService>();
     await genStaticDataService.GenerateFiles();
+}
+
+else if (args.Contains("gen-convert"))
+{
+    Log.Information("-- Convert view generation --");
+
+    await GenerateConvertView.Generate(sp);
 }
 
 else

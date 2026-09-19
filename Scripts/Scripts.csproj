@@ -5,11 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="7.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="NJsonSchema.CodeGeneration.TypeScript" Version="11.6.1" />
     <PackageReference Include="PokeApi.Models" Version="[1.0.147]" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="DiffPlex" Version="1.9.0" />
 
     <ProjectReference Include="..\PKVault.Core\PKVault.Core.csproj" />
     <Reference Include="../PKVault.Core/PKHeX.Core.dll" />
+    
+    <Content Include="generate-convert-view/frontend/*" />
+    <Content Include="generate-convert-view/frontend/public/**/*" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+    <Content Include="generate-convert-view/frontend/index.html" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
   </ItemGroup>
 </Project>

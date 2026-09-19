@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml"
+    href="https://raw.githubusercontent.com/Chnapy/PKVault/refs/heads/main/frontend/public/icon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PKVault Static page</title>
+  <style>
+    body {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      font-family: calibri;
+      background-color: #934E3D;
+      color: #FFF;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    h1 {
+      max-width: 300px;
+      text-align: center;
+      /* margin: 0; */
+    }
+
+    small {
+      display: flex;
+      font-size: 0.5em;
+      opacity: 0.8;
+      text-align: inherit;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    a {
+      flex-grow: 1;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px;
+      background-color: #B6634E;
+      border-radius: 8px;
+      font-size: 2em;
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    a:hover {
+      filter: brightness(1.1);
+    }
+
+    img {
+      width: 48px;
+      image-rendering: pixelated;
+      padding: 4px;
+      background-color: #934E3D;
+      border-radius: 8px;
+    }
+
+    .pxl {
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="column">
+    <h1>
+      PKVault
+      <small>Pokemon hub for your games</small>
+    </h1>
+
+    <a href="https://pkvault-demo.chnapy.dev">
+      <img src="https://raw.githubusercontent.com/Chnapy/PKVault/refs/heads/main/frontend/public/icon.png" />
+      DEMO
+    </a>
+
+    <a href="https://github.com/Chnapy/PKVault/releases/latest">
+      <img src="https://raw.githubusercontent.com/Chnapy/PKVault/refs/heads/main/frontend/public/icon.png" />
+      DOWNLOAD
+    </a>
+
+    <a href="convert.html">
+      <img class="pxl"
+        src="https://raw.githubusercontent.com/Chnapy/PKVault/refs/heads/main/frontend/src/assets/pkhex/alpha.png" />
+      Convert View
+    </a>
+
+    <a href="https://github.com/Chnapy/PKVault">
+      <img src="http://github.com/favicon.ico" />
+      Repository
+    </a>
+
+    <a href="https://projectpokemon.org/home/forums/topic/67239-pkvault-centralized-pkm-storage-management-pokedex-app">
+      <img class="pxl" src="http://projectpokemon.org/favicon.ico" />
+      ProjectPokemon
+    </a>
+  </div>
+</body>
+
+</html>

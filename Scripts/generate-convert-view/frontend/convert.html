@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml"
+    href="https://raw.githubusercontent.com/Chnapy/PKVault/refs/heads/main/frontend/src/assets/pkhex/alpha.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PKVault Convert View</title>
+  <style>
+    body {
+      font-family: calibri;
+      background-color: #f4f4f4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    summary {
+      width: 100%;
+    }
+
+    select {
+      min-width: 100%;
+      overflow: auto;
+      padding: 4px;
+    }
+
+    #intro .links {
+      float: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #controls {
+      position: sticky;
+      top: 0;
+      float: right;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      background-color: #934E3D;
+      color: #FFF;
+      border-radius: 4px;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    #controls button,
+    #controls details summary,
+    #controls label {
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background-color: #B6634E;
+      color: inherit;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      padding: 0 4px;
+      cursor: pointer;
+    }
+
+    #controls button[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #controls details {
+      height: 20px;
+    }
+
+    #control-properties-wrapper summary {
+      cursor: pointer;
+    }
+
+    #control-columns {
+      height: 250px;
+    }
+
+    #control-properties {
+      height: 400px;
+    }
+
+    .form-line {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      /* gap: 8px; */
+      background-color: #f4eae0;
+      border: 1px solid #cfc4b8;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    .form-line summary {
+      position: sticky;
+      top: 0px;
+      z-index: 2;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #f4eae0;
+    }
+
+    .form-line[open] summary,
+    .form-line summary:hover {
+      background-color: #ede2d8;
+    }
+
+    .form-line summary::marker {
+      content: '';
+    }
+
+    .form-left {
+      display: flex;
+      width: 100%;
+      gap: 4px;
+    }
+
+    .form-left-title {
+      white-space: pre-line;
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    .species-img {
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
+      justify-content: center;
+      align-items: center;
+      display: inline-flex;
+      overflow: hidden;
+    }
+
+    .species-img img {
+      object-fit: none;
+      image-rendering: pixelated;
+      /* transform: scale(0.75); */
+      pointer-events: none;
+    }
+
+    [open] .species-img {
+      width: 48px;
+      height: 48px;
+    }
+
+    [open] .species-img img {
+      transform: scale(0.5);
+    }
+
+    .form-data {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px;
+      flex-wrap: wrap;
+    }
+
+    .warnings {
+      display: inline-block;
+      white-space: pre-line;
+      margin: 8px;
+      margin-top: 0;
+      padding: 8px;
+      background-color: #faf6f0;
+      color: #D80;
+      border: 1px solid currentColor;
+      border-radius: 8px;
+    }
+
+    .warnings:empty {
+      display: none;
+    }
+
+    .step-suite-steps {
+      display: flex;
+      gap: 4px;
+    }
+
+    .step {
+      display: inline-block;
+    }
+
+    .step-fields {
+      display: inline-block;
+    }
+
+    dl {
+      margin: 0;
+    }
+
+    dt {
+      float: left;
+      clear: left;
+      margin-right: 5px;
+      font-weight: bold;
+    }
+
+    dd {
+      margin-left: 0px;
+      text-align: right;
+    }
+
+    .step-suite {
+      max-width: 100%;
+      display: inline-block;
+      background-color: #faf6f0;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .step-suite-scroll {
+      overflow-x: auto;
+    }
+
+    .step-suite-table {
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    tr th {
+      position: sticky;
+      left: 0;
+      text-align: left;
+      z-index: 1;
+      background-color: #f4f0ea;
+      text-align: left;
+      user-select: none;
+    }
+
+    .step-header-row th:first-child {
+      z-index: 3;
+    }
+
+    .step-header-row th:not(:first-child):not(:nth-child(2))::before {
+      content: '→';
+    }
+
+    .field-row {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .field-row td {
+      white-space: break-spaces;
+      vertical-align: top;
+      max-width: 200px;
+    }
+
+    :not(tr).changed {
+      background-color: #FFA;
+    }
+
+    .bool {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 99px;
+      background-color: #A88;
+    }
+
+    .bool-true {
+      background-color: #8A8;
+    }
+
+    .bool+.bool {
+      margin-left: 2px;
+    }
+
+    [data-empty="true"] {
+      opacity: 0.4;
+    }
+
+    [data-type="FORWARD"] {
+      color: #33F;
+    }
+
+    [data-type="BACKWARD"] {
+      color: #B44;
+    }
+
+    [data-type="BASE_TO_VARIANT"] {
+      color: #808;
+    }
+
+    [data-type="VARIANT_TO_BASE"] {
+      color: #A4A;
+    }
+
+    td[data-status="error"] {
+      color: #C00;
+      max-width: 160px;
+    }
+  </style>
+  <style id="changes-only"></style>
+  <style id="columns"></style>
+  <style id="properties"></style>
+</head>
+
+<body>
+  <div id="root">
+    <div id="intro">
+      <div class="links">
+        <a href="index.html">PKVault Index</a>
+        <a href="https://pkvault-demo.chnapy.dev">PKVault DEMO</a>
+        <a href="https://github.com/Chnapy/PKVault">PKVault repository</a>
+        <a href="https://github.com/Chnapy/PKVault/releases/latest">DOWNLOAD</a>
+      </div>
+      <h3>
+        PKVault Convert View
+      </h3>
+
+      <p>
+        Big view showing PKVault convert results, with all species (1000+) and forms, covering a maximum of use cases.
+        <br />Every PKM generated is displayed, with all its properties.
+        <br /><span class="changed">Changed properties from previous PKM are highlighted</span> to identify possible
+        unexpected changes.
+        <br />Multiple convert suites are done. 4 types of suite exist:
+      </p>
+      <ul>
+        <li>
+          <b data-type="FORWARD">FORWARD</b>: From a generation to a new one (like G2->G8)
+        </li>
+        <li>
+          <b data-type="BACKWARD">BACKWARD</b>: From a generation to an old one (like G9->G1)
+        </li>
+        <li>
+          <b data-type="BASE_TO_VARIANT">BASE_TO_VARIANT</b>: From a primary game to a secondary one (like
+          G7->G7b, aka Sun->Let'sGo)
+        </li>
+        <li>
+          <b data-type="VARIANT_TO_BASE">VARIANT_TO_BASE</b>: From a secondary game to a primary one (like
+          G7b->G7, aka Let'sGo->Sun)
+        </li>
+      </ul>
+    </div>
+    <div id="controls">
+      <label><input id="control-changes" type="checkbox" />Lines with changes only</label>
+
+      <details id="control-columns-wrapper">
+        <summary>Columns</summary>
+        <select id="control-columns" multiple></select>
+      </details>
+      <details id="control-properties-wrapper">
+        <summary>Properties</summary>
+        <select id="control-properties" multiple></select>
+      </details>
+    </div>
+  </div>
+
+  <template id="form-line">
+    <details class="form-line">
+      <summary>
+        <div class="form-left">
+          <div class="species-img"><img /></div>
+          <h4 class="form-left-title"></h4>
+        </div>
+      </summary>
+      <div class="form-data"></div>
+      <div class="warnings"></div>
+    </details>
+  </template>
+
+  <template id="step-suite">
+    <section class="step-suite">
+      <div class="step-suite-scroll">
+        <table class="step-suite-table"></table>
+      </div>
+    </section>
+  </template>
+
+  <template id="step">
+    <article class="step">
+      <header class="step-header">
+        <span class="step-type"></span>
+      </header>
+      <dl class="step-fields"></dl>
+    </article>
+  </template>
+
+  <script type="module" src="public/js/main.js"></script>
+</body>
+
+</html>
