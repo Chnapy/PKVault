@@ -122,6 +122,8 @@ The characteristics of the base pokémon are taken and converted for the target 
 The conversion of the created pokémon may be imperfect, and involuntarily create an illegal pokémon.
 If needed, you can open the pokémon (its PK file) via PKHeX, and correct legality issues directly.
 
+Checkout [Convert Big View](https://chnapy.github.io/PKVault/convert.html).
+
 </details>
 
 <details> 

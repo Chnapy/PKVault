@@ -1,19 +1,19 @@
 import { ConvertDirection, ConvertFormJSON, ConvertStep, IndexJSON, LanguageID, PkmLegalityDTO, PkmVariantDTO, StaticOthersData, StaticSpecies, StaticSpritesheetsData } from './types.gen.js';
 
-const fetchSheets = () => fetch('/public/static/spritesheets.json')
+const fetchSheets = () => fetch('public/static/spritesheets.json')
     .then(res => res.json() as Promise<StaticSpritesheetsData>)
     .then(data => data.Species);
 
-const fetchSpecies = () => fetch('/public/static/species.json')
+const fetchSpecies = () => fetch('public/static/species.json')
     .then(res => res.json() as Promise<Record<number, StaticSpecies>>);
 
-const fetchOthers = () => fetch('/public/static/others.json')
+const fetchOthers = () => fetch('public/static/others.json')
     .then(res => res.json() as Promise<StaticOthersData>);
 
-const fetchIndex = () => fetch('/public/export/index.json')
+const fetchIndex = () => fetch('public/export/index.json')
     .then(res => res.json() as Promise<IndexJSON>);
 
-const fetchForm = (id: string) => fetch(`/public/export/${id}.json`)
+const fetchForm = (id: string) => fetch(`public/export/${id}.json`)
     .then(res => res.json() as Promise<ConvertFormJSON>);
 
 type Section = Extract<keyof ConvertStep, 'PkmVariant' | 'PkmLegality'>;
@@ -407,7 +407,7 @@ window.onload = async () => {
             continue;
         }
 
-        const imgSrc = `/public/sheets/${spriteObj?.SheetName}`;
+        const imgSrc = `public/sheets/${spriteObj?.SheetName}`;
 
         const formTitle = formLine.querySelector<HTMLElement>('.form-left-title')!;
         formTitle.innerHTML = `#${entry.Species.toString().padStart(4, '0')} ${speciesForm?.Name}`;

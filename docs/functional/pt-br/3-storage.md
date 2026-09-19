@@ -122,6 +122,8 @@ As características do pokémon base são copiadas e convertidas para a geraçã
 A conversão do pokémon criado pode ser imperfeita e, involuntariamente, gerar um pokémon ilegal.
 Se necessário, você pode abrir o pokémon (seu arquivo PK) via PKHeX e corrigir problemas de legalidade diretamente.
 
+Checkout [Convert Big View](https://chnapy.github.io/PKVault/convert.html).
+
 </details>
 
 <details> 

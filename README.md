@@ -44,7 +44,7 @@ Similar to Pokémon Home, offline as online.
 - Storage & save manipulation
   - compatible with all pokémon games, from first generation to **Pokémon Legends: Z-A**
   - **move** pokémons between saves
-  - **convert** pokémon to any generation (ex. G7 to G2)
+  - [**convert** pokémons to any generation](https://chnapy.github.io/PKVault/convert.html) (ex. G7 to G2)
   - **store** pokémons outside saves using banks & boxes
   - allow use of multiple **"variants"** for stored pokémons
   - move/delete actions
@@ -62,6 +62,9 @@ Similar to Pokémon Home, offline as online.
     - possible shiny dex
 - Dynamic saves listing based on paths & globs
 - Dark mode & sprite sizing
+
+Are you wondering about conversion reliability ?
+Checkout [Convert Big View](https://chnapy.github.io/PKVault/convert.html).
 
 ## Desktop/SteamDeck/Mobile usage
 
