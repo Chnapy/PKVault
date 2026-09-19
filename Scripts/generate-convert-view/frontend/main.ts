@@ -350,13 +350,6 @@ window.onload = async () => {
     const rootChildren: Node[] = [];
 
     for (const entry of (await getIndexData()).Entries) {
-        const speciesData = await getSpeciesData();
-
-        const speciesForm = Object.values(speciesData[ entry.Species ]?.Forms ?? {})
-            .find(forms => forms.length > entry.Form)?.[ entry.Form ];
-        if (speciesForm?.IsBattleOnly)
-            continue;
-
         const formLineTem = document.importNode(formLineTemplate.content, true);
 
         const formLine = formLineTem.querySelector<HTMLDetailsElement>('.form-line')!;
@@ -394,13 +387,26 @@ window.onload = async () => {
 
             } else {
                 formData.innerHTML = '';
+                formWarnings.innerHTML = '';
             }
         });
 
-        const sheetsData = await getSheetsData();
+        const [ sheetsData, speciesData ] = await Promise.all([
+            getSheetsData(),
+            getSpeciesData(),
+        ]);
+
+        const speciesForm = Object.values(speciesData[ entry.Species ]?.Forms ?? {})
+            .find(forms => forms.length > entry.Form)?.[ entry.Form ];
 
         const sprite = speciesForm?.SpriteDefault;
         const spriteObj = sheetsData[ sprite ?? '' ];
+
+        if (!spriteObj) {
+            console.warn('No sprite found for', entry, speciesData[ entry.Species ]);
+            continue;
+        }
+
         const imgSrc = `/public/sheets/${spriteObj?.SheetName}`;
 
         const formTitle = formLine.querySelector<HTMLElement>('.form-left-title')!;

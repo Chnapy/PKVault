@@ -338,3 +338,19 @@ VOLUME [ "/pkvault" ]
 EXPOSE 3000
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+# convert-view builder
+FROM core-builder AS convert-view-builder
+
+WORKDIR /src
+
+COPY Scripts/Scripts.csproj Scripts/
+
+RUN dotnet restore "Scripts/Scripts.csproj"
+
+COPY frontend/public/imgs/sheets frontend/public/imgs/sheets
+COPY Scripts Scripts
+
+RUN dotnet run --project "Scripts/Scripts.csproj" -c Release gen-convert
+
+COPY Scripts/bin/Release/net10.0/generate-convert-view/frontend /app/publish

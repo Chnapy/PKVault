@@ -22,6 +22,18 @@ public partial class GenerateConvertView
 
     private static readonly GameVersionUtil.VersionChecker VersionChecker = new();
 
+    private static string BasePath
+    {
+        get
+        {
+#if DEBUG
+            return ".";
+#else
+            return AppDomain.CurrentDomain.BaseDirectory;
+#endif
+        }
+    }
+
     private static readonly HashSet<string> PkmVariantPropertiesToUse = [
         // "IsMain",
         // "IsExternal",
@@ -143,12 +155,6 @@ public partial class GenerateConvertView
         }
     }
 
-    private static readonly TypeScriptGeneratorSettings TSOptions = new()
-    {
-        TypeStyle = TypeScriptTypeStyle.Interface,
-        TypeScriptVersion = 5.0m,
-    };
-
     private static readonly JsonSerializerOptions StaticJsonOptions = new()
     {
         // PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -182,23 +188,37 @@ public partial class GenerateConvertView
         var fileIOService = sp.GetRequiredService<IFileIOService>();
         var staticDataService = sp.GetRequiredService<StaticDataService>();
 
-        var file = new TypeScriptGenerator(JsonSchema.FromType<FrontendTypes>(), TSOptions).GenerateFile();
-        file = string.Join('\n', file.Split('\n').Where(line =>
+#if DEBUG
+        TypeScriptGeneratorSettings tsOptions = new()
+        {
+            TypeStyle = TypeScriptTypeStyle.Interface,
+            TypeScriptVersion = 5.0m,
+        };
+
+        var types = new TypeScriptGenerator(JsonSchema.FromType<FrontendTypes>(), tsOptions).GenerateFile();
+        types = string.Join('\n', types.Split('\n').Where(line =>
         {
             line = line.Trim();
             return line.Length > 0 && !line.StartsWith("//");
         })) + '\n';
-        await File.WriteAllTextAsync("generate-convert-view/frontend/types.gen.ts", file);
+        await File.WriteAllTextAsync("generate-convert-view/frontend/types.gen.ts", types);
+#endif
 
         var sheetsPaths = fileIOService.Matcher.SearchPaths(["../frontend/public/imgs/sheets/"]);
         foreach (var path in sheetsPaths)
         {
-            var sheetDestPath = $"generate-convert-view/frontend/public/sheets/{Path.GetFileName(path)}";
+            var sheetDestPath = Path.Combine(
+                BasePath,
+                $"generate-convert-view/frontend/public/sheets/{Path.GetFileName(path)}"
+            );
             fileIOService.CreateDirectoryIfAny(sheetDestPath);
             fileIOService.Copy(path, sheetDestPath, true);
         }
 
-        var sheetsJSONDestPath = $"generate-convert-view/frontend/public/static/spritesheets.json";
+        var sheetsJSONDestPath = Path.Combine(
+            BasePath,
+            $"generate-convert-view/frontend/public/static/spritesheets.json"
+        );
         fileIOService.CreateDirectoryIfAny(sheetsJSONDestPath);
         using var sheetsStream = File.Create(sheetsJSONDestPath);
         await JsonSerializer.SerializeAsync(
@@ -207,7 +227,10 @@ public partial class GenerateConvertView
             StaticJsonOptions
         );
 
-        var speciesJSONDestPath = $"generate-convert-view/frontend/public/static/species.json";
+        var speciesJSONDestPath = Path.Combine(
+            BasePath,
+            $"generate-convert-view/frontend/public/static/species.json"
+        );
         fileIOService.CreateDirectoryIfAny(speciesJSONDestPath);
         using var speciesStream = File.Create(speciesJSONDestPath);
         await JsonSerializer.SerializeAsync(
@@ -216,7 +239,10 @@ public partial class GenerateConvertView
             StaticJsonOptions
         );
 
-        var othersJSONDestPath = $"generate-convert-view/frontend/public/static/others.json";
+        var othersJSONDestPath = Path.Combine(
+            BasePath,
+            $"generate-convert-view/frontend/public/static/others.json"
+        );
         fileIOService.CreateDirectoryIfAny(othersJSONDestPath);
         using var othersStream = File.Create(othersJSONDestPath);
         await JsonSerializer.SerializeAsync(
@@ -359,7 +385,10 @@ public partial class GenerateConvertView
             Entries: entries.ToArray()
         );
 
-        var indexPath = $"generate-convert-view/frontend/public/export/index.json";
+        var indexPath = Path.Combine(
+            BasePath,
+            $"generate-convert-view/frontend/public/export/index.json"
+        );
         var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(indexJson, FormJsonOptions);
         await fileIOService.WriteBytes(indexPath, jsonBytes);
 
@@ -487,7 +516,10 @@ public partial class GenerateConvertView
             }
         }
 
-        var filePath = $"generate-convert-view/frontend/public/export/{formJson.Id}.json";
+        var filePath = Path.Combine(
+            BasePath,
+            $"generate-convert-view/frontend/public/export/{formJson.Id}.json"
+        );
         var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(formJson, FormJsonOptions);
         await fileIOService.WriteBytes(filePath, jsonBytes);
     }
