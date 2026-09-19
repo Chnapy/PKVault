@@ -15,7 +15,7 @@ public class PkmLegalityService(ISettingsService settingsService, ILegalityAnaly
         return CreateDTO(pkmSave.Id, pkmSave.Pkm, pkmSave.Save, GetPkmStorageType(pkmSave));
     }
 
-    private PkmLegalityDTO CreateDTO(
+    public PkmLegalityDTO CreateDTO(
         string id,
         ImmutablePKM pkm,
         SaveWrapper? save,

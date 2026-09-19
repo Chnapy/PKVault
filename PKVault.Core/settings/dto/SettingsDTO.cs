@@ -24,6 +24,8 @@ public record SettingsDTO(
     SettingsMutableDTO SettingsMutable
 )
 {
+    public static bool IsScriptsContext { get; set; }
+
     public string SavesUploadsPath => "./saves-uploads/";
 
     public string GetStoragePath() => NormalizeSafePath(SettingsMutable.STORAGE_PATH);
@@ -37,6 +39,8 @@ public record SettingsDTO(
 
     public string GetLanguageOrDefault()
     {
+        if (IsScriptsContext)
+            return SettingsService.DefaultLanguage;
         return SettingsMutable.LANGUAGE ?? SettingsService.DefaultLanguage;
     }
 

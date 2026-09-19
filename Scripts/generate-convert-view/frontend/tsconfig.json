@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "esnext",
+    "rootDir": ".",
+    "outDir": "public/js"
+  },
+  "include": [
+    "*.ts"
+  ]
+}

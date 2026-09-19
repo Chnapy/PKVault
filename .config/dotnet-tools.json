@@ -15,6 +15,13 @@
         "maui"
       ],
       "rollForward": false
+    },
+    "dotnet-gcdump": {
+      "version": "10.0.745401",
+      "commands": [
+        "dotnet-gcdump"
+      ],
+      "rollForward": false
     }
   }
 }

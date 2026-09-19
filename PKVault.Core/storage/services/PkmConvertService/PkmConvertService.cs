@@ -221,7 +221,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
         };
     }
 
-    private static int GetPKMTypeWeight(Type pkmType) => pkmType.Name switch
+    public static int GetPKMTypeWeight(Type pkmType) => pkmType.Name switch
     {
         "PK1" => 0,
         "PK2" => 1,
