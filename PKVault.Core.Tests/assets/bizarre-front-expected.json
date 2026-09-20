@@ -562,7 +562,6 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing",
             "Encounter-TransferBad"
         ]
     },
@@ -606,8 +605,7 @@
         ],
         "language": 3,
         "illegalities": [
-            "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing"
+            "PID-PIDTypeMismatch"
         ]
     },
     "PA8": {
@@ -654,8 +652,7 @@
             0
         ],
         "illegalities": [
-            "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing"
+            "PID-PIDTypeMismatch"
         ]
     },
     "PK9": {

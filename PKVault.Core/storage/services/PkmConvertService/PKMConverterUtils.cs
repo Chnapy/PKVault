@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
+using Serilog;
 
 namespace PKVault.Core;
 
@@ -410,6 +411,8 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         var rnd = Util.Rand;
         var i = 0;
 
+        var initialPID = pkm.PID;
+
         bool hasWrongShiny()
         {
             if (pkm is PK1)
@@ -484,10 +487,12 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
             if (i > 10_000_000)
             {
-                throw new Exception(
-                    $"PID FIX ERROR: {pkm.GetType().Name} {pkm.Nickname} {pkm.Species}"
-                    + $"\nPID shiny={pkm.IsShiny}/{isShiny} form={pkm.Form}/{form} gender={pkm.Gender}/{gender} nature={pkm.Nature}/{nature} checkLegality={checkLegality}"
+                Log.Error(
+                    $"FixPID stopped after 10^7 failing tries, this PKM may have PID-related illegalities: {pkm.GetType().Name} {pkm.Nickname} #{pkm.Species}"
+                    + $"\nCurrent/Expected: shiny={pkm.IsShiny}/{isShiny} form={pkm.Form}/{form} gender={pkm.Gender}/{gender} nature={pkm.Nature}/{nature} checkLegality?={checkLegality}-{save?.Metadata.FilePath}"
                 );
+                pkm.PID = initialPID;
+                return;
             }
         }
 

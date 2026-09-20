@@ -591,20 +591,22 @@ public class PkmConvertServiceTests
             }
         }
 
-        var legality = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
+        var legality = new LegalityAnalysisWrapper(
+            LegalityAnalysisService.GetLegalitySafeRaw(new(pkm))
+        );
 
         if (!legality.Valid)
         {
             Console.WriteLine();
             Console.WriteLine($"{pkm.GetType().Name} - {pkm.Nickname}");
-            Console.WriteLine(legality.Report());
+            Console.WriteLine(legality.Report("en"));
         }
 
         var commonIllegalities = legality.Results.ToList()
             .FindAll(r => !r.Valid)
             .Select(r => $"{r.Identifier}-{r.Result}").ToArray();
 
-        var moveIllegalities = legality.Info.Moves.ToList()
+        var moveIllegalities = legality.Info!.Moves.ToList()
             .FindAll(r => !r.Valid)
             .Select(r => $"Move-{r.Expect}");
 

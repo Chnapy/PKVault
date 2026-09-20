@@ -710,7 +710,6 @@
         "illegalities": [
             "PID-PIDTypeMismatch",
             "Evolution-EvoInvalid",
-            "Encounter-TransferTrackerMissing",
             "Encounter-TransferBad"
         ]
     },
@@ -839,9 +838,7 @@
             "RibbonChampionG3": 1,
             "RibbonEffort": 1
         },
-        "illegalities": [
-            "Encounter-TransferTrackerMissing"
-        ]
+        "illegalities": []
     },
     "PK9": {
         "species": 89,
@@ -910,9 +907,7 @@
             1,
             0
         ],
-        "illegalities": [
-            "Encounter-TransferTrackerMissing"
-        ]
+        "illegalities": []
     },
     "PA9": {
         "species": 89,
