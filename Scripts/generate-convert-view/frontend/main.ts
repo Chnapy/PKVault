@@ -194,7 +194,10 @@ window.onload = async () => {
         if (typeof value === "object") {
             const dl = document.createElement("dl");
             dl.className = "value-object";
-            for (const [ k, v ] of Object.entries(value)) {
+            const entries = Object.entries(value);
+            if (entries.length === 0)
+                return textSpan("-");
+            for (const [ k, v ] of entries) {
                 const dt = document.createElement("dt");
                 dt.textContent = k;
                 const dd = document.createElement("dd");

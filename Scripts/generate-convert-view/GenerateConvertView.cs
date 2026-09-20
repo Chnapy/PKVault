@@ -22,17 +22,7 @@ public partial class GenerateConvertView
 
     private static readonly GameVersionUtil.VersionChecker VersionChecker = new();
 
-    private static string BasePath
-    {
-        get
-        {
-#if DEBUG
-            return ".";
-#else
-            return AppDomain.CurrentDomain.BaseDirectory;
-#endif
-        }
-    }
+    private static string BasePath => AppDomain.CurrentDomain.BaseDirectory;
 
     private static readonly HashSet<string> PkmVariantPropertiesToUse = [
         // "IsMain",
@@ -72,8 +62,8 @@ public partial class GenerateConvertView
         "IsShiny",
         "IsAlpha",
         "IsNoble",
-        "NSparkle",
-        "CanGigantamax",
+        // "NSparkle",
+        // "CanGigantamax",
         "Ball",
         "Gender",
         "Types",
@@ -97,13 +87,13 @@ public partial class GenerateConvertView
         "Moves",
         "RelearnMoves",
         "AlphaMove",
-        "TID",
-        "SID",
+        // "TID",
+        // "SID",
         "OriginTrainerName",
         "OriginTrainerGender",
-        "HandlingTrainerName",
-        "HandlingTrainerGender",
-        "HandlingTrainerFriendship",
+        // "HandlingTrainerName",
+        // "HandlingTrainerGender",
+        // "HandlingTrainerFriendship",
         "IsCurrentHandler",
         "OriginMetDate",
         "OriginMetLocation",
@@ -313,25 +303,6 @@ public partial class GenerateConvertView
                 .Where(entry => entry.Save.IsSpeciesAllowed(species))
                 .ToArray();
 
-            Dictionary<string, VersionSaveEntry> secondaryVersionsToPrimary = [];
-            foreach (var versionSave in versionsSaves)
-            {
-                var pkmType = versionSave.Save.PKMType;
-                if (secondaryVersionsToPrimary.ContainsKey(pkmType.Name)
-                    || pkmType.Name.StartsWith("PK"))
-                    continue;
-
-                var pkmTypeWeight = PkmConvertService.GetPKMTypeWeight(pkmType);
-                var primaryVersionSave = versionsSaves.LastOrDefault(s => s.Save.PKMType != pkmType
-                    && s.Save.PKMType.Name.StartsWith("PK")
-                    && PkmConvertService.GetPKMTypeWeight(s.Save.PKMType) < pkmTypeWeight
-                );
-                if (primaryVersionSave == null)
-                    continue;
-
-                secondaryVersionsToPrimary.Add(pkmType.Name, primaryVersionSave);
-            }
-
             for (byte form = 0; form < byte.MaxValue; form++)
             {
                 if (FormInfo.IsBattleOnlyForm(species, form, default))
@@ -339,16 +310,32 @@ public partial class GenerateConvertView
 
                 var formVersionsSaves = versionsSaves.Where(entry =>
                 {
-                    var formListEn = species == (ushort)Species.Alcremie
-                        ? FormConverter.GetAlcremieFormList(GameInfo.Strings.forms)
-                        : FormConverter.GetFormList(species, GameInfo.Strings.Types, GameInfo.Strings.forms, GameInfo.GenderSymbolASCII, entry.Save.Context);
-
-                    return form < formListEn.Length;
+                    var pi = entry.Save.Personal[species];
+                    return pi.IsFormWithinRange(form);
                 })
                 .ToArray();
 
                 if (formVersionsSaves.Length == 0)
                     break;
+
+                Dictionary<string, VersionSaveEntry> secondaryVersionsToPrimary = [];
+                foreach (var versionSave in formVersionsSaves)
+                {
+                    var pkmType = versionSave.Save.PKMType;
+                    if (secondaryVersionsToPrimary.ContainsKey(pkmType.Name)
+                        || pkmType.Name.StartsWith("PK"))
+                        continue;
+
+                    var pkmTypeWeight = PkmConvertService.GetPKMTypeWeight(pkmType);
+                    var primaryVersionSave = formVersionsSaves.LastOrDefault(s => s.Save.PKMType != pkmType
+                        && s.Save.PKMType.Name.StartsWith("PK")
+                        && PkmConvertService.GetPKMTypeWeight(s.Save.PKMType) < pkmTypeWeight
+                    );
+                    if (primaryVersionSave == null)
+                        continue;
+
+                    secondaryVersionsToPrimary.Add(pkmType.Name, primaryVersionSave);
+                }
 
                 var entry = new IndexEntry(
                     Id: $"{species.ToString().PadLeft(4, '0')}-{form.ToString().PadLeft(2, '0')}",

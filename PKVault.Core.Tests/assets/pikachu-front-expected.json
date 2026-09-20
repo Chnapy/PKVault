@@ -559,9 +559,7 @@
         ],
         "language": 3,
         "metLocation": 30001,
-        "illegalities": [
-            "Encounter-TransferTrackerMissing"
-        ]
+        "illegalities": []
     },
     "PB8": {
         "species": 25,
@@ -601,9 +599,7 @@
         ],
         "language": 3,
         "metLocation": 30001,
-        "illegalities": [
-            "Encounter-TransferTrackerMissing"
-        ]
+        "illegalities": []
     },
     "PA8": {
         "species": 25,
@@ -649,8 +645,7 @@
         ],
         "metLocation": 30001,
         "illegalities": [
-            "PID-PIDTypeMismatch",
-            "Encounter-TransferTrackerMissing"
+            "PID-PIDTypeMismatch"
         ]
     },
     "PK9": {
@@ -696,9 +691,7 @@
             0
         ],
         "metLocation": 30001,
-        "illegalities": [
-            "Encounter-TransferTrackerMissing"
-        ]
+        "illegalities": []
     },
     "PA9": {
         "species": 25,
