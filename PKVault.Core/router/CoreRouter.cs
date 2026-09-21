@@ -196,7 +196,7 @@ public partial class CoreRouter
                 var seg = templateSegments[i];
                 if (seg.StartsWith('{') && seg.EndsWith('}'))
                 {
-                    values[seg[1..^1]] = pathSegments[i];
+                    values[seg[1..^1]] = HttpUtility.UrlDecode(pathSegments[i]);
                 }
                 else if (!string.Equals(seg, pathSegments[i], StringComparison.OrdinalIgnoreCase))
                 {
