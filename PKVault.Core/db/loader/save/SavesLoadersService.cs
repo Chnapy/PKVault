@@ -130,6 +130,9 @@ public class SavesLoadersService(
 
     private async Task WriteSave(SaveWrapper save)
     {
+        if (save.GetSave() is IStorageCleanup scSave)
+            scSave.FixStoragePreWrite();
+
         var path = save.Metadata.FilePath;
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         await fileIOService.WriteBytes(path, save.GetSaveFileData());
