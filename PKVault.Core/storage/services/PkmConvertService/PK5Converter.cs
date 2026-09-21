@@ -9,12 +9,7 @@ public class PK5Converter(PKMConverterUtils utils)
     {
         var pk6 = pk5.ConvertToPK6();
 
-        utils.FixMetLocation(pk6, [
-            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
-            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
-            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
-            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS
-        ]);
+        utils.FixMetLocation(pk6, rndValues);
 
         utils.CopyHeldItemFrom(pk6, pk5.HeldItem, pk5.Context, pk5.Version);
 
@@ -60,9 +55,9 @@ public class PK5Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk4, pk5.HeldItem, pk5.Context, pk5.Version);
 
-        utils.FixAbility(pk4);
+        utils.FixAbility(pk4, rndValues);
 
-        utils.FixMetLocation(pk4, [GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.HG, GameVersion.SS]);
+        utils.FixMetLocation(pk4, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk4, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);

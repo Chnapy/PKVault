@@ -57,6 +57,7 @@ public abstract record PkmBaseDTO(
     public MoveCategory HiddenPowerCategory => Pkm.HiddenPowerCategory;
     public Nature Nature => Pkm.Nature;
     public int Ability => Pkm.Ability;
+    public int AbilityNumber => Pkm.AbilityNumber;
     public bool IsAbilityHidden => Pkm.IsAbilityHidden;
 
     public List<ushort> Moves => Pkm.Moves;

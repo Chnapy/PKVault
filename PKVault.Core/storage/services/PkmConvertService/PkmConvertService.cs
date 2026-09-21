@@ -49,10 +49,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
             result.CurrentHandler = targetSave.IsFromTrainer(result) ? (byte)0 : (byte)1;
         }
 
-        pkmConverterUtils.FixCommonLegalityIssues(result, targetSave != null ? new(targetSave) : null);
-
-        var fixMemories = result.GetType().GetMethod("FixMemories");
-        fixMemories?.Invoke(result, null);
+        pkmConverterUtils.FixCommonLegalityIssues(result, targetSave != null ? new(targetSave) : null, rndValues);
 
         result.Heal();
         result.ResetPartyStats();

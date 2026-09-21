@@ -128,7 +128,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 10,
+        "version": 7,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -161,7 +161,7 @@
             23
         ],
         "language": 3,
-        "metLocation": 68,
+        "metLocation": 224,
         "illegalities": [
             "PID-PIDTypeMismatch"
         ]
@@ -170,7 +170,7 @@
         "species": 25,
         "form": 0,
         "gender": 0,
-        "version": 21,
+        "version": 7,
         "level": 50,
         "exp": 125000,
         "moves": [
@@ -203,9 +203,9 @@
             23
         ],
         "language": 3,
-        "metLocation": 75,
+        "metLocation": 30001,
         "illegalities": [
-            "Encounter-EncInvalid"
+            "PID-PIDTypeMismatch"
         ]
     },
     "PK6": {

@@ -308,6 +308,7 @@ export interface PkmBaseDTO {
     HiddenPowerCategory: MoveCategory;
     Nature: Nature;
     Ability: number;
+    AbilityNumber: number;
     IsAbilityHidden: boolean;
     Moves: number[];
     RelearnMoves: number[] | undefined;

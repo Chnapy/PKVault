@@ -3038,6 +3038,7 @@
           "hiddenPowerCategory",
           "nature",
           "ability",
+          "abilityNumber",
           "isAbilityHidden",
           "moves",
           "tid",
@@ -3217,6 +3218,10 @@
             "$ref": "#/components/schemas/Nature"
           },
           "ability": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "abilityNumber": {
             "type": "integer",
             "format": "int32"
           },

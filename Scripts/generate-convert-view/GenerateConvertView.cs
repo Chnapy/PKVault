@@ -83,6 +83,7 @@ public partial class GenerateConvertView
         "HiddenPowerCategory",
         "Nature",
         "Ability",
+        "AbilityNumber",
         "IsAbilityHidden",
         "Moves",
         "RelearnMoves",
