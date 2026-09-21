@@ -9,10 +9,7 @@ public class PK3Converter(PKMConverterUtils utils)
     {
         var pk4 = pk3.ConvertToPK4();
 
-        utils.FixMetLocation(pk4, [
-            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
-            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG
-        ]);
+        utils.FixMetLocation(pk4, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk4, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature);
@@ -64,13 +61,13 @@ public class PK3Converter(PKMConverterUtils utils)
         var pk2 = new PK2()
         {
             Version = pk3.Version.Generation <= 2 ? pk3.Version : GameVersion.C,
-            EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32(),
+            EncryptionConstant = rndValues?.TargetPkm.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk3.Species,
             TID16 = pk3.TID16,
             CurrentLevel = pk3.CurrentLevel,
             EXP = pk3.EXP,
             Nature = Experience.GetNatureVC(pk3.EXP),
-            PID = rndValues?.PID ?? Util.Rand.Rand32(),
+            PID = rndValues?.TargetPkm.PID ?? Util.Rand.Rand32(),
             Ball = 4,
 
             MetLocation = 0,
@@ -106,7 +103,7 @@ public class PK3Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemByStringFrom(pk2, pk3.HeldItem, pk3.Context, pk3.Version);
 
-        utils.FixMetLocation(pk2, [GameVersion.GD, GameVersion.SI, GameVersion.C]);
+        utils.FixMetLocation(pk2, rndValues);
 
         pk2.SetIVs(ConvertIVsToG2(utils.GetAllIVs(pk3)));
 

@@ -35,8 +35,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
             targetPkm is GBPKM
                 ? null
                 : new(
-                    PID: targetPkm.PID,
-                    EncryptionConstant: targetPkm.EncryptionConstant
+                    TargetPkm: targetPkm
                 ),
             save
         );
@@ -160,7 +159,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
                 targetPkm.PokerusStrain = resultPkm.PokerusStrain;
             }
         }
-        
+
         if (source.Format >= 2
             && sourcePkm is not PB7
             && sourcePkm is not PA8
@@ -196,6 +195,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
             if (
                 targetPkm is IContestStats targetPkmContest
                 && resultPkm is IContestStatsReadOnly resultPkmContest
+                && resultPkmContest.HasContestStats()
             )
             {
                 resultPkmContest.CopyContestStatsTo(targetPkmContest);
@@ -452,6 +452,10 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
         targetPkm.Heal();
         targetPkm.ResetPartyStats();
         targetPkm.RefreshChecksum();
+
+#if DEBUG
+        ObjectComparer.DisplayDifferences(targetPkm, resultPkm);
+#endif
 
         var target = new ImmutablePKM(targetPkm);
 

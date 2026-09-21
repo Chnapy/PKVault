@@ -39,16 +39,9 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk8, pk7.HeldItem, pk7.Context, pk7.Version);
 
-        utils.FixAbility(pk8);
+        utils.FixAbility(pk8, rndValues);
 
-        utils.FixMetLocation(pk8, [
-            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
-            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
-            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
-            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
-            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
-            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
-        ]);
+        utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk8, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
@@ -181,9 +174,9 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk6, pk7.HeldItem, pk7.Context, pk7.Version);
 
-        utils.FixAbility(pk6);
+        utils.FixAbility(pk6, rndValues);
 
-        utils.FixMetLocation(pk6, [GameVersion.X, GameVersion.Y, GameVersion.AS, GameVersion.OR]);
+        utils.FixMetLocation(pk6, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk6, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
@@ -254,9 +247,9 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk7, pb7.HeldItem, pb7.Context, pb7.Version);
 
-        utils.FixAbility(pk7);
+        utils.FixAbility(pk7, rndValues);
 
-        utils.FixMetLocation(pk7, [GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
+        utils.FixMetLocation(pk7, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk7, pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature);

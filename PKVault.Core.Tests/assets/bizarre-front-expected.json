@@ -217,7 +217,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 10,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -254,14 +254,14 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
-            "Level-LevelMetBelow"
+            "EVs-EffortUntrainedCap_0"
         ]
     },
     "BK4": {
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 10,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -298,14 +298,14 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
-            "Level-LevelMetBelow"
+            "EVs-EffortUntrainedCap_0"
         ]
     },
     "RK4": {
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 10,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -342,14 +342,14 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
-            "Level-LevelMetBelow"
+            "EVs-EffortUntrainedCap_0"
         ]
     },
     "PK5": {
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -392,7 +392,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -435,7 +435,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -525,7 +525,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -569,7 +569,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -612,7 +612,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "level": 5,
         "exp": 125,
         "moves": [
@@ -659,7 +659,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 223,
         "level": 5,
         "exp": 125,
@@ -704,7 +704,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 8,
+        "version": 7,
         "helditem": 0,
         "level": 5,
         "exp": 125,

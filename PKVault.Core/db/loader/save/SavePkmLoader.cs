@@ -152,8 +152,7 @@ public class SavePkmLoader(
             dto.Pkm.GetMutablePkm() is GBPKM
                 ? null
                 : new(
-                    PID: dto.Pkm.PID,
-                    EncryptionConstant: dto.Pkm.EncryptionConstant
+                    TargetPkm: dto.Pkm.GetMutablePkm()
                 ),
             targetSave: save.GetSave()
         );

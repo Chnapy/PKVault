@@ -913,7 +913,7 @@
         "species": 89,
         "form": 0,
         "gender": 0,
-        "version": 52,
+        "version": 48,
         "helditem": 0,
         "ball": 2,
         "level": 38,
@@ -959,16 +959,18 @@
             false
         ],
         "contest": [
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            10,
+            55,
+            41,
+            8,
+            120,
+            150
         ],
-        "ribbons": {},
+        "ribbons": {
+            "RibbonEffort": 1
+        },
         "illegalities": [
-            "Encounter-EncInvalid",
+            "Evolution-EvoInvalid",
             "Encounter-TransferBad",
             "Move-0",
             "Move-0",

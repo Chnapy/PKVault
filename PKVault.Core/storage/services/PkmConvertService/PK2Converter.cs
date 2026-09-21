@@ -17,13 +17,13 @@ public class PK2Converter(PKMConverterUtils utils)
 
         var pk3 = new PK3()
         {
-            EncryptionConstant = rndValues?.EncryptionConstant ?? Util.Rand.Rand32(),
+            EncryptionConstant = rndValues?.TargetPkm.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk2.Species,
             TID16 = pk2.TID16,
             CurrentLevel = pk2.CurrentLevel,
             EXP = pk2.EXP,
             Nature = Experience.GetNatureVC(pk2.EXP),
-            PID = rndValues?.PID ?? Util.Rand.Rand32(),
+            PID = rndValues?.TargetPkm.PID ?? Util.Rand.Rand32(),
             Ball = 4,
 
             MetLocation = 0,
@@ -56,7 +56,7 @@ public class PK2Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk3, pk2.HeldItem, pk2.Context, pk2.Version);
 
-        utils.FixMetLocation(pk3, [GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD]);
+        utils.FixMetLocation(pk3, rndValues);
 
         if (pk2.Species is 151 or 251)
         {

@@ -124,8 +124,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                PID: result.PID,
-                EncryptionConstant: result.EncryptionConstant
+                TargetPkm: result
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -178,8 +177,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                PID: result.PID,
-                EncryptionConstant: result.EncryptionConstant
+                TargetPkm: result
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -242,8 +240,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                PID: result.PID,
-                EncryptionConstant: result.EncryptionConstant
+                TargetPkm: result
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -308,8 +305,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                PID: result.PID,
-                EncryptionConstant: result.EncryptionConstant
+                TargetPkm: result
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -372,8 +368,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                PID: result.PID,
-                EncryptionConstant: result.EncryptionConstant
+                TargetPkm: result
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);

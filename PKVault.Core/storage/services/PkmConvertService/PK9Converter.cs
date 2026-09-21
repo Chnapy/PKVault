@@ -47,7 +47,7 @@ public class PK9Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pa9, pk9.HeldItem, pk9.Context, pk9.Version);
 
-        utils.FixMetLocation(pa9, [GameVersion.ZA]);
+        utils.FixMetLocation(pa9, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pa9, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
@@ -91,9 +91,9 @@ public class PK9Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk8, pk9.HeldItem, pk9.Context, pk9.Version);
 
-        utils.FixAbility(pk8);
+        utils.FixAbility(pk8, rndValues);
 
-        utils.FixMetLocation(pk8, [GameVersion.SW, GameVersion.SH]);
+        utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk8, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
@@ -152,9 +152,9 @@ public class PK9Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk9, pa9.HeldItem, pa9.Context, pa9.Version);
 
-        utils.FixAbility(pk9);
+        utils.FixAbility(pk9, rndValues);
 
-        utils.FixMetLocation(pk9, [GameVersion.SL, GameVersion.VL]);
+        utils.FixMetLocation(pk9, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk9, pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);

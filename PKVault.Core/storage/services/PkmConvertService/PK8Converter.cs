@@ -49,17 +49,9 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk9, pk8.HeldItem, pk8.Context, pk8.Version);
 
-        utils.FixAbility(pk9);
+        utils.FixAbility(pk9, rndValues);
 
-        utils.FixMetLocation(pk9, [
-            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
-            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
-            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
-            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
-            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
-            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
-            GameVersion.SL, GameVersion.VL,
-        ]);
+        utils.FixMetLocation(pk9, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk9, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
@@ -106,16 +98,9 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pb8, pk8.HeldItem, pk8.Context, pk8.Version);
 
-        utils.FixAbility(pb8);
+        utils.FixAbility(pb8, rndValues);
 
-        utils.FixMetLocation(pb8, [
-            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
-            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
-            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
-            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
-            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
-            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
-        ]);
+        utils.FixMetLocation(pb8, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pb8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
@@ -162,16 +147,9 @@ public class PK8Converter(PKMConverterUtils utils)
         pk8.CopyRibbonSetMemory6(pa8);
         pk8.CopyRibbonSetCommon7(pa8);
 
-        utils.FixAbility(pa8);
+        utils.FixAbility(pa8, rndValues);
 
-        utils.FixMetLocation(pa8, [
-            GameVersion.S, GameVersion.R, GameVersion.E, GameVersion.FR, GameVersion.LG, GameVersion.CXD,
-            GameVersion.D, GameVersion.P, GameVersion.Pt, GameVersion.SS, GameVersion.HG,
-            GameVersion.B, GameVersion.W, GameVersion.B2, GameVersion.W2,
-            GameVersion.X, GameVersion.Y, GameVersion.OR, GameVersion.AS,
-            GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM,
-            GameVersion.SW, GameVersion.SH, GameVersion.BD, GameVersion.SP, GameVersion.PLA,
-        ]);
+        utils.FixMetLocation(pa8, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pa8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
@@ -216,9 +194,9 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk7, pk8.HeldItem, pk8.Context, pk8.Version);
 
-        utils.FixAbility(pk7);
+        utils.FixAbility(pk7, rndValues);
 
-        utils.FixMetLocation(pk7, [GameVersion.SN, GameVersion.MN, GameVersion.US, GameVersion.UM]);
+        utils.FixMetLocation(pk7, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk7, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
@@ -267,9 +245,9 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk8, pb8.HeldItem, pb8.Context, pb8.Version);
 
-        utils.FixAbility(pk8);
+        utils.FixAbility(pk8, rndValues);
 
-        utils.FixMetLocation(pk8, [GameVersion.SW, GameVersion.SH]);
+        utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk8, pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature);
@@ -318,9 +296,9 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk8, pa8.HeldItem, pa8.Context, pa8.Version);
 
-        utils.FixAbility(pk8);
+        utils.FixAbility(pk8, rndValues);
 
-        utils.FixMetLocation(pk8, [GameVersion.SW, GameVersion.SH]);
+        utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
             utils.FixPID(pk8, pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature);
