@@ -22,6 +22,28 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         FixPokerusLegality(pkm, save);
         FixMovesLegality(pkm, save);
         FixRelearnMovesLegality(pkm, save);
+        FixRegionLegality(pkm, save);
+
+        var fixMemories = pkm.GetType().GetMethod("FixMemories");
+        fixMemories?.Invoke(pkm, null);
+    }
+
+    public void FixRegionLegality(PKM pkm, SaveWrapper? save)
+    {
+        if (pkm is not IRegionOrigin pkmRg)
+            return;
+
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        if (legality.la == null || legality.Valid)
+            return;
+
+        if (!legality.Results.Any(r => !r.Valid && r.Result == LegalityCheckResultCode.GeoHardwareInvalid))
+            return;
+
+        if (save != null && save.GetSave() is IRegionOriginReadOnly saveRg)
+            saveRg.CopyRegionOrigin(pkmRg);
+        else
+            pkmRg.ClearRegionOrigin();
     }
 
     // Fix each move legality ONLY if an expected one is present
@@ -647,7 +669,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             .ToArray();
 
         GameVersion[] allVersionsToTry = [pkm.Version, .. versionsToTry];
-        allVersionsToTry = allVersionsToTry.Distinct().ToArray();
+        // allVersionsToTry = allVersionsToTry.Distinct().ToArray();
 
         foreach (var version in allVersionsToTry)
         {

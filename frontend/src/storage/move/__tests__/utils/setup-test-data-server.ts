@@ -97,6 +97,7 @@ export const setupTestDataServer = () => {
         hiddenPowerCategory: 0,
         nature: 0,
         ability: -1,
+        abilityNumber: 0,
         isAbilityHidden: false,
         moves: [],
         pokerusStrain: 0,
@@ -178,6 +179,7 @@ export const setupTestDataServer = () => {
         hiddenPowerCategory: 0,
         nature: 0,
         ability: -1,
+        abilityNumber: 0,
         isAbilityHidden: false,
         moves: [],
         pokerusStrain: 0,
@@ -220,7 +222,7 @@ export const setupTestDataServer = () => {
 
     const server = setupServer(
         http.get(getSaveInfosGetAllUrl(), () => {
-            return HttpResponse.json<saveInfosGetAllResponse200['data']>({
+            return HttpResponse.json<saveInfosGetAllResponse200[ 'data' ]>({
                 123: createSaveInfos({
                     id: 123,
                     generation: 3,

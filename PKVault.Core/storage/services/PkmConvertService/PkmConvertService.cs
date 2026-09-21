@@ -51,9 +51,6 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
 
         pkmConverterUtils.FixCommonLegalityIssues(result, targetSave != null ? new(targetSave) : null, rndValues);
 
-        var fixMemories = result.GetType().GetMethod("FixMemories");
-        fixMemories?.Invoke(result, null);
-
         result.Heal();
         result.ResetPartyStats();
         result.RefreshChecksum();
