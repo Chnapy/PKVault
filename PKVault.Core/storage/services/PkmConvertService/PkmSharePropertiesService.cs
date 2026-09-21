@@ -92,8 +92,9 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
             }
         }
 
+        // don't rely on targetPkm.IsNicknamed, its value may not change (CK3)
         targetPkm.IsNicknamed = resultPkm.IsNicknamed;
-        if (!targetPkm.IsNicknamed)
+        if (!resultPkm.IsNicknamed)
             targetPkm.ClearNickname();
         else if (targetPkm.MaxStringLengthNickname <= sourcePkm.MaxStringLengthNickname
             || !targetPkm.Nickname.StartsWith(resultPkm.Nickname))
