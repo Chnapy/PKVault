@@ -41,8 +41,6 @@ public class PkmConvertServiceTests
         mockSettingsService.Setup(x => x.GetSettings()).Returns(new SettingsDTO(
             BuildID: default, RuntimeSystem: RuntimeSystem.LINUX, SourceProvider: SourceProvider.GithubRelease, FlatpakMigrated: false,
             Version: "", PkhexVersion: "", AppDirectory: "", SettingsPath: "", UserId: "",
-            IsDesktop: false, UpdateUrl: null, CanUpdateSettings: false, CanScanSaves: false, DemoMode: false,
-            CanUploadSaves: true, CanDeleteSaves: true, CanOpenFolder: true, CanUseDesktopFileExplorer: true,
             SettingsMutable: new(
                 DB_PATH: "", SAVE_GLOBS: [], PKM_EXTERNAL_GLOBS: [], STORAGE_PATH: "", BACKUP_PATH: "",
                 LANGUAGE: "fr", HIDE_CHEATS: false, SKIP_LEGALITY_CHECKS: false

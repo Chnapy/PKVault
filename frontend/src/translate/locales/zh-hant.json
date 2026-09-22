@@ -223,6 +223,7 @@
   "settings.backups.4.description": "可在 PKVault 外部開啟（.zip）",
   "settings.backups.4.label": "通用格式",
   "settings.backups.controls-label": "變更備份設定",
+  "settings.backups.create": "建立備份",
   "settings.backups.name.edit": "編輯名稱",
   "settings.backups.restore": "還原",
   "settings.external.1.description": "來自你個人儲存空間的 PKM 檔案（.pk*）。",

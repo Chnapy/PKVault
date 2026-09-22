@@ -74,7 +74,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                             });
                         }}
                         selected={!pathOverride}
-                        disabled={settings?.demoMode || !settings?.canUpdateSettings || !pathOverride}
+                        disabled={!settings?.canUpdateSettings || !pathOverride}
                         size='compact-sm'
                     >
                         {t('save.edit.duplicate.default')}
@@ -100,7 +100,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                             imgSrc={getGameInfos(s.displayedVersion).img}
                             selected={save === s}
                             disabled={pathOverride === s.path}
-                            onSelect={settings?.demoMode || settings?.canUpdateSettings
+                            onSelect={settings?.canUpdateSettings
                                 ? (async () => {
                                     const savePathOverrides = { ...settingsMutable.savE_PATH_OVERRIDES };
                                     if (s.path === savePathOverrides[ s.id ]) {
@@ -135,7 +135,7 @@ export const SaveItemEdit: React.FC<{ saveId: number }> = ({ saveId }) => {
                                     nested
                                 >
                                     <Button
-                                        disabled={settings?.demoMode || !settings?.canUpdateSettings}
+                                        disabled={!settings?.canUpdateSettings}
                                         variant='filled'
                                         color='red'
                                         size='compact-xs'

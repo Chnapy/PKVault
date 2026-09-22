@@ -183,8 +183,9 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         return BaseSettings with
         {
-            CanUpdateSettings = sessionService.HasEmptyActionList(),
-            CanScanSaves = sessionService.HasEmptyActionList()
+            CanUpdateSettings = !EnvUtil.DEMO_MODE && sessionService.HasEmptyActionList(),
+            CanScanSaves = sessionService.HasEmptyActionList(),
+            CanCreateBackup = !EnvUtil.DEMO_MODE && sessionService.HasEmptyActionList(),
         };
     }
 
@@ -285,6 +286,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             AppDirectory: MatcherUtil.NormalizePath(Directory.GetCurrentDirectory()),
             SettingsPath: FilePath,
             UserId: "", // should be defined later
+            SettingsMutable: mutableDto,
+
             IsDesktop: isDesktop,
             UpdateUrl: updateUrl,
             CanUploadSaves: canUploadSaves,
@@ -293,8 +296,8 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             CanUseDesktopFileExplorer: canUseDesktopFileExplorer,
             CanUpdateSettings: false,
             CanScanSaves: false,
-            DemoMode: EnvUtil.DEMO_MODE,
-            SettingsMutable: mutableDto
+            CanCreateBackup: false,
+            DemoMode: EnvUtil.DEMO_MODE
         );
     }
 
