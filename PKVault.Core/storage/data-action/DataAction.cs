@@ -34,4 +34,5 @@ public enum DataActionType
     DEX_SYNC,
     DATA_NORMALIZE,
     UPDATE_EXTERNAL_PKM,
+    SET_PKM_VERSION_MAIN,
 }

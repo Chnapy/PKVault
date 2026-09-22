@@ -161,6 +161,17 @@ public class ActionService(
         );
     }
 
+    public async Task<DataUpdateFlags> MainSetPkmVariantMain(string pkmVariantId)
+    {
+        using var scope = sp.CreateScope();
+
+        return await AddAction(
+            scope,
+            (scope) => scope.ServiceProvider.GetRequiredService<SetPkmVariantMainAction>(),
+            new(pkmVariantId)
+        );
+    }
+
     public async Task<DataUpdateFlags> SaveEditPkm(uint saveId, string pkmId, EditPkmVariantPayload payload)
     {
         using var scope = sp.CreateScope();

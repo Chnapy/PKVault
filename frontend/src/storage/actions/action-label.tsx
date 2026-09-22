@@ -1,5 +1,5 @@
 import { Group, ThemeIcon } from '@mantine/core';
-import { BoxIcon, CalendarSyncIcon, ChevronsRight, Database, ImportIcon, LandmarkIcon, LinkIcon, MoveIcon, PenIcon, PlusCircleIcon, RefreshCcw, SortDescIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
+import { BoxIcon, CalendarSyncIcon, ChevronsRight, CircleSmallIcon, Database, ImportIcon, LandmarkIcon, LinkIcon, MoveIcon, PenIcon, PlusCircleIcon, RefreshCcw, SortDescIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
 import type React from 'react';
 import { DataActionType, EntityContext, type DataActionPayload } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
@@ -67,11 +67,12 @@ const ActionLabelMap = {
         </>;
     },
     CreateVariant: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+        const context = parameters[ 1 ] as EntityContext | undefined;
         const species = parameters[ 2 ];
 
         return <>
             {typeof species === 'number'
-                ? <SpeciesImg context={EntityContext.Gen9a} species={species} form={0} />
+                ? <SpeciesImg context={context ?? EntityContext.Gen9a} species={species} form={0} />
                 : <UIBallIcon />}
 
             <ThemeIcon variant='transparent' color='green' size='xs' fz='sm'>
@@ -111,11 +112,12 @@ const ActionLabelMap = {
         </>;
     },
     EditPkmVariant: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+        const context = parameters[ 1 ] as EntityContext | undefined;
         const species = parameters[ 2 ];
 
         return <>
             {typeof species === 'number'
-                ? <SpeciesImg context={EntityContext.Gen9a} species={species} form={0} />
+                ? <SpeciesImg context={context ?? EntityContext.Gen9a} species={species} form={0} />
                 : <UIBallIcon />}
 
             <ThemeIcon variant='transparent' color='blue' size='xs' fz='sm'>
@@ -136,12 +138,27 @@ const ActionLabelMap = {
             </ThemeIcon>
         </>;
     },
-    DeletePkmVariant: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+    SetPkmVariantMain: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+        const context = parameters[ 1 ] as EntityContext | undefined;
         const species = parameters[ 2 ];
 
         return <>
             {typeof species === 'number'
-                ? <SpeciesImg context={EntityContext.Gen9a} species={species} form={0} />
+                ? <SpeciesImg context={context ?? EntityContext.Gen9a} species={species} form={0} />
+                : <UIBallIcon />}
+
+            <ThemeIcon variant='transparent' color='blue' size='xs' fz='sm'>
+                <CircleSmallIcon />
+            </ThemeIcon>
+        </>;
+    },
+    DeletePkmVariant: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+        const context = parameters[ 1 ] as EntityContext | undefined;
+        const species = parameters[ 2 ];
+
+        return <>
+            {typeof species === 'number'
+                ? <SpeciesImg context={context ?? EntityContext.Gen9a} species={species} form={0} />
                 : <UIBallIcon />}
 
             <ThemeIcon variant='transparent' color='red' size='xs' fz='sm'>
@@ -236,6 +253,7 @@ export const ActionLabel: React.FC<DataActionPayload> = ({ type, parameters }) =
         [ DataActionType.DETACH_PKM_SAVE ]: ActionLabelMap.DetachPkm,
         [ DataActionType.EDIT_PKM_VERSION ]: ActionLabelMap.EditPkmVariant,
         [ DataActionType.EDIT_PKM_SAVE ]: ActionLabelMap.EditPkmSave,
+        [ DataActionType.SET_PKM_VERSION_MAIN ]: ActionLabelMap.SetPkmVariantMain,
         [ DataActionType.DELETE_PKM_VERSION ]: ActionLabelMap.DeletePkmVariant,
         [ DataActionType.SAVE_DELETE_PKM ]: ActionLabelMap.DeletePkmSave,
         [ DataActionType.PKM_SYNCHRONIZE ]: ActionLabelMap.PkmSynchronize,

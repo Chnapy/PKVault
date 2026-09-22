@@ -35,6 +35,7 @@ export type UIDetailsMainProps = {
     canEvolve?: boolean;
     isDuplicate?: boolean;
     warning?: boolean;
+    main?: React.ReactNode;
     heldItem?: React.ReactNode;
     attachedBtn?: React.ReactNode;
     children: React.ReactNode;
@@ -45,7 +46,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     ball, nickname, gender, isEnabled, isShiny, isAlpha, isN,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
     canEvolve, isDuplicate, warning,
-    types, teraType, heldItem, markings, attachedBtn,
+    types, teraType, main, heldItem, markings, attachedBtn,
     children,
 }) => {
     const { t } = useTranslate();
@@ -124,6 +125,8 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
             </Stack>
             <Center>{children}</Center>
             <Stack align='flex-end'>
+                {main}
+
                 {markings}
 
                 {(pokerusDays || isPokerusCured) && <Tooltip label={isPokerusCured
