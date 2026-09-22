@@ -12,16 +12,17 @@ public record SettingsDTO(
     string AppDirectory,
     string SettingsPath,
     string UserId,
-    bool IsDesktop,
-    string? UpdateUrl,
-    bool CanUpdateSettings,
-    bool CanScanSaves,
-    bool CanUploadSaves,
-    bool CanDeleteSaves,
-    bool CanOpenFolder,
-    bool CanUseDesktopFileExplorer,
-    bool DemoMode,
-    SettingsMutableDTO SettingsMutable
+    SettingsMutableDTO SettingsMutable,
+    bool IsDesktop = false,
+    string? UpdateUrl = null,
+    bool CanUpdateSettings = false,
+    bool CanScanSaves = false,
+    bool CanUploadSaves = false,
+    bool CanDeleteSaves = false,
+    bool CanCreateBackup = false,
+    bool CanOpenFolder = false,
+    bool CanUseDesktopFileExplorer = false,
+    bool DemoMode = false
 )
 {
     public static bool IsScriptsContext { get; set; }

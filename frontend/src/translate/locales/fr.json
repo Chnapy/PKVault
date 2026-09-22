@@ -223,6 +223,7 @@
   "settings.backups.4.description": "Peut être ouvert hors-PKVault (.zip)",
   "settings.backups.4.label": "Format générique",
   "settings.backups.controls-label": "Changer de backups",
+  "settings.backups.create": "Créer un backup",
   "settings.backups.name.edit": "Éditer le nom",
   "settings.backups.restore": "Restaurer",
   "settings.external.1.description": "Fichiers PKM (.pk*) depuis votre stockage",

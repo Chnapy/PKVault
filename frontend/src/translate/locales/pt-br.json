@@ -223,6 +223,7 @@
   "settings.backups.4.description": "Você pode restaurar o estado anterior a partir de um backup.",
   "settings.backups.4.label": "Restauração",
   "settings.backups.controls-label": "Controles de backup",
+  "settings.backups.create": "Criar backup",
   "settings.backups.name.edit": "Editar nome do backup",
   "settings.backups.restore": "Restaurar",
   "settings.external.1.description": "Carrega arquivos .pk3, .pk4, etc. diretamente.",

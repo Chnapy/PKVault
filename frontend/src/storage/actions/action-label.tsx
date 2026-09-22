@@ -1,9 +1,12 @@
 import { Group, ThemeIcon } from '@mantine/core';
 import { BoxIcon, CalendarSyncIcon, ChevronsRight, Database, ImportIcon, LandmarkIcon, LinkIcon, MoveIcon, PenIcon, PlusCircleIcon, RefreshCcw, SortDescIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
-import { DataActionType, EntityContext, type DataActionPayload } from '../../data/sdk/model';
-import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
-import { SpeciesImg } from '../../img/species-img';
 import type React from 'react';
+import { DataActionType, EntityContext, type DataActionPayload } from '../../data/sdk/model';
+import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { SpeciesImg } from '../../img/species-img';
+import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
+import { UIPokedexIcons } from '../../ui/pokedex/icons/ui-pokedex-icons';
+import { UIGameImg } from '../../ui/sprite-img/ui-game-img';
 import { switchUtil } from '../../util/switch-util';
 
 const ActionLabelMap = {
@@ -159,6 +162,19 @@ const ActionLabelMap = {
             </ThemeIcon>
         </>;
     },
+    PkmSynchronize: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+        const saveId = Number(parameters[ 0 ]);
+        const save = useSaveInfosGetAll().data?.data[ saveId ];
+
+        return <>
+            {save && <UIGameImg
+                version={save.displayedVersion}
+                size={16}
+            />}
+
+            <UIPokedexIcons.Attached size='xs' fz='sm' needSynchronize />
+        </>;
+    },
     EvolvePkm: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
         const oldSpecies = parameters[ 2 ];
         const newSpecies = parameters[ 3 ];
@@ -222,7 +238,7 @@ export const ActionLabel: React.FC<DataActionPayload> = ({ type, parameters }) =
         [ DataActionType.EDIT_PKM_SAVE ]: ActionLabelMap.EditPkmSave,
         [ DataActionType.DELETE_PKM_VERSION ]: ActionLabelMap.DeletePkmVariant,
         [ DataActionType.SAVE_DELETE_PKM ]: ActionLabelMap.DeletePkmSave,
-        [ DataActionType.PKM_SYNCHRONIZE ]: () => null,
+        [ DataActionType.PKM_SYNCHRONIZE ]: ActionLabelMap.PkmSynchronize,
         [ DataActionType.EVOLVE_PKM ]: ActionLabelMap.EvolvePkm,
 
         [ DataActionType.SORT_PKM ]: ActionLabelMap.SortBox,

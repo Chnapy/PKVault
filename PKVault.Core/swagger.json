@@ -33,6 +33,24 @@
           }
         }
       },
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "operationId": "Backup_Create",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataDTO"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Backup"
@@ -4043,15 +4061,16 @@
           "appDirectory",
           "settingsPath",
           "userId",
+          "settingsMutable",
           "isDesktop",
           "canUpdateSettings",
           "canScanSaves",
           "canUploadSaves",
           "canDeleteSaves",
+          "canCreateBackup",
           "canOpenFolder",
           "canUseDesktopFileExplorer",
           "demoMode",
-          "settingsMutable",
           "savesUploadsPath"
         ],
         "properties": {
@@ -4083,6 +4102,9 @@
           "userId": {
             "type": "string"
           },
+          "settingsMutable": {
+            "$ref": "#/components/schemas/SettingsMutableDTO"
+          },
           "isDesktop": {
             "type": "boolean"
           },
@@ -4101,6 +4123,9 @@
           "canDeleteSaves": {
             "type": "boolean"
           },
+          "canCreateBackup": {
+            "type": "boolean"
+          },
           "canOpenFolder": {
             "type": "boolean"
           },
@@ -4109,9 +4134,6 @@
           },
           "demoMode": {
             "type": "boolean"
-          },
-          "settingsMutable": {
-            "$ref": "#/components/schemas/SettingsMutableDTO"
           },
           "savesUploadsPath": {
             "type": "string"
