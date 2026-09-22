@@ -1185,6 +1185,37 @@
         }
       }
     },
+    "/api/storage/main/pkm-version/{pkmVariantId}/main": {
+      "put": {
+        "tags": [
+          "Storage"
+        ],
+        "operationId": "Storage_MainSetPkmVariantMain",
+        "parameters": [
+          {
+            "name": "pkmVariantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/storage/main/pkm/detach-save": {
       "put": {
         "tags": [
@@ -3860,7 +3891,8 @@
           "SORT_PKM",
           "DEX_SYNC",
           "DATA_NORMALIZE",
-          "UPDATE_EXTERNAL_PKM"
+          "UPDATE_EXTERNAL_PKM",
+          "SET_PKM_VERSION_MAIN"
         ],
         "enum": [
           0,
@@ -3881,7 +3913,8 @@
           15,
           16,
           17,
-          18
+          18,
+          19
         ]
       },
       "WarningsDTO": {

@@ -52,6 +52,11 @@ export const useActionDescription = () => {
                     save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : null,
                     name: parameters[ 1 ],
                 }),
+            [ DataActionType.SET_PKM_VERSION_MAIN ]: () =>
+                t('storage.save-actions.type.main-set-pkm-main', {
+                    name: parameters[ 0 ],
+                    generation: getEntityContextGenerationName(parameters[ 1 ] as EntityContext, true),
+                }),
             [ DataActionType.DELETE_PKM_VERSION ]: () =>
                 t('storage.save-actions.type.main-delete-pkm', {
                     name: parameters[ 0 ],

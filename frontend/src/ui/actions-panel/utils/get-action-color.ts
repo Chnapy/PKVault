@@ -16,6 +16,7 @@ export const getActionColor = (type: DataActionType): NonNullable<BadgeProps[ 'c
         case DataActionType.MAIN_UPDATE_BOX:
         case DataActionType.EDIT_PKM_VERSION:
         case DataActionType.EDIT_PKM_SAVE:
+        case DataActionType.SET_PKM_VERSION_MAIN:
         case DataActionType.EVOLVE_PKM:
         case DataActionType.DETACH_PKM_SAVE:
         case DataActionType.DEX_SYNC:

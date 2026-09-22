@@ -108,6 +108,7 @@ public class Program
         services.AddScoped<MainCreatePkmVariantAction>();
         services.AddScoped<EditPkmVariantAction>();
         services.AddScoped<EditPkmSaveAction>();
+        services.AddScoped<SetPkmVariantMainAction>();
         services.AddScoped<DetachPkmSaveAction>();
         services.AddScoped<DeletePkmVariantAction>();
         services.AddScoped<SaveDeletePkmAction>();

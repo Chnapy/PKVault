@@ -63,14 +63,17 @@ public partial class CoreRouter
 
         try
         {
-            await SetupTask;
-
             var match = Match(httpMethod, httpPath);
             if (!match.HasValue)
             {
                 throw new KeyNotFoundException($"No route found for {httpMethod} {httpPath} routes.length={Routes.Count()}");
             }
             var (Route, PathVariables) = match.Value;
+
+            await SetupTask;
+
+            var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
+            await sessionService.EnsureSessionCreated();
 
             var controllerType = Route.MethodInfo.DeclaringType!;
             object controller = sp.GetRequiredService(controllerType);

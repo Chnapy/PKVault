@@ -156,6 +156,14 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
+    [HttpPut("main/pkm-version/{pkmVariantId}/main")]
+    public async Task<DataDTO> MainSetPkmVariantMain(string pkmVariantId)
+    {
+        var flags = await actionService.MainSetPkmVariantMain(pkmVariantId);
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
+    }
+
     [HttpDelete("save/{saveId}/pkm")]
     public async Task<DataDTO> SaveDeletePkms(uint saveId, string[] pkmIds)
     {

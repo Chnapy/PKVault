@@ -23,13 +23,6 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         const { storageIndex, getSelected } = useCurrentStorage();
         const navigate = Route.useNavigate();
 
-        const selected = Route.useSearch({
-            select: search => {
-                const value = getSelected(search.selected);
-                return !value?.saveId && value?.id === pkmId;
-            },
-        });
-
         const variantsQuery = usePkmVariantIndex(
             useSelectCallback(data => {
                 const baseVariant = data.data.byId[ pkmId ];
@@ -61,6 +54,13 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             }, [ pkmId ])
         );
         const variantInfos = variantsQuery.data;
+
+        const selected = Route.useSearch({
+            select: search => {
+                const value = getSelected(search.selected);
+                return !value?.saveId && variantInfos?.variants.some(v => v.id === value?.id);
+            },
+        });
 
         const canSynchronizeQuery = usePkmSaveIndex(variantInfos?.attachedVariant?.attachedSaveId ?? 0,
             useSelectCallback(data => {
