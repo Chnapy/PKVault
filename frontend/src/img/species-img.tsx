@@ -66,6 +66,7 @@ export const SpeciesImg: React.FC<SpeciesImgProps> = ({ species, context, form, 
         sheetUrl={sheetUrl}
         spriteInfos={spriteInfos}
         species={species}
+        isShadow={isShadow}
         {...imgProps}
     />;
 };
