@@ -167,11 +167,12 @@ export const PokedexDetails: React.FC = () => {
         if (!save)
           return null;
 
+        const gameInfos = getGameInfos(save.displayedVersion);
+
         return <UIDetailsSaveTab
           key={item.id}
           id={item.id}
-          version={save.displayedVersion}
-          color={getGameInfos(save.displayedVersion).color}
+          imgSrc={gameInfos.img}
           selected={selected}
           label={item.label}
         />;

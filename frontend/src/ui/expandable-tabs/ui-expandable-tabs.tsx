@@ -1,4 +1,4 @@
-import { ActionIcon, Stack, Tabs, type TabsProps } from '@mantine/core';
+import { ActionIcon, Group, Stack, Tabs, type TabsProps } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React from 'react';
@@ -182,22 +182,28 @@ export function UIExpandableTabs<D extends UIExpandableTabsData = UIExpandableTa
                     ))}
                 </ScrollerControlled>
 
-                {renderExpanded && <ActionIcon
-                    variant='subtle'
-                    size='sm'
-                    p='xs'
-                    mih='1lh'
+                {(renderExpanded || right) && <Group
+                    align='inherit'
+                    wrap='nowrap'
+                    gap='sm'
                     ml={grow ? 'auto' : undefined}
-                    onClick={() => setExpanded(value => !value)}
-                    color='currentcolor'
-                    disabled={forcedExpanded !== undefined}
                 >
-                    {expanded
-                        ? <ChevronUpIcon />
-                        : <ChevronDownIcon />}
-                </ActionIcon>}
+                    {renderExpanded && <ActionIcon
+                        variant='subtle'
+                        size='sm'
+                        p='xs'
+                        mih='1lh'
+                        onClick={() => setExpanded(value => !value)}
+                        color='currentcolor'
+                        disabled={forcedExpanded !== undefined}
+                    >
+                        {expanded
+                            ? <ChevronUpIcon />
+                            : <ChevronDownIcon />}
+                    </ActionIcon>}
 
-                {right}
+                    {right}
+                </Group>}
             </Tabs.List>
 
             {expanded && renderExpanded && renderScopedExpanded(

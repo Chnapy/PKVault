@@ -113,8 +113,7 @@ export const Primary: Story = {
             actions={closeBtn}
             renderTab={({ item, i, selected }) => <UIDetailsSaveTab
                 id={item.id}
-                version={GameVersion.X}
-                color={getGameInfos(GameVersion.X).color}
+                imgSrc={getGameInfos(GameVersion.X).img}
                 selected={selected}
                 label={item.label}
                 isEnabled={i !== 4}
