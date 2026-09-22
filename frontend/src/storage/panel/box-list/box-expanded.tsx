@@ -25,13 +25,13 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
     const pkmsQuery = usePkmIndex(
         saveId,
         useSelectCallback(data => {
-            if (!box?.idInt)
+            if (!box)
                 return;
 
             return Object.fromEntries(
                 Object.entries(data.data.byBox[ box.idInt ] ?? {}).map(([ slot, pkm ]) => [ slot, !!pkm ])
             );
-        }, [ box?.idInt ]),
+        }, [ box ]),
     );
 
     const boxPkms = pkmsQuery.data;
