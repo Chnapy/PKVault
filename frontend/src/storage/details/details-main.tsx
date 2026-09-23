@@ -1,6 +1,6 @@
-import { Badge, Tooltip } from '@mantine/core';
+import { Badge, Group, Tooltip } from '@mantine/core';
 import { t } from 'i18next';
-import { CircleSmallIcon } from 'lucide-react';
+import { CircleSmallIcon, DiffIcon } from 'lucide-react';
 import type React from 'react';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
@@ -11,11 +11,14 @@ import { BallImg } from '../../img/ball-img';
 import { ItemImg } from '../../img/item-img';
 import { SpeciesImg } from '../../img/species-img';
 import { Route } from '../../routes/storage';
+import { UIActionIcon } from '../../ui/form/button/ui-action-icon';
 import { UIButton } from '../../ui/form/button/ui-button';
+import { UIPopover } from '../../ui/popover/ui-popover';
 import { UIMarkingList } from '../../ui/storage/storage-details/marking/ui-marking-list';
 import { UIDetailsMain } from '../../ui/storage/storage-details/ui-details-main';
 import { useCurrentStorage } from '../panel/storage-panel-context';
 import { DetailsAttachedButton } from './details-attached-button';
+import { StorageDetailsDiff } from './diff/storage-details-diff';
 import { TypeItem } from './type-item/type-item';
 
 export const DetailsMain: React.FC = () => {
@@ -65,29 +68,50 @@ export const DetailsMain: React.FC = () => {
         canEvolve={pkm.canEvolve}
         isDuplicate={pkm.isDuplicate}
         warning={!!pkmLegality && !pkmLegality.isValid}
-        main={!selectedSaveId && <Tooltip
-            label={t('details.main.description')}
-        >
+        main={!selectedSaveId && <>
             {(pkm as PkmVariantDTO).isMain
-                ? <Badge
-                    variant='dot'
-                    h={22}
-                >
-                    {t('details.main')}
-                </Badge>
-                : <UIButton
-                    name='main-pkm'
-                    controlLabel={t('action.select')}
-                    onClick={() => setPkmVariantMainMutation.mutateAsync({
-                        pkmVariantId: pkm.id
-                    })}
-                    size='compact-xs'
-                    leftSection={<CircleSmallIcon />}
-                    disabled={!pkm.canEdit}
-                >
-                    {t('storage.actions.main')}
-                </UIButton>}
-        </Tooltip>}
+                ? <Tooltip label={t('details.main.description')}>
+                    <Badge
+                        variant='dot'
+                        h={22}
+                    >
+                        {t('details.main')}
+                    </Badge>
+                </Tooltip>
+                : pkm.isEnabled && <Group wrap='nowrap' gap='sm'>
+                    <UIPopover
+                        position='left'
+                        dropdown={<StorageDetailsDiff id={pkm.id} />}
+                    >
+                        <Tooltip label={t('details.diff')}>
+                            <UIActionIcon
+                                name='diff-pkm'
+                                controlLabel={t('action.select')}
+                                variant='default'
+                                size='sm'
+                                fz='sm'
+                            >
+                                <DiffIcon />
+                            </UIActionIcon>
+                        </Tooltip>
+                    </UIPopover>
+
+                    <Tooltip label={t('details.main.description')}>
+                        <UIButton
+                            name='main-pkm'
+                            controlLabel={t('action.select')}
+                            onClick={() => setPkmVariantMainMutation.mutateAsync({
+                                pkmVariantId: pkm.id
+                            })}
+                            size='compact-xs'
+                            leftSection={<CircleSmallIcon />}
+                            disabled={!pkm.canEdit}
+                        >
+                            {t('storage.actions.main')}
+                        </UIButton>
+                    </Tooltip>
+                </Group>}
+        </>}
         heldItem={pkm.heldItem > 0
             ? <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
             : null}

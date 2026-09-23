@@ -24,115 +24,10 @@ public partial class GenerateConvertView
 
     private static string BasePath => AppDomain.CurrentDomain.BaseDirectory;
 
-    private static readonly HashSet<string> PkmVariantPropertiesToUse = [
-        // "IsMain",
-        // "IsExternal",
-        // "AttachedSaveId",
-        // "AttachedSavePkmIdBase",
-        // "IsFilePresent",
-        // "Filepath",
-        // "FilepathAbsolute",
-        // "VersionChecker",
-        // "CanMoveAttachedToSave",
-        // "CanDelete",
-        // "CanMoveToSave",
-        // "CanEdit",
-        // "CanEvolve",
-        // "CanCreateVariant",
-        // "CompatibleWithVersions",
-        // "Id",
-        "Generation",
-        // "BoxId",
-        // "BoxSlot",
-        // "IsDuplicate",
-        // "SettingsLanguage",
-        // "Pkm",
-        // "Evolves",
-        "IdBase",
-        // "BoxKey",
-        "Version",
-        "ContextVersion",
-        "Context",
-        "PID",
-        "IsNicknamed",
-        "Nickname",
-        "Species",
-        "Form",
-        "IsEgg",
-        "IsShiny",
-        "IsAlpha",
-        "IsNoble",
-        // "NSparkle",
-        // "CanGigantamax",
-        "Ball",
-        "Gender",
-        "Types",
-        "TeraType",
-        "Level",
-        "Exp",
-        "ExpToLevelUp",
-        "LevelUpPercent",
-        "Friendship",
-        // "EggHatchCount",
-        "IVs",
-        "EVs",
-        "Stats",
-        "BaseStats",
-        "HiddenPowerType",
-        "HiddenPowerPower",
-        "HiddenPowerCategory",
-        "Nature",
-        "Ability",
-        "AbilityNumber",
-        "IsAbilityHidden",
-        "Moves",
-        "RelearnMoves",
-        "AlphaMove",
-        // "TID",
-        // "SID",
-        "OriginTrainerName",
-        "OriginTrainerGender",
-        // "HandlingTrainerName",
-        // "HandlingTrainerGender",
-        // "HandlingTrainerFriendship",
-        "IsCurrentHandler",
-        "OriginMetDate",
-        "OriginMetLocation",
-        "OriginMetLevel",
-        "FatefulEncounter",
-        "HeldItem",
-        // "DynamicChecksum",
-        // "NicknameMaxLength",
-        "LanguageID",
-        "HomeTracker",
-        "Markings",
-        "Contest",
-        "Ribbons",
-        "PokerusStrain",
-        "PokerusDays",
-        "IsPokerusInfected",
-        "IsPokerusCured",
-        "IsShadow",
-        // "CanMove",
-        // "LoadError",
-        // "HasLoadError",
-        // "IsEnabled",
-    ];
-
-    private static readonly HashSet<string> PkmLegalityPropertiesToUse = [
-        // "Id",
-        // "SaveId",
-        "MovesLegality",
-        "RelearnMovesLegality",
-        "IsValid",
-        "ValidityReport",
-        "IllegalitiesCount",
-    ];
-
     private static void IgnoreIrrelevantProperties(JsonTypeInfo typeInfo)
     {
-        HashSet<string>? propertiesToUse = typeInfo.Type == typeof(PkmVariantDTO) ? PkmVariantPropertiesToUse
-            : typeInfo.Type == typeof(PkmLegalityDTO) ? PkmLegalityPropertiesToUse
+        HashSet<string>? propertiesToUse = typeInfo.Type == typeof(PkmVariantDTO) ? DtoCompareProperties.PkmVariantPropertiesToUse
+            : typeInfo.Type == typeof(PkmLegalityDTO) ? DtoCompareProperties.PkmLegalityPropertiesToUse
             : null;
 
         if (propertiesToUse == null)
@@ -368,8 +263,8 @@ public partial class GenerateConvertView
 
         var indexJson = new IndexJSON(
             PKTypes: pkTypes.ToArray(),
-            PkmVariantProperties: PkmVariantPropertiesToUse.ToArray(),
-            PkmLegalityProperties: PkmLegalityPropertiesToUse.ToArray(),
+            PkmVariantProperties: DtoCompareProperties.PkmVariantPropertiesToUse.ToArray(),
+            PkmLegalityProperties: DtoCompareProperties.PkmLegalityPropertiesToUse.ToArray(),
             Entries: entries.ToArray()
         );
 

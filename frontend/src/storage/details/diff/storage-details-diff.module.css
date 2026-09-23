@@ -1,0 +1,15 @@
+.storage-details-diff {
+    overflow: auto;
+}
+
+.storage-details-diff table th,
+.storage-details-diff table td {
+    max-width: 180px;
+    overflow: hidden;
+    white-space: break-spaces;
+    vertical-align: top;
+}
+
+.null {
+    opacity: 0.25;
+}

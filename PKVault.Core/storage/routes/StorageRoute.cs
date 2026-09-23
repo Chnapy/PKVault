@@ -47,6 +47,12 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return pkmsLegality;
     }
 
+    [HttpGet("main/pkm-version/{pkmVariantId}/diff")]
+    public async Task<Dictionary<string, Tuple<string, string>>> GetMainPkmVariantDiff(string pkmVariantId)
+    {
+        return await storageQueryService.GetMainPkmVariantDiff(pkmVariantId);
+    }
+
     [HttpPut("move/pkm")]
     public async Task<DataDTO> MovePkm(
         string[] pkmIds, uint? sourceSaveId,

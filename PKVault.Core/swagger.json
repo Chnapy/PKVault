@@ -1185,6 +1185,40 @@
         }
       }
     },
+    "/api/storage/main/pkm-version/{pkmVariantId}/diff": {
+      "get": {
+        "tags": [
+          "Storage"
+        ],
+        "operationId": "Storage_GetMainPkmVariantDiff",
+        "parameters": [
+          {
+            "name": "pkmVariantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/TupleOfStringAndString"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/storage/main/pkm-version/{pkmVariantId}/main": {
       "put": {
         "tags": [
@@ -4732,6 +4766,22 @@
             "items": {
               "type": "integer"
             }
+          }
+        }
+      },
+      "TupleOfStringAndString": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "item1",
+          "item2"
+        ],
+        "properties": {
+          "item1": {
+            "type": "string"
+          },
+          "item2": {
+            "type": "string"
           }
         }
       },

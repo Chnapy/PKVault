@@ -276,7 +276,18 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     }
 
     // Data used here is considered to be mutable over pkm lifetime
-    public string DynamicChecksum => $"{Species}.{Form}.{Nickname}.{CurrentLevel}.{EXP}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+    public string DynamicChecksum => $"{Species}.{Form}.{GetComparableNickname(Pkm)}.{CurrentLevel}.{EXP}.{string.Join("-", EVs)}.{string.Join("-", Moves)}.{HeldItem}";
+
+    public static string GetComparableNickname(PKM pkm)
+    {
+        if (!pkm.IsNicknamed)
+            return "";
+
+        // some characters may change over generations
+        // eg: G5/CH'DING G6/CH’DING G1/CH DING
+        // https://github.com/Chnapy/PKVault/issues/205
+        return pkm.Nickname.Replace('’', '\'').Replace(' ', '\'');
+    }
 
     public bool IsSpeciesValid => Species > 0 && Species < GameInfo.Strings.Species.Count;
 

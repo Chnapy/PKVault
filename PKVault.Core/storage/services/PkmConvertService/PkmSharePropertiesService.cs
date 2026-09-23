@@ -99,10 +99,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
         else if (targetPkm.MaxStringLengthNickname <= sourcePkm.MaxStringLengthNickname
             || !targetPkm.Nickname.StartsWith(resultPkm.Nickname))
         {
-            // some characters may change over generations
-            // eg: G5/CH'DING G6/CH’DING G1/CH DING
-            // https://github.com/Chnapy/PKVault/issues/205
-            if (targetPkm.Nickname.Replace('’', '\'').Replace(' ', '\'') != resultPkm.Nickname.Replace('’', '\'').Replace(' ', '\''))
+            if (ImmutablePKM.GetComparableNickname(targetPkm) != ImmutablePKM.GetComparableNickname(resultPkm))
                 targetPkm.Nickname = resultPkm.Nickname;
         }
 

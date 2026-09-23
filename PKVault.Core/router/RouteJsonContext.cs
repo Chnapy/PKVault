@@ -33,6 +33,7 @@ namespace PKVault.Core;
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(Dictionary<string, object?>))]
 [JsonSerializable(typeof(Dictionary<string, StringValues>))]
+[JsonSerializable(typeof(Dictionary<string, Tuple<string, string>>))]
 public partial class RouteJsonContext : JsonSerializerContext
 {
     public static readonly RouteJsonContext DefaultWithOptions = new(

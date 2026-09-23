@@ -72,9 +72,6 @@ public partial class CoreRouter
 
             await SetupTask;
 
-            var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
-            await sessionService.EnsureSessionCreated();
-
             var controllerType = Route.MethodInfo.DeclaringType!;
             object controller = sp.GetRequiredService(controllerType);
 
