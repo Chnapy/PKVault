@@ -125,4 +125,32 @@ public class StorageQueryService(
             return (id, pkmSave == null ? null : pkmLegalityService.CreateDTO(pkmSave));
         }))).ToDictionary();
     }
+
+    public async Task<Dictionary<string, Tuple<string, string>>> GetMainPkmVariantDiff(string pkmVariantId)
+    {
+        using var scope = sp.CreateScope();
+        var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
+
+        var pkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+        var mainPkmVariant = (await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId)).TryGetValue(pkmVariant.BoxSlot, out var pv)
+            ? pv.Values.First(p => p.IsMain)
+            : null;
+
+        var dto1 = await pkmVariantLoader.CreateDTO(mainPkmVariant);
+        var dto2 = await pkmVariantLoader.CreateDTO(pkmVariant);
+
+        var legalities = (await GetPkmsLegality([dto1.Id, dto2.Id], null)).Values.ToArray();
+
+        Dictionary<string, Tuple<string, string>> dict = [];
+
+        foreach (var e in ObjectComparer.GetObjectsDiff(dto1, dto2)
+            .Where(e => DtoCompareProperties.PkmVariantPropertiesToUse.Contains(e.Key)))
+            dict.TryAdd(e.Key, e.Value);
+
+        foreach (var e in ObjectComparer.GetObjectsDiff(legalities[0]!, legalities[1]!)
+            .Where(e => DtoCompareProperties.PkmLegalityPropertiesToUse.Contains(e.Key)))
+            dict.TryAdd(e.Key, e.Value);
+
+        return dict;
+    }
 }

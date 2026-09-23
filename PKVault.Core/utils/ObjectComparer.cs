@@ -13,90 +13,130 @@ public static class ObjectComparer
             return;
         }
 
-        Type type = obj1.GetType();
+        var objectsDiffs = GetObjectsDiff(obj1, obj2);
 
-        var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)
-            .Where(prop => prop.CanRead)
-            .Select(prop =>
-            {
-                try
-                {
-                    return (
-                        prop.Name,
-                        V1: prop.GetValue(obj1),
-                        V2: prop.GetValue(obj2),
-                        prop.PropertyType.IsArray
-                    );
-                }
-                catch
-                {
-                    return (
-                        prop.Name,
-                        V1: "(error)",
-                        V2: "(error)",
-                        IsArray: false
-                    );
-                }
-            });
-
-        var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic)
-            .Select(prop =>
-            {
-                try
-                {
-                    return (
-                        prop.Name,
-                        V1: prop.GetValue(obj1),
-                        V2: prop.GetValue(obj2),
-                        prop.FieldType.IsArray
-                    );
-                }
-                catch
-                {
-                    return (
-                        prop.Name,
-                        V1: "(error)",
-                        V2: "(error)",
-                        IsArray: false
-                    );
-                }
-            });
-        IEnumerable<(string Name, object? V1, object? V2, bool IsArray)> allProps = [.. properties, .. fields];
-
-        foreach (var (Name, V1, V2, IsArray) in allProps)
+        foreach (var (Name, (Value1, Value2)) in objectsDiffs)
         {
-            if (IsArray)
+            LogDifference(Name, Value1, Value2);
+        }
+    }
+
+    public static Dictionary<string, Tuple<string, string>> GetObjectsDiff(object obj1, object obj2)
+    {
+        var obj1Members = GetObjectMembers(obj1);
+        var obj2Members = GetObjectMembers(obj2);
+
+        string[] membersNames = [.. obj1Members.Keys, .. obj2Members.Keys];
+        membersNames = membersNames.Distinct().ToArray();
+
+        return membersNames.Select(name =>
+        {
+            obj1Members.TryGetValue(name, out var v1);
+            obj2Members.TryGetValue(name, out var v2);
+
+            if (v1.IsArray || v2.IsArray)
             {
-                if (!AreArraysEqual(V1 as Array, V2 as Array))
-                    LogDifference(Name, FormatArray(V1 as Array), FormatArray(V2 as Array));
+                if (!AreArraysEqual(v1.Value as Array, v2.Value as Array))
+                    return (Name: name, Value1: FormatArray(v1.Value as Array), Value2: FormatArray(v2.Value as Array));
             }
             else
             {
-                if (!Equals(V1, V2))
-                    LogDifference(Name, V1, V2);
+                if (!IsValuesEqual(v1.Value, v2.Value))
+                    return (Name: name, Value1: FormatPrimitive(v1.Value), Value2: FormatPrimitive(v2.Value));
             }
+            return default;
+        })
+        .Where(e => e != default)
+        .ToDictionary(
+            e => e.Name,
+            e => Tuple.Create(e.Value1, e.Value2)
+        );
+    }
+
+    private static Dictionary<string, (object? Value, bool IsArray)> GetObjectMembers(object obj)
+    {
+        Type type = obj.GetType();
+
+        Dictionary<string, (object? Value, bool IsArray)> dict = [];
+
+        dict.Add("Type", (Value: type.FullName, IsArray: false));
+
+        foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic))
+        {
+            if (!prop.CanRead)
+                continue;
+            try
+            {
+                dict.TryAdd(prop.Name, (
+                    Value: prop.GetValue(obj),
+                    prop.PropertyType.IsArray
+                ));
+            }
+            catch
+            { }
         }
+
+        foreach (var prop in type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic))
+        {
+            try
+            {
+                dict.TryAdd(prop.Name, (
+                    Value: prop.GetValue(obj),
+                    prop.FieldType.IsArray
+                ));
+            }
+            catch
+            { }
+        }
+
+        return dict;
     }
 
     private static void LogDifference(string name, object? val1, object? val2)
     {
-        Log.Debug($"[Compare] {name}: {val1}/{val2}");
+        Log.Debug($"[Compare] {name}: {val1} / {val2}");
     }
 
     private static bool AreArraysEqual(Array? arr1, Array? arr2)
     {
-        if (arr1 == null && arr2 == null) return true;
-        if (arr1 == null || arr2 == null) return false;
+        arr1 ??= Array.Empty<object>();
+        arr2 ??= Array.Empty<object>();
+
         if (arr1.Length != arr2.Length) return false;
 
         for (int i = 0; i < arr1.Length; i++)
         {
             var item1 = arr1.GetValue(i);
             var item2 = arr2.GetValue(i);
-            if (!Equals(item1, item2))
+            if (!IsValuesEqual(item1, item2))
                 return false;
         }
         return true;
+    }
+
+    private static bool IsValuesEqual(object? v1, object? v2)
+    {
+        if (v1 == v2)
+            return true;
+
+        var t = v1?.GetType() ?? v2!.GetType();
+        var value1NonNull = v1 ?? GetDefaultValue(t);
+        var value2NonNull = v2 ?? GetDefaultValue(t);
+
+        return Equals(value1NonNull, value2NonNull)
+            || Equals(FormatPrimitive(value1NonNull), FormatPrimitive(value2NonNull));
+    }
+
+    private static object? GetDefaultValue(Type t)
+    {
+        if (t == typeof(string)) return "";
+        return Activator.CreateInstance(t);
+    }
+
+    private static string FormatPrimitive(object? value)
+    {
+        if (value == null) return "null";
+        return $"{value}";
     }
 
     private static string FormatArray(Array? arr)

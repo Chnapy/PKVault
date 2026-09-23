@@ -158,8 +158,8 @@ public class Program
     {
         await SetupSampleSaveFile(sp);
 
-        // var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
-        // await sessionService.EnsureSessionCreated();
+        var sessionService = sp.GetRequiredService<ISessionServiceMinimal>();
+        await sessionService.EnsureSessionCreated();
     }
 
     private static async Task SetupSampleSaveFile(IServiceProvider sp)

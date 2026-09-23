@@ -109,6 +109,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
             onClick={onClickMove}
             size='compact-md'
             leftSection={<MoveIcon />}
+            disabled={!draggingMove.enabled}
             focusOnMount={focusOnMount}
             // eslint-disable-next-line react-hooks/refs
             ref={dragging.ref}
@@ -159,7 +160,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                         <LinkIcon />
                     </Group>}
                     rightSection={hasDuplicate && <UIPokedexIcons.Duplicate />}
-                    disabled={hasDuplicate}
+                    disabled={!draggingMoveAttached.enabled || hasDuplicate}
                 >
                     {t('storage.actions.move-attached')}
                 </UIButton>
@@ -180,6 +181,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                 color='blue'
                 size='compact-md'
                 leftSection={<PencilIcon />}
+                disabled={canEditList.length === 0}
             >
                 {t('storage.actions.edit')}
             </UIButton>
@@ -224,6 +226,7 @@ export const DetailsActions: React.FC<DetailsActionsProps> = ({ focusOnMount, pk
                 color='blue'
                 size='compact-md'
                 leftSection={<SparklesIcon />}
+                disabled={canEvolveList.length === 0}
             >
                 {t('storage.actions.evolve')} {renderCount(canEvolveList.length)}
             </UIButton>
