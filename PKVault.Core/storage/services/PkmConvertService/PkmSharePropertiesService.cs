@@ -32,12 +32,10 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
         var result = pkmConvertService.ConvertTo(
             source,
             targetPkm.GetType(),
-            targetPkm is GBPKM
-                ? null
-                : new(
-                    TargetPkm: targetPkm
-                ),
-            save
+            new(
+                TargetPkm: targetPkm,
+                TargetSave: save is null ? null : new(save)
+            )
         );
 
         var resultPkm = result.GetMutablePkm();
@@ -441,7 +439,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
 
         var legality = legalityAnalysisService.GetLegalitySafe(new(targetPkm));
         var args = new RibbonVerifierArguments(
-            legality.la.Info.Entity,
+            legality.la!.Info.Entity,
             legality.la.EncounterMatch,
             legality.la.Info.EvoChainsAllGens
         );

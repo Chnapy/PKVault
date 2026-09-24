@@ -9,15 +9,15 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
     public void FixPID(
         PKM pkm,
         bool isShiny, byte form, byte gender, Nature nature, int ability,
-        bool checkLegality = false, SaveWrapper? save = null,
+        bool checkLegality = false,
         // force final values
-        PKMRndValues? rndValues = null
+        ConvertContext? ctx = null
     )
     {
-        if (rndValues?.TargetPkm.GetType() == pkm.GetType())
+        if (ctx?.TargetPkm?.GetType() == pkm.GetType())
         {
-            FixAbility(pkm, rndValues);
-            pkm.PID = rndValues.TargetPkm.PID;
+            FixAbility(pkm, ctx);
+            pkm.PID = ctx.TargetPkm.PID;
             if (pkm is GBPKM gbpkm)
             {
                 if (isShiny)
@@ -91,7 +91,7 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
             if (!checkLegality)
                 return false;
 
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx?.TargetSave);
             return !legality.Valid && legality.Results.Any(r => !r.Valid && (
                 r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip
 
@@ -143,7 +143,7 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
             + $" ability={pkm.Ability}/{ability} ({pkm.AbilityNumber}/{initialAbilityNumber}) index={pkm.PersonalInfo.GetIndexOfAbility(ability)} checkLegality={checkLegality}"
             + $" available={pkm.PersonalInfo.GetAbilityAtIndex(0)}/{pkm.PersonalInfo.GetAbilityAtIndex(1)}"
             + $"\nversion={pkm.Version} origin={new ImmutablePKM(pkm).GetOriginMetLocation("en")} / {pkm.MetLevel} {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}"
-            + $"\n{legalityAnalysisService.GetLegalitySafe(new(pkm), save).Report("en")}";
+            + $"\n{legalityAnalysisService.GetLegalitySafe(new(pkm), ctx?.TargetSave).Report("en")}";
 
         // for debug purpose only
         void CheckIfWrongData(Func<bool> fn)
@@ -238,15 +238,15 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
     public void FixAbility(
         PKM pkm,
         // force final values
-        PKMRndValues? rndValues
+        ConvertContext? ctx
     )
     {
         if (pkm is GBPKM)
             return;
 
-        if (rndValues?.TargetPkm.GetType() == pkm.GetType())
+        if (ctx?.TargetPkm?.GetType() == pkm.GetType())
         {
-            pkm.SetAbilityIndex(GetAbilityIndex(rndValues.TargetPkm.AbilityNumber));
+            pkm.SetAbilityIndex(GetAbilityIndex(ctx.TargetPkm.AbilityNumber));
             return;
         }
 

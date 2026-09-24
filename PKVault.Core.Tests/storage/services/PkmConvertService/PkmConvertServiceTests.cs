@@ -122,7 +122,8 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                TargetPkm: result
+                TargetPkm: result,
+                TargetSave: null
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -175,7 +176,8 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                TargetPkm: result
+                TargetPkm: result,
+                TargetSave: null
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -238,7 +240,8 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                TargetPkm: result
+                TargetPkm: result,
+                TargetSave: null
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -303,7 +306,8 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                TargetPkm: result
+                TargetPkm: result,
+                TargetSave: null
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);
@@ -366,7 +370,8 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
-                TargetPkm: result
+                TargetPkm: result,
+                TargetSave: null
             )).GetMutablePkm();
 
             Assert.Equal(result.PID, result2.PID);

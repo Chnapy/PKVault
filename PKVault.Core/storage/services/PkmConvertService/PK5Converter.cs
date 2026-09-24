@@ -5,15 +5,15 @@ namespace PKVault.Core;
 
 public class PK5Converter(PKMConverterUtils utils)
 {
-    public PK6 ConvertToPK6Fixed(PK5 pk5, PKMRndValues? rndValues)
+    public PK6 ConvertToPK6Fixed(PK5 pk5, ConvertContext? ctx)
     {
         var pk6 = pk5.ConvertToPK6();
 
-        utils.FixMetLocation(pk6, rndValues);
+        utils.FixMetLocation(pk6, ctx);
 
         utils.CopyHeldItemFrom(pk6, pk5.HeldItem, pk5.Context, pk5.Version);
 
-        if (rndValues == null)
+        if (ctx == null)
             utils.FixPID(pk6, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature, pk5.Ability);
 
         utils.CopyMovesFrom(pk6, pk5);
@@ -24,7 +24,7 @@ public class PK5Converter(PKMConverterUtils utils)
         return pk6;
     }
 
-    public PK4 ConvertToPK4(PK5 pk5, PKMRndValues? rndValues)
+    public PK4 ConvertToPK4(PK5 pk5, ConvertContext? ctx)
     {
         var pk4 = new PK4()
         {
@@ -42,7 +42,7 @@ public class PK5Converter(PKMConverterUtils utils)
             PokerusState = pk5.PokerusState,
         };
 
-        utils.CopyCommonPropertiesFrom(pk4, pk5, 4, rndValues);
+        utils.CopyCommonPropertiesFrom(pk4, pk5, 4, ctx);
         utils.CopyIVsFrom(pk4, pk5);
         utils.CopyEVsFrom(pk4, pk5);
 
@@ -55,11 +55,11 @@ public class PK5Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk4, pk5.HeldItem, pk5.Context, pk5.Version);
 
-        utils.FixAbility(pk4, rndValues);
+        utils.FixAbility(pk4, ctx);
 
-        utils.FixMetLocation(pk4, rndValues);
+        utils.FixMetLocation(pk4, ctx);
 
-        if (rndValues == null)
+        if (ctx == null)
             utils.FixPID(pk4, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature, pk5.Ability);
 
         utils.CopyMovesFrom(pk4, pk5);

@@ -476,8 +476,10 @@ public partial class GenerateConvertView
                     var pkmResult = pkmConvertService.ConvertTo(
                         pkmSource,
                         destType,
-                        null,
-                        mainVersionSaveTarget.Saves.First().GetSave()
+                        new(
+                            TargetPkm: null,
+                            TargetSave: new(mainVersionSaveTarget.Saves.First().GetSave())
+                        )
                     );
 
                     if (!pkmResult.IsEnabled || pkmResult.Generation == 0)
