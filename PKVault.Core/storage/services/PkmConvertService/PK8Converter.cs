@@ -54,7 +54,7 @@ public class PK8Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk9, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk9, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+            utils.FixPID(pk9, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
 
         utils.CopyMovesFrom(pk9, pk8);
 
@@ -103,7 +103,7 @@ public class PK8Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pb8, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pb8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+            utils.FixPID(pb8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
 
         utils.CopyMovesFrom(pb8, pk8);
 
@@ -152,7 +152,7 @@ public class PK8Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pa8, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pa8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+            utils.FixPID(pa8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
 
         utils.CopyMovesFrom(pa8, pk8);
 
@@ -199,7 +199,7 @@ public class PK8Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk7, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk7, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature);
+            utils.FixPID(pk7, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
 
         utils.CopyMovesFrom(pk7, pk8);
 
@@ -250,7 +250,7 @@ public class PK8Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk8, pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature);
+            utils.FixPID(pk8, pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature, pb8.Ability);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pb8.FormArgumentRemain;
@@ -301,7 +301,7 @@ public class PK8Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk8, pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature);
+            utils.FixPID(pk8, pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature, pa8.Ability);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pa8.FormArgumentRemain;

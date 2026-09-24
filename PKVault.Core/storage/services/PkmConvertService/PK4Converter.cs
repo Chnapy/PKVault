@@ -14,7 +14,7 @@ public class PK4Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk5, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk5, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
+            utils.FixPID(pk5, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
 
         pk5.OriginalTrainerFriendship = pk4.CurrentFriendship;
         pk5.HandlingTrainerFriendship = pk4.CurrentFriendship;
@@ -34,7 +34,7 @@ public class PK4Converter(PKMConverterUtils utils)
         }
 
         if (rndValues == null)
-            utils.FixPID(bk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
+            utils.FixPID(bk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
 
         utils.CopyMovesFrom(bk4, pk4);
 
@@ -51,7 +51,7 @@ public class PK4Converter(PKMConverterUtils utils)
         }
 
         if (rndValues == null)
-            utils.FixPID(rk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
+            utils.FixPID(rk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
 
         utils.CopyMovesFrom(rk4, pk4);
 
@@ -90,7 +90,7 @@ public class PK4Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk3, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk3, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature);
+            utils.FixPID(pk3, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
 
         utils.CopyMovesFrom(pk3, pk4);
 

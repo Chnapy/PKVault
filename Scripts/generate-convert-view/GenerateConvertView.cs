@@ -18,7 +18,7 @@ public partial class GenerateConvertView
         ConvertFormJSON ConvertFormJSON
     );
 
-    public record VersionSaveEntry(GameVersion Version, SaveWrapper Save, ImmutablePKM[] Pkms);
+    public record VersionSaveEntry(GameVersion Version, SaveWrapper[] Saves, ImmutablePKM[] Pkms);
 
     private static readonly GameVersionUtil.VersionChecker VersionChecker = new();
 
@@ -168,26 +168,29 @@ public partial class GenerateConvertView
             {
                 var versionToUse = GameVersionUtil.GetSingleVersion(version);
 
-                var save = saves.FirstOrDefault(s => s?.Version == versionToUse, null)
-                    ?? VersionChecker.allVersionBlankSaves
-                        .FirstOrDefault(s => s.Version == versionToUse && s.Save != null).Save
-                    ?? new(BlankSaveFile.Get(versionToUse));
+                var saveList = saves.Where(s => s?.Version == versionToUse);
+                if (!saveList.Any())
+                    saveList = VersionChecker.allVersionBlankSaves
+                        .Where(s => s.Version == versionToUse && s.Save != null)
+                        .Distinct()
+                        .Select(s => s.Save!);
+                if (!saveList.Any())
+                    saveList = [new(BlankSaveFile.Get(versionToUse))];
+
+                var pkms = saveList.SelectMany(save => save.GetAllPKM()).ToArray();
 
                 return new VersionSaveEntry(
                     Version: version,
-                    Save: save,
-                    Pkms: save.GetAllPKM().ToArray()
+                    Saves: saveList.ToArray(),
+                    Pkms: pkms
                 );
             })
             .ToArray()
-            .OrderBy(entry => entry.Save == null
-                ? 9999
-                : PkmConvertService.GetPKMTypeWeight(entry.Save.PKMType))
+            .OrderBy(entry => PkmConvertService.GetPKMTypeWeight(entry.Saves.First().PKMType))
             .ToArray();
 
         HashSet<string> pkTypes = allVersionSaves
-            .Where(versionSave => versionSave.Save != null)
-            .Select(versionSave => versionSave.Save.PKMType.Name)
+            .Select(versionSave => versionSave.Saves.First().PKMType.Name)
             .ToHashSet();
 
         List<IndexEntry> entries = [];
@@ -196,7 +199,7 @@ public partial class GenerateConvertView
         for (ushort species = 1; species < (ushort)Species.MAX_COUNT; species++)
         {
             var versionsSaves = allVersionSaves
-                .Where(entry => entry.Save.IsSpeciesAllowed(species))
+                .Where(entry => entry.Saves.First().IsSpeciesAllowed(species))
                 .ToArray();
 
             for (byte form = 0; form < byte.MaxValue; form++)
@@ -206,7 +209,7 @@ public partial class GenerateConvertView
 
                 var formVersionsSaves = versionsSaves.Where(entry =>
                 {
-                    var pi = entry.Save.Personal[species];
+                    var pi = entry.Saves.First().Personal[species];
                     return pi.IsFormWithinRange(form);
                 })
                 .ToArray();
@@ -217,15 +220,15 @@ public partial class GenerateConvertView
                 Dictionary<string, VersionSaveEntry> secondaryVersionsToPrimary = [];
                 foreach (var versionSave in formVersionsSaves)
                 {
-                    var pkmType = versionSave.Save.PKMType;
+                    var pkmType = versionSave.Saves.First().PKMType;
                     if (secondaryVersionsToPrimary.ContainsKey(pkmType.Name)
                         || pkmType.Name.StartsWith("PK"))
                         continue;
 
                     var pkmTypeWeight = PkmConvertService.GetPKMTypeWeight(pkmType);
-                    var primaryVersionSave = formVersionsSaves.LastOrDefault(s => s.Save.PKMType != pkmType
-                        && s.Save.PKMType.Name.StartsWith("PK")
-                        && PkmConvertService.GetPKMTypeWeight(s.Save.PKMType) < pkmTypeWeight
+                    var primaryVersionSave = formVersionsSaves.LastOrDefault(s => s.Saves.First().PKMType != pkmType
+                        && s.Saves.First().PKMType.Name.StartsWith("PK")
+                        && PkmConvertService.GetPKMTypeWeight(s.Saves.First().PKMType) < pkmTypeWeight
                     );
                     if (primaryVersionSave == null)
                         continue;
@@ -246,6 +249,8 @@ public partial class GenerateConvertView
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
         Log.Information($"Memory checks: setuped={setupedMemoryUsedMB} MB");
 
+        List<Exception> exs = [];
+
         await Parallel.ForEachAsync(
             workItems,
             new ParallelOptions
@@ -254,12 +259,22 @@ public partial class GenerateConvertView
             },
             async (p, ct) =>
             {
-                await GenerateFormSuites(
+                var suiteExs = await GenerateFormSuites(
                     evolves, fileIOService, pkmLegalityService, pkmConvertService,
                     p.Entry, p.VersionsSaves, p.SecondaryVersionsToPrimary
                 );
+                exs.AddRange(suiteExs);
             }
         );
+
+        if (exs.Count > 0)
+        {
+            Log.Error($"Errors caught during convert processes: {exs.Count}");
+            for (var i = 0; i < exs.Count; i++)
+                Log.Error(exs[i], $"Exception {i + 1}/{exs.Count}");
+        }
+        else
+            Log.Information($"No error caught during any convert process.");
 
         var indexJson = new IndexJSON(
             PKTypes: pkTypes.ToArray(),
@@ -279,7 +294,7 @@ public partial class GenerateConvertView
         Log.Information($"Memory checks: setuped={endMemoryUsedMB} MB");
     }
 
-    private static async Task GenerateFormSuites(
+    private static async Task<Exception[]> GenerateFormSuites(
         Dictionary<ushort, StaticEvolve> evolves,
         IFileIOService fileIOService, PkmLegalityService pkmLegalityService, IPkmConvertService pkmConvertService,
         IndexEntry indexEntry,
@@ -295,7 +310,9 @@ public partial class GenerateConvertView
             MissingSavePkmTypes: []
         );
 
-        var mainVersionsSaves = formVersionsSaves.Where(entry => entry.Save.PKMType.Name.StartsWith("PK")).ToArray();
+        List<Exception> exs = [];
+
+        var mainVersionsSaves = formVersionsSaves.Where(entry => entry.Saves.First().PKMType.Name.StartsWith("PK")).ToArray();
         var mainVersionsSavesReverse = mainVersionsSaves.ToArray().Reverse().ToArray();
         var secondaryVersionsSaves = formVersionsSaves.Except(mainVersionsSaves).ToArray();
         // Console.WriteLine(string.Join(',', secondaryVersionsSaves.Select(s => s.Save.GetSave().GetType().Name)));
@@ -318,65 +335,69 @@ public partial class GenerateConvertView
 
         Log.Debug($"Species={indexEntry.Species} Form={indexEntry.Form}");
 
-        var forwardSteps = GetSimpleStepSuite(
+        var (forwardSteps, forwardExs) = GetSimpleStepSuite(
             evolves, pkmLegalityService, pkmConvertService,
             mainVersionsSaves,
             formJson.Id, ConvertDirection.FORWARD,
             minimalMainVersionSaveSource, maximalMainVersionSaveTarget
         );
+        exs.AddRange(forwardExs);
         if (forwardSteps.Length > 0)
             formJson.Paths.Add(new(ConvertDirection.FORWARD, forwardSteps));
 
-        var backwardSteps = GetSimpleStepSuite(
+        var (backwardSteps, backwardExs) = GetSimpleStepSuite(
             evolves, pkmLegalityService, pkmConvertService,
             mainVersionsSavesReverse,
             formJson.Id, ConvertDirection.BACKWARD,
             maximalMainVersionSaveSource, minimalMainVersionSaveTarget
         );
+        exs.AddRange(backwardExs);
         if (backwardSteps.Length > 0)
             formJson.Paths.Add(new(ConvertDirection.BACKWARD, backwardSteps));
 
         foreach (var entry in secondaryVersionsToPrimary)
         {
             var source = GetVersionSaveWithPkm(mainVersionsSaves
-                .Where(s => s.Save.PKMType == entry.Value.Save.PKMType)
+                .Where(s => s.Saves.First().PKMType == entry.Value.Saves.First().PKMType)
                 .ToArray());
             var target = secondaryVersionsSaves
-                .FirstOrDefault(s => s.Save.PKMType.Name == entry.Key);
+                .FirstOrDefault(s => s.Saves.First().PKMType.Name == entry.Key);
 
             Log.Debug(
-                $"\t{ConvertDirection.BASE_TO_VARIANT} {(source == default ? null : source.Entry.Save.PKMType.Name)}"
-                + $"=>{(target == default ? null : target.Save.PKMType.Name)}"
+                $"\t{ConvertDirection.BASE_TO_VARIANT} {(source == default ? null : source.Entry.Saves.First().PKMType.Name)}"
+                + $"=>{(target == default ? null : target.Saves.First().PKMType.Name)}"
             );
 
             List<ConvertStep> baseVariantSteps = [];
 
             if (source == default)
-                formJson.MissingSavePkmsPresent.Add(entry.Value.Save.PKMType.Name);
+                formJson.MissingSavePkmsPresent.Add(entry.Value.Saves.First().PKMType.Name);
 
             if (target == default)
                 formJson.MissingSavePkmTypes.Add(entry.Key);
 
             if (source != default && target != default)
             {
-                baseVariantSteps.AddRange(GetSimpleStepSuite(
+                var (bvSteps, bvExs) = GetSimpleStepSuite(
                     evolves, pkmLegalityService, pkmConvertService,
                     [source.Entry, target],
                     formJson.Id, ConvertDirection.BASE_TO_VARIANT,
                     source, target
-                ));
+                );
+                exs.AddRange(bvExs);
+                baseVariantSteps.AddRange(bvSteps);
                 formJson.Paths.Add(new(ConvertDirection.BASE_TO_VARIANT, baseVariantSteps.ToArray()));
             }
 
             source = GetVersionSaveWithPkm(secondaryVersionsSaves
-                .Where(s => s.Save.PKMType.Name == entry.Key)
+                .Where(s => s.Saves.First().PKMType.Name == entry.Key)
                 .ToArray());
             target = mainVersionsSaves
-                .FirstOrDefault(s => s?.Save.PKMType == entry.Value.Save.PKMType);
+                .FirstOrDefault(s => s?.Saves.First().PKMType == entry.Value.Saves.First().PKMType);
 
             Log.Debug(
-                $"\t{ConvertDirection.VARIANT_TO_BASE} {(source == default ? null : source.Entry.Save.PKMType.Name)}"
-                + $"=>{(target == default ? null : target.Save.PKMType.Name)}"
+                $"\t{ConvertDirection.VARIANT_TO_BASE} {(source == default ? null : source.Entry.Saves.First().PKMType.Name)}"
+                + $"=>{(target == default ? null : target.Saves.First().PKMType.Name)}"
             );
 
             baseVariantSteps = [];
@@ -385,16 +406,18 @@ public partial class GenerateConvertView
                 formJson.MissingSavePkmsPresent.Add(entry.Key);
 
             if (target == default)
-                formJson.MissingSavePkmTypes.Add(entry.Value.Save.PKMType.Name);
+                formJson.MissingSavePkmTypes.Add(entry.Value.Saves.First().PKMType.Name);
 
             if (source != default && target != default)
             {
-                baseVariantSteps.AddRange(GetSimpleStepSuite(
+                var (vbSteps, vbExs) = GetSimpleStepSuite(
                     evolves, pkmLegalityService, pkmConvertService,
                     [source.Entry, target],
                     formJson.Id, ConvertDirection.VARIANT_TO_BASE,
                     source, target
-                ));
+                );
+                exs.AddRange(vbExs);
+                baseVariantSteps.AddRange(vbSteps);
                 formJson.Paths.Add(new(ConvertDirection.VARIANT_TO_BASE, baseVariantSteps.ToArray()));
             }
         }
@@ -405,9 +428,11 @@ public partial class GenerateConvertView
         );
         var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(formJson, FormJsonOptions);
         await fileIOService.WriteBytes(filePath, jsonBytes);
+
+        return exs.ToArray();
     }
 
-    private static ConvertStep[] GetSimpleStepSuite(
+    private static (ConvertStep[] Steps, Exception[] Exs) GetSimpleStepSuite(
         Dictionary<ushort, StaticEvolve> evolves, PkmLegalityService pkmLegalityService, IPkmConvertService pkmConvertService,
         VersionSaveEntry[] versionsSaves,
         string formId, ConvertDirection direction,
@@ -416,11 +441,12 @@ public partial class GenerateConvertView
     )
     {
         Log.Debug(
-            $"\t{direction} {(source == default ? null : source.Entry.Save.PKMType.Name)}"
-            + $"=>{(target == default ? null : target.Save.PKMType.Name)}"
+            $"\t{direction} {(source == default ? null : source.Entry.Saves.First().PKMType.Name)}"
+            + $"=>{(target == default ? null : target.Saves.First().PKMType.Name)}"
         );
 
         List<ConvertStep> steps = [];
+        List<Exception> exs = [];
 
         if (source != default && target != default)
         {
@@ -428,7 +454,7 @@ public partial class GenerateConvertView
             var pkmSource = source.Pkm;
 
             var firstSourceDto = GetVariantDTO(pkmSource, evolves);
-            var firstSourceLegality = pkmLegalityService.CreateDTO("", pkmSource, mainVersionSaveSource.Save);
+            var firstSourceLegality = pkmLegalityService.CreateDTO("", pkmSource, mainVersionSaveSource.Saves.First());
 
             steps.Add(GetStep(
                 formId, direction,
@@ -439,20 +465,29 @@ public partial class GenerateConvertView
             for (var i = versionsSaves.IndexOf(source.Entry) + 1; i < versionsSaves.Length; i++)
             {
                 var mainVersionSaveTarget = versionsSaves[i];
-                if (mainVersionSaveTarget.Save.PKMType == mainVersionSaveSource.Save.PKMType)
+                if (mainVersionSaveTarget.Saves.First().PKMType == mainVersionSaveSource.Saves.First().PKMType)
                     continue;
 
                 try
                 {
+                    var sourceType = pkmSource.GetMutablePkm().GetType();
+                    var destType = mainVersionSaveTarget.Saves.First().PKMType;
+
                     var pkmResult = pkmConvertService.ConvertTo(
                         pkmSource,
-                        mainVersionSaveTarget.Save.PKMType,
+                        destType,
                         null,
-                        mainVersionSaveTarget.Save.GetSave()
+                        mainVersionSaveTarget.Saves.First().GetSave()
                     );
 
+                    if (!pkmResult.IsEnabled || pkmResult.Generation == 0)
+                        throw new Exception(
+                            $"{sourceType.Name}->{destType.Name} Convert result is invalid"
+                            + $"\nspecies={pkmSource.Species} form={pkmSource.Form} enabled={pkmResult.IsEnabled} version={pkmResult.Version} generation={pkmResult.Generation}"
+                        );
+
                     var targetDto = GetVariantDTO(pkmResult, evolves);
-                    var targetLegality = pkmLegalityService.CreateDTO("", pkmResult, mainVersionSaveTarget.Save);
+                    var targetLegality = pkmLegalityService.CreateDTO("", pkmResult, mainVersionSaveTarget.Saves.First());
 
                     steps.Add(GetStep(
                         formId, direction,
@@ -465,14 +500,15 @@ public partial class GenerateConvertView
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(
-                        $"Exception during convert process with {pkmSource.GetMutablePkm().GetType().Name}->{mainVersionSaveTarget.Save.PKMType} Species={pkmSource.Species} Form={pkmSource.Form}",
-                        ex
+                    Log.Error(ex,
+                        $"Exception during convert process with {pkmSource.GetMutablePkm().GetType().Name}->{mainVersionSaveTarget.Saves.First().PKMType} Species={pkmSource.Species} Form={pkmSource.Form}"
                     );
+
+                    exs.Add(ex);
 
                     steps.Add(GetStep(
                         formId, direction,
-                        mainVersionSaveTarget.Save.PKMType.Name,
+                        mainVersionSaveTarget.Saves.First().PKMType.Name,
                         ex
                     ));
                     break;
@@ -480,7 +516,7 @@ public partial class GenerateConvertView
             }
         }
 
-        return steps.ToArray();
+        return (steps.ToArray(), exs.ToArray());
     }
 
     private static ConvertStep GetStep(

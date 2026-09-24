@@ -90,7 +90,7 @@ public class PK2Converter(PKMConverterUtils utils)
         pk3.SetEVs(evs);
 
         if (rndValues == null)
-            utils.FixPID(pk3, pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
+            utils.FixPID(pk3, pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature, pk3.Ability);
 
         utils.CopyMovesFrom(pk3, pk2);
 

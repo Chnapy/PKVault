@@ -12,7 +12,7 @@ public class PK6Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk7, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk7, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
+            utils.FixPID(pk7, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature, pk6.Ability);
 
         utils.CopyMovesFrom(pk7, pk6);
 
@@ -53,7 +53,7 @@ public class PK6Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk5, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk5, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature);
+            utils.FixPID(pk5, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature, pk6.Ability);
 
         utils.CopyMovesFrom(pk5, pk6);
 

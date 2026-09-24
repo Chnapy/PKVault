@@ -44,7 +44,7 @@ public class PK7Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk8, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
+            utils.FixPID(pk8, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature, pk7.Ability);
 
         utils.CopyMovesFrom(pk8, pk7);
 
@@ -93,12 +93,7 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.CopyMovesFrom(pb7, pk7);
 
-        // pb7.FixMetLocation([
-        //     // GameVersion.RD, GameVersion.GN, GameVersion.BU, GameVersion.YW,
-        //     // GameVersion.GD, GameVersion.SI, GameVersion.C,
-        //     GameVersion.GP, GameVersion.GE,
-        //     GameVersion.GO,
-        // ]);
+        utils.FixMetLocation(pb7, rndValues);
 
         pb7.ResetCalculatedValues();
 
@@ -179,7 +174,7 @@ public class PK7Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk6, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk6, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature);
+            utils.FixPID(pk6, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature, pk7.Ability);
 
         // for Furfrou and Hoopa
         pk6.FormArgumentRemain = pk7.FormArgumentRemain;
@@ -252,7 +247,7 @@ public class PK7Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk7, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk7, pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature);
+            utils.FixPID(pk7, pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature, pb7.Ability);
 
         utils.CopyMovesFrom(pk7, pb7);
 

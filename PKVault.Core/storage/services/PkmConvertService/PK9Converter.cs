@@ -50,7 +50,7 @@ public class PK9Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pa9, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pa9, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
+            utils.FixPID(pa9, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature, pk9.Ability);
 
         utils.CopyMovesFrom(pa9, pk9);
 
@@ -96,7 +96,7 @@ public class PK9Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk8, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk8, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature);
+            utils.FixPID(pk8, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature, pk9.Ability);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pk9.FormArgumentRemain;
@@ -157,7 +157,7 @@ public class PK9Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk9, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk9, pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature);
+            utils.FixPID(pk9, pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature, pa9.Ability);
 
         utils.CopyMovesFrom(pk9, pa9);
 

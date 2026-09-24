@@ -14,7 +14,7 @@ public class PK5Converter(PKMConverterUtils utils)
         utils.CopyHeldItemFrom(pk6, pk5.HeldItem, pk5.Context, pk5.Version);
 
         if (rndValues == null)
-            utils.FixPID(pk6, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+            utils.FixPID(pk6, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature, pk5.Ability);
 
         utils.CopyMovesFrom(pk6, pk5);
 
@@ -60,7 +60,7 @@ public class PK5Converter(PKMConverterUtils utils)
         utils.FixMetLocation(pk4, rndValues);
 
         if (rndValues == null)
-            utils.FixPID(pk4, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature);
+            utils.FixPID(pk4, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature, pk5.Ability);
 
         utils.CopyMovesFrom(pk4, pk5);
 
