@@ -9,11 +9,12 @@ export const FilterViews: React.FC = () => {
 
   const navigate = Route.useNavigate();
 
-  const allValues = [ 'display-forms', 'display-genders' ] as const;
+  const allValues = [ 'display-forms', 'display-genders', 'display-living-dex' ] as const;
 
   const value = [
     Route.useSearch({ select: (search) => search.showForms ? allValues[ 0 ] : undefined }),
     Route.useSearch({ select: (search) => search.showGenders ? allValues[ 1 ] : undefined }),
+    Route.useSearch({ select: (search) => search.showLivingDex ? allValues[ 2 ] : undefined }),
   ].filter(v => typeof v === 'string');
 
   return <Checkbox.Group
@@ -22,10 +23,11 @@ export const FilterViews: React.FC = () => {
       search: {
         showForms: values.includes('display-forms') || undefined,
         showGenders: values.includes('display-genders') || undefined,
+        showLivingDex: values.includes('display-living-dex') || undefined,
       },
     }))}
   >
-    <Group grow wrap='nowrap'>
+    <Group grow wrap='wrap'>
       <Checkbox.Card
         renderRoot={props => <UIButton
           name={allValues[ 0 ]}
@@ -58,6 +60,23 @@ export const FilterViews: React.FC = () => {
         value={allValues[ 1 ]}
       >
         {t('dex.filters.genders')}
+      </Checkbox.Card>
+
+      <Checkbox.Card
+        renderRoot={props => <UIButton
+          name={allValues[ 2 ]}
+          controlLabel={t('dex.filters.living-dex')}
+          leftSection={<Checkbox.Indicator />}
+          styles={{
+            label: {
+              flexGrow: 1,
+            },
+          }}
+          {...props}
+        />}
+        value={allValues[ 2 ]}
+      >
+        {t('dex.filters.living-dex')}
       </Checkbox.Card>
     </Group>
   </Checkbox.Group>;
