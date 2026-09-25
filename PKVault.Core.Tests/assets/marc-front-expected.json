@@ -1,0 +1,550 @@
+{
+    "PK3": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 254,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "CK3": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 254,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "XK3": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 254,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PK4": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 55,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "BK4": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 55,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "RK4": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 55,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PK5": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 30001,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PK6": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 30001,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PK7": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 30001,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PB7": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 34,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 50,
+        "ball": 4,
+        "moves": [
+            23,
+            35,
+            0,
+            0
+        ],
+        "ivs": [
+            25,
+            23,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PK8": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 30001,
+        "ball": 4,
+        "moves": [
+            111,
+            282,
+            23,
+            35
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PB8": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 5,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 30001,
+        "ball": 4,
+        "moves": [
+            111,
+            23,
+            35,
+            0
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": []
+    },
+    "PA8": {
+        "species": 108,
+        "form": 0,
+        "gender": 0,
+        "version": 44,
+        "level": 32,
+        "exp": 32768,
+        "shiny": false,
+        "nicknamed": true,
+        "nickname": "MARC",
+        "ability": 20,
+        "tid": 1239,
+        "ot": "HADEN",
+        "language": 2,
+        "metLocation": 166,
+        "ball": 4,
+        "moves": [
+            156,
+            523,
+            428,
+            38
+        ],
+        "ivs": [
+            24,
+            19,
+            21,
+            23,
+            21,
+            15
+        ],
+        "evs": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "friendship": 70,
+        "sid": 0,
+        "illegalities": [
+            "Misc-PIDTypeMismatch"
+        ]
+    }
+}

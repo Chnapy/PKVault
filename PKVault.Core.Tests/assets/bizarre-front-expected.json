@@ -16,7 +16,6 @@
         "shiny": true,
         "nicknamed": true,
         "nickname": "BIZARRE",
-        "nature": 0,
         "ability": -1,
         "friendship": 200,
         "tid": 58388,
@@ -57,7 +56,6 @@
         "shiny": true,
         "nicknamed": true,
         "nickname": "BIZARRE",
-        "nature": 0,
         "ability": -1,
         "friendship": 200,
         "tid": 58388,
@@ -99,6 +97,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 190,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -143,6 +143,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 190,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -187,6 +189,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 190,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -231,6 +235,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 209,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -275,6 +281,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 209,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -319,6 +327,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 209,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -363,6 +373,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 30001,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -406,6 +418,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 30001,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -449,6 +463,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 30001,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -474,98 +490,6 @@
             "PID-PIDTypeMismatch"
         ]
     },
-    "PB7": {
-        "species": 201,
-        "form": 8,
-        "gender": 2,
-        "version": 34,
-        "level": 5,
-        "exp": 125,
-        "moves": [
-            237,
-            0,
-            0,
-            0
-        ],
-        "shiny": true,
-        "nicknamed": true,
-        "nickname": "BIZARRE",
-        "ability": 26,
-        "friendship": 200,
-        "tid": 58388,
-        "sid": 8239,
-        "ot": "CHNAPY",
-        "evs": [
-            119,
-            95,
-            71,
-            46,
-            46,
-            23
-        ],
-        "ivs": [
-            17,
-            23,
-            21,
-            23,
-            21,
-            20
-        ],
-        "language": 3,
-        "size": [
-            30,
-            24
-        ],
-        "illegalities": [
-            "Encounter-EncInvalid",
-            "Move-0"
-        ]
-    },
-    "PK8": {
-        "species": 201,
-        "form": 8,
-        "gender": 2,
-        "version": 7,
-        "helditem": 223,
-        "level": 5,
-        "exp": 125,
-        "moves": [
-            237,
-            0,
-            0,
-            0
-        ],
-        "shiny": true,
-        "nicknamed": true,
-        "nickname": "BIZARRE",
-        "ability": 26,
-        "friendship": 200,
-        "tid": 58388,
-        "sid": 8239,
-        "ot": "CHNAPY",
-        "evs": [
-            150,
-            120,
-            90,
-            59,
-            59,
-            29
-        ],
-        "ivs": [
-            16,
-            23,
-            20,
-            20,
-            20,
-            20
-        ],
-        "language": 3,
-        "illegalities": [
-            "PID-PIDTypeMismatch",
-            "Ability-AbilityUnexpected",
-            "Encounter-TransferBad"
-        ]
-    },
     "PB8": {
         "species": 201,
         "form": 8,
@@ -584,6 +508,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 30001,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -626,6 +552,8 @@
         "nicknamed": true,
         "nickname": "BIZARRE",
         "ability": 26,
+        "metLocation": 30001,
+        "ball": 4,
         "friendship": 200,
         "tid": 58388,
         "sid": 8239,
@@ -655,90 +583,5 @@
         "illegalities": [
             "PID-PIDTypeMismatch"
         ]
-    },
-    "PK9": {
-        "species": 201,
-        "form": 8,
-        "gender": 2,
-        "version": 7,
-        "helditem": 223,
-        "level": 5,
-        "exp": 125,
-        "moves": [
-            237,
-            0,
-            0,
-            0
-        ],
-        "shiny": true,
-        "nicknamed": true,
-        "nickname": "BIZARRE",
-        "ability": 26,
-        "friendship": 200,
-        "tid": 58388,
-        "sid": 8239,
-        "ot": "CHNAPY",
-        "evs": [
-            150,
-            120,
-            90,
-            59,
-            59,
-            29
-        ],
-        "ivs": [
-            16,
-            23,
-            20,
-            20,
-            20,
-            20
-        ],
-        "language": 3,
-        "size": [
-            1,
-            1,
-            0
-        ]
-    },
-    "PA9": {
-        "species": 201,
-        "form": 8,
-        "gender": 2,
-        "version": 7,
-        "helditem": 0,
-        "level": 5,
-        "exp": 125,
-        "moves": [
-            237,
-            0,
-            0,
-            0
-        ],
-        "shiny": true,
-        "nicknamed": true,
-        "nickname": "BIZARRE",
-        "ability": 26,
-        "friendship": 200,
-        "tid": 58388,
-        "sid": 8239,
-        "ot": "CHNAPY",
-        "evs": [
-            150,
-            120,
-            90,
-            59,
-            59,
-            29
-        ],
-        "ivs": [
-            16,
-            23,
-            20,
-            20,
-            20,
-            20
-        ],
-        "language": 3
     }
 }
