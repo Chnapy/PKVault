@@ -5,16 +5,15 @@ namespace PKVault.Core;
 
 public class PK4Converter(PKMConverterUtils utils)
 {
-    public PK5 ConvertToPK5Fixed(PK4 pk4, ConvertContext? ctx)
+    public PK5 ConvertToPK5Fixed(PK4 pk4, ConvertContext ctx)
     {
         var pk5 = pk4.ConvertToPK5();
-        if (ctx?.TargetPkm != null)
+        if (ctx.TargetPkm != null)
             pk5.PID = ctx.TargetPkm.PID;
 
         utils.FixMetLocation(pk5, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk5, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
+        utils.FixPersonalData(pk5, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability, false, ctx);
 
         pk5.OriginalTrainerFriendship = pk4.CurrentFriendship;
         pk5.HandlingTrainerFriendship = pk4.CurrentFriendship;
@@ -24,7 +23,7 @@ public class PK4Converter(PKMConverterUtils utils)
         return pk5;
     }
 
-    public BK4 ConvertToBK4Fixed(PK4 pk4, ConvertContext? ctx)
+    public BK4 ConvertToBK4Fixed(PK4 pk4, ConvertContext ctx)
     {
         var bk4 = pk4.ConvertToBK4();
 
@@ -33,15 +32,14 @@ public class PK4Converter(PKMConverterUtils utils)
             bk4.SetMarking(i, pk4.GetMarking(i));
         }
 
-        if (ctx == null)
-            utils.FixPID(bk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
+        utils.FixPersonalData(bk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability, false, ctx);
 
         utils.CopyMovesFrom(bk4, pk4);
 
         return bk4;
     }
 
-    public RK4 ConvertToRK4Fixed(PK4 pk4, ConvertContext? ctx)
+    public RK4 ConvertToRK4Fixed(PK4 pk4, ConvertContext ctx)
     {
         var rk4 = pk4.ConvertToRK4();
 
@@ -50,15 +48,14 @@ public class PK4Converter(PKMConverterUtils utils)
             rk4.SetMarking(i, pk4.GetMarking(i));
         }
 
-        if (ctx == null)
-            utils.FixPID(rk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
+        utils.FixPersonalData(rk4, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability, false, ctx);
 
         utils.CopyMovesFrom(rk4, pk4);
 
         return rk4;
     }
 
-    public PK3 ConvertToPK3(PK4 pk4, ConvertContext? ctx)
+    public PK3 ConvertToPK3(PK4 pk4, ConvertContext ctx)
     {
         var pk3 = new PK3()
         {
@@ -89,8 +86,7 @@ public class PK4Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk3, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk3, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability);
+        utils.FixPersonalData(pk3, pk4.IsShiny, pk4.Form, pk4.Gender, pk4.Nature, pk4.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk3, pk4);
 

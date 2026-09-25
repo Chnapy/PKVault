@@ -5,7 +5,7 @@ namespace PKVault.Core;
 
 public class PK8Converter(PKMConverterUtils utils)
 {
-    public PK9 ConvertToPK9(PK8 pk8, ConvertContext? ctx)
+    public PK9 ConvertToPK9(PK8 pk8, ConvertContext ctx)
     {
         var pk9 = new PK9()
         {
@@ -53,15 +53,14 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk9, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk9, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
+        utils.FixPersonalData(pk9, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk9, pk8);
 
         return pk9;
     }
 
-    public PB8 ConvertToPB8(PK8 pk8, ConvertContext? ctx)
+    public PB8 ConvertToPB8(PK8 pk8, ConvertContext ctx)
     {
         var pb8 = new PB8()
         {
@@ -102,15 +101,14 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pb8, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pb8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
+        utils.FixPersonalData(pb8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability, false, ctx);
 
         utils.CopyMovesFrom(pb8, pk8);
 
         return pb8;
     }
 
-    public PA8 ConvertToPA8(PK8 pk8, ConvertContext? ctx)
+    public PA8 ConvertToPA8(PK8 pk8, ConvertContext ctx)
     {
         var pa8 = new PA8()
         {
@@ -151,8 +149,7 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pa8, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pa8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
+        utils.FixPersonalData(pa8, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability, false, ctx);
 
         utils.CopyMovesFrom(pa8, pk8);
 
@@ -162,7 +159,7 @@ public class PK8Converter(PKMConverterUtils utils)
         return pa8;
     }
 
-    public PK7 ConvertToPK7(PK8 pk8, ConvertContext? ctx)
+    public PK7 ConvertToPK7(PK8 pk8, ConvertContext ctx)
     {
         var pk7 = new PK7()
         {
@@ -198,8 +195,7 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk7, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk7, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability);
+        utils.FixPersonalData(pk7, pk8.IsShiny, pk8.Form, pk8.Gender, pk8.Nature, pk8.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk7, pk8);
 
@@ -211,7 +207,7 @@ public class PK8Converter(PKMConverterUtils utils)
         return pk7;
     }
 
-    public PK8 ConvertToPK8(PB8 pb8, ConvertContext? ctx)
+    public PK8 ConvertToPK8(PB8 pb8, ConvertContext ctx)
     {
         var pk8 = new PK8()
         {
@@ -249,8 +245,7 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk8, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk8, pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature, pb8.Ability);
+        utils.FixPersonalData(pk8, pb8.IsShiny, pb8.Form, pb8.Gender, pb8.Nature, pb8.Ability, false, ctx);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pb8.FormArgumentRemain;
@@ -262,7 +257,7 @@ public class PK8Converter(PKMConverterUtils utils)
         return pk8;
     }
 
-    public PK8 ConvertToPK8(PA8 pa8, ConvertContext? ctx)
+    public PK8 ConvertToPK8(PA8 pa8, ConvertContext ctx)
     {
         var pk8 = new PK8()
         {
@@ -300,8 +295,7 @@ public class PK8Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk8, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk8, pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature, pa8.Ability);
+        utils.FixPersonalData(pk8, pa8.IsShiny, pa8.Form, pa8.Gender, pa8.Nature, pa8.Ability, false, ctx);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pa8.FormArgumentRemain;

@@ -5,21 +5,20 @@ namespace PKVault.Core;
 
 public class PK6Converter(PKMConverterUtils utils)
 {
-    public PK7 ConvertToPK7Fixed(PK6 pk6, ConvertContext? ctx)
+    public PK7 ConvertToPK7Fixed(PK6 pk6, ConvertContext ctx)
     {
         var pk7 = pk6.ConvertToPK7();
 
         utils.FixMetLocation(pk7, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk7, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature, pk6.Ability);
+        utils.FixPersonalData(pk7, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature, pk6.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk7, pk6);
 
         return pk7;
     }
 
-    public PK5 ConvertToPK5(PK6 pk6, ConvertContext? ctx)
+    public PK5 ConvertToPK5(PK6 pk6, ConvertContext ctx)
     {
         var pk5 = new PK5()
         {
@@ -52,8 +51,7 @@ public class PK6Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk5, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk5, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature, pk6.Ability);
+        utils.FixPersonalData(pk5, pk6.IsShiny, pk6.Form, pk6.Gender, pk6.Nature, pk6.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk5, pk6);
 

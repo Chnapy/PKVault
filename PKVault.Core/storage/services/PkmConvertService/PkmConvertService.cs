@@ -34,6 +34,8 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
     {
         Log.Debug($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> {targetPkmType.Name}");
 
+        ctx ??= new(null, null);
+
         var fallbackLang = settingsService.GetSettings().GetSafeLanguageID();
 
         var result = ConvertRecursive(sourcePkm.GetMutablePkm().Clone(), targetPkmType, fallbackLang, ctx);
@@ -60,7 +62,7 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
         return new(result);
     }
 
-    private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang, ConvertContext? ctx)
+    private PKM ConvertRecursive(PKM current, Type targetType, LanguageID fallbackLang, ConvertContext ctx)
     {
         // log.LogInformation($"Convert recursive {current.GetType().Name} -> {targetType.Name}");
 
@@ -93,9 +95,9 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
         throw new InvalidOperationException($"No conversion path from {current.GetType().Name} to {targetType.Name}");
     }
 
-    private PKM? TryPKToVariant(PKM source, Type targetType, ConvertContext? ctx)
+    private PKM? TryPKToVariant(PKM source, Type targetType, ConvertContext ctx)
     {
-        // log.LogInformation($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={ctx?.PID}");
+        // log.LogInformation($"Convert forward {source.GetType().Name} -> {targetType.Name} - PID={ctx.PID}");
 
         return (source.GetType().Name, targetType.Name) switch
         {
@@ -127,9 +129,9 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
         };
     }
 
-    private PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, ConvertContext? ctx)
+    private PKM? TryForwardConversion(PKM source, LanguageID fallbackLang, ConvertContext ctx)
     {
-        // log.LogInformation($"Convert forward {source.GetType().Name} - PID={ctx?.PID}");
+        // log.LogInformation($"Convert forward {source.GetType().Name} - PID={ctx.PID}");
 
         if (source is ITrainerInfo sourceTrainer)
         {
@@ -154,15 +156,15 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
         // Check unexpected nature changes after G2
         // if (pkm != null && source.Generation > 2 && source.Nature != pkm.Nature)
         // {
-        //     throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={ctx?.PID}");
+        //     throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={ctx.PID}");
         // }
 
         return pkm;
     }
 
-    private PKM? TryBackwardConversion(PKM source, ConvertContext? ctx)
+    private PKM? TryBackwardConversion(PKM source, ConvertContext ctx)
     {
-        // log.LogInformation($"Convert backward {source.GetType().Name} - PID={ctx?.PID}");
+        // log.LogInformation($"Convert backward {source.GetType().Name} - PID={ctx.PID}");
 
         if (source is ITrainerInfo sourceTrainer)
         {
@@ -187,15 +189,15 @@ public class PkmConvertService(ISettingsService settingsService, ILegalityAnalys
         // Check unexpected nature changes before G2
         // if (pkm != null && pkm.Generation > 2 && source.Nature != pkm.Nature)
         // {
-        //     throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={ctx?.PID}");
+        //     throw new Exception($"Different nature {source.Nature} / {pkm.Nature} - PID={ctx.PID}");
         // }
 
         return pkm;
     }
 
-    private PKM? TryVariantToPK(PKM source, ConvertContext? ctx)
+    private PKM? TryVariantToPK(PKM source, ConvertContext ctx)
     {
-        // log.LogInformation($"Convert backward {source.GetType().Name} - PID={ctx?.PID}");
+        // log.LogInformation($"Convert backward {source.GetType().Name} - PID={ctx.PID}");
 
         return source.GetType().Name switch
         {

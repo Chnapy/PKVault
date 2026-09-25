@@ -5,14 +5,13 @@ namespace PKVault.Core;
 
 public class PK3Converter(PKMConverterUtils utils)
 {
-    public PK4 ConvertToPK4Fixed(PK3 pk3, ConvertContext? ctx)
+    public PK4 ConvertToPK4Fixed(PK3 pk3, ConvertContext ctx)
     {
         var pk4 = pk3.ConvertToPK4();
 
         utils.FixMetLocation(pk4, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk4, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature, pk3.Ability);
+        utils.FixPersonalData(pk4, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature, pk3.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk4, pk3);
 
@@ -22,7 +21,7 @@ public class PK3Converter(PKMConverterUtils utils)
         return pk4;
     }
 
-    public XK3 ConvertToXK3Fixed(PK3 pk3, ConvertContext? ctx)
+    public XK3 ConvertToXK3Fixed(PK3 pk3, ConvertContext ctx)
     {
         var pk = pk3.ConvertToXK3();
 
@@ -31,15 +30,14 @@ public class PK3Converter(PKMConverterUtils utils)
             pk.SetMarking(i, pk3.GetMarking(i));
         }
 
-        if (ctx == null)
-            utils.FixPID(pk, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature, pk3.Ability);
+        utils.FixPersonalData(pk, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature, pk3.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk, pk3);
 
         return pk;
     }
 
-    public CK3 ConvertToCK3Fixed(PK3 pk3, ConvertContext? ctx)
+    public CK3 ConvertToCK3Fixed(PK3 pk3, ConvertContext ctx)
     {
         var pk = pk3.ConvertToCK3();
 
@@ -48,26 +46,25 @@ public class PK3Converter(PKMConverterUtils utils)
             pk.SetMarking(i, pk3.GetMarking(i));
         }
 
-        if (ctx == null)
-            utils.FixPID(pk, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature, pk3.Ability);
+        utils.FixPersonalData(pk, pk3.IsShiny, pk3.Form, pk3.Gender, pk3.Nature, pk3.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk, pk3);
 
         return pk;
     }
 
-    public PK2 ConvertToPK2(PK3 pk3, ConvertContext? ctx)
+    public PK2 ConvertToPK2(PK3 pk3, ConvertContext ctx)
     {
         var pk2 = new PK2()
         {
             Version = pk3.Version.Generation <= 2 ? pk3.Version : GameVersion.C,
-            EncryptionConstant = ctx?.TargetPkm?.EncryptionConstant ?? Util.Rand.Rand32(),
+            EncryptionConstant = ctx.TargetPkm?.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk3.Species,
             TID16 = pk3.TID16,
             CurrentLevel = pk3.CurrentLevel,
             EXP = pk3.EXP,
             Nature = Experience.GetNatureVC(pk3.EXP),
-            PID = ctx?.TargetPkm?.PID ?? Util.Rand.Rand32(),
+            PID = ctx.TargetPkm?.PID ?? Util.Rand.Rand32(),
             Ball = 4,
 
             MetLocation = 0,
@@ -125,8 +122,7 @@ public class PK3Converter(PKMConverterUtils utils)
         // }
         pk2.SetEVs(evs);
 
-        if (ctx == null)
-            utils.FixPID(pk2, pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature, pk2.Ability);
+        utils.FixPersonalData(pk2, pk3.IsShiny, pk3.Form, pk3.Gender, pk2.Nature, pk2.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk2, pk3);
 

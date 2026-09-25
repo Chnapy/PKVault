@@ -5,7 +5,7 @@ namespace PKVault.Core;
 
 public class PK9Converter(PKMConverterUtils utils)
 {
-    public PA9 ConvertToPA9(PK9 pk9, ConvertContext? ctx)
+    public PA9 ConvertToPA9(PK9 pk9, ConvertContext ctx)
     {
         var pa9 = new PA9()
         {
@@ -49,15 +49,14 @@ public class PK9Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pa9, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pa9, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature, pk9.Ability);
+        utils.FixPersonalData(pa9, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature, pk9.Ability, false, ctx);
 
         utils.CopyMovesFrom(pa9, pk9);
 
         return pa9;
     }
 
-    public PK8 ConvertToPK8(PK9 pk9, ConvertContext? ctx)
+    public PK8 ConvertToPK8(PK9 pk9, ConvertContext ctx)
     {
         var pk8 = new PK8()
         {
@@ -95,8 +94,7 @@ public class PK9Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk8, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk8, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature, pk9.Ability);
+        utils.FixPersonalData(pk8, pk9.IsShiny, pk9.Form, pk9.Gender, pk9.Nature, pk9.Ability, false, ctx);
 
         // for Furfrou and Hoopa
         pk8.FormArgumentRemain = pk9.FormArgumentRemain;
@@ -108,7 +106,7 @@ public class PK9Converter(PKMConverterUtils utils)
         return pk8;
     }
 
-    public PK9 ConvertToPK9(PA9 pa9, ConvertContext? ctx)
+    public PK9 ConvertToPK9(PA9 pa9, ConvertContext ctx)
     {
         var pk9 = new PK9()
         {
@@ -156,8 +154,7 @@ public class PK9Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk9, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk9, pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature, pa9.Ability);
+        utils.FixPersonalData(pk9, pa9.IsShiny, pa9.Form, pa9.Gender, pa9.Nature, pa9.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk9, pa9);
 

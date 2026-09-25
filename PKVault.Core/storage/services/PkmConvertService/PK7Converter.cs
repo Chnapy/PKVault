@@ -5,7 +5,7 @@ namespace PKVault.Core;
 
 public class PK7Converter(PKMConverterUtils utils)
 {
-    public PK8 ConvertToPK8(PK7 pk7, ConvertContext? ctx)
+    public PK8 ConvertToPK8(PK7 pk7, ConvertContext ctx)
     {
         var pk8 = new PK8()
         {
@@ -43,8 +43,7 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk8, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk8, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature, pk7.Ability);
+        utils.FixPersonalData(pk8, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature, pk7.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk8, pk7);
 
@@ -56,7 +55,7 @@ public class PK7Converter(PKMConverterUtils utils)
         return pk8;
     }
 
-    public PB7 ConvertToPB7(PK7 pk7, ConvertContext? ctx)
+    public PB7 ConvertToPB7(PK7 pk7, ConvertContext ctx)
     {
         byte convertEVToAV(float value) => byte.Max((byte)(value / pk7.MaxEV * 200), 2);
 
@@ -138,7 +137,7 @@ public class PK7Converter(PKMConverterUtils utils)
         ];
     }
 
-    public PK6 ConvertToPK6(PK7 pk7, ConvertContext? ctx)
+    public PK6 ConvertToPK6(PK7 pk7, ConvertContext ctx)
     {
         var pk6 = new PK6()
         {
@@ -173,8 +172,7 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk6, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk6, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature, pk7.Ability);
+        utils.FixPersonalData(pk6, pk7.IsShiny, pk7.Form, pk7.Gender, pk7.Nature, pk7.Ability, false, ctx);
 
         // for Furfrou and Hoopa
         pk6.FormArgumentRemain = pk7.FormArgumentRemain;
@@ -186,7 +184,7 @@ public class PK7Converter(PKMConverterUtils utils)
         return pk6;
     }
 
-    public PK7 ConvertToPK7(PB7 pb7, ConvertContext? ctx)
+    public PK7 ConvertToPK7(PB7 pb7, ConvertContext ctx)
     {
         byte convertAVToEV(float value) => (byte)(byte.Max(0, (byte)(value - 2)) * EffortValues.Max252 / 198);
 
@@ -246,8 +244,7 @@ public class PK7Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk7, ctx);
 
-        if (ctx == null)
-            utils.FixPID(pk7, pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature, pb7.Ability);
+        utils.FixPersonalData(pk7, pb7.IsShiny, pb7.Form, pb7.Gender, pb7.Nature, pb7.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk7, pb7);
 
