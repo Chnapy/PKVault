@@ -149,12 +149,10 @@ public class SavePkmLoader(
         var pkm = pkmConvertService.ConvertTo(
             dto.Pkm,
             save.GetBlankPKM().GetMutablePkm().GetType(),
-            dto.Pkm.GetMutablePkm() is GBPKM
-                ? null
-                : new(
-                    TargetPkm: dto.Pkm.GetMutablePkm()
-                ),
-            targetSave: save.GetSave()
+            new(
+                TargetPkm: dto.Pkm.GetMutablePkm(),
+                TargetSave: save
+            )
         );
 
         // stored dto should use updated pkm

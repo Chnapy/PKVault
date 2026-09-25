@@ -5,7 +5,7 @@ namespace PKVault.Core;
 
 public class PK2Converter(PKMConverterUtils utils)
 {
-    public PK3 ConvertToPK3(PK2 pk2, LanguageID fallbackLang, PKMRndValues? rndValues)
+    public PK3 ConvertToPK3(PK2 pk2, LanguageID fallbackLang, ConvertContext ctx)
     {
         // Inspired by PK2.ConvertToPK7
 
@@ -17,13 +17,13 @@ public class PK2Converter(PKMConverterUtils utils)
 
         var pk3 = new PK3()
         {
-            EncryptionConstant = rndValues?.TargetPkm.EncryptionConstant ?? Util.Rand.Rand32(),
+            EncryptionConstant = ctx.TargetPkm?.EncryptionConstant ?? Util.Rand.Rand32(),
             Species = pk2.Species,
             TID16 = pk2.TID16,
             CurrentLevel = pk2.CurrentLevel,
             EXP = pk2.EXP,
             Nature = Experience.GetNatureVC(pk2.EXP),
-            PID = rndValues?.TargetPkm.PID ?? Util.Rand.Rand32(),
+            PID = ctx.TargetPkm?.PID ?? Util.Rand.Rand32(),
             Ball = 4,
 
             MetLocation = 0,
@@ -56,7 +56,7 @@ public class PK2Converter(PKMConverterUtils utils)
 
         utils.CopyHeldItemFrom(pk3, pk2.HeldItem, pk2.Context, pk2.Version);
 
-        utils.FixMetLocation(pk3, rndValues);
+        utils.FixMetLocation(pk3, ctx);
 
         if (pk2.Species is 151 or 251)
         {
@@ -89,8 +89,7 @@ public class PK2Converter(PKMConverterUtils utils)
         }
         pk3.SetEVs(evs);
 
-        if (rndValues == null)
-            utils.FixPID(pk3, pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature);
+        utils.FixPersonalData(pk3, pk2.IsShiny, pk2.Form, pk2.Gender, pk3.Nature, pk3.Ability, false, ctx);
 
         utils.CopyMovesFrom(pk3, pk2);
 

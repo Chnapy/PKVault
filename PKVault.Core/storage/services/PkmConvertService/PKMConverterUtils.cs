@@ -6,50 +6,66 @@ using Serilog;
 
 namespace PKVault.Core;
 
-public record PKMRndValues(
-    PKM TargetPkm
+public record ConvertContext(
+    PKM? TargetPkm,
+    SaveWrapper? TargetSave
 );
 
 public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 {
-    public void FixCommonLegalityIssues(PKM pkm, SaveWrapper? save, PKMRndValues? rndValues)
+    private readonly PKMPersonalFixer personalFixer = new(legalityAnalysisService);
+
+    public void FixCommonLegalityIssues(PKM pkm, ConvertContext ctx)
     {
-        FixPID(pkm, pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, true, save, rndValues);
-        FixBallLegality(pkm, save);
-        FixHeldItemLegality(pkm, save);
-        FixRibbonLegality(pkm, save);
-        FixContestLegality(pkm, save);
-        FixPokerusLegality(pkm, save);
-        FixMovesLegality(pkm, save);
-        FixRelearnMovesLegality(pkm, save);
-        FixRegionLegality(pkm, save);
+        FixHandlingTrainer(pkm, ctx);
+        FixPersonalData(pkm, pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, pkm.Ability, true, ctx);
+        FixBallLegality(pkm, ctx);
+        FixHeldItemLegality(pkm, ctx);
+        FixRibbonLegality(pkm, ctx);
+        FixContestLegality(pkm, ctx);
+        FixPokerusLegality(pkm, ctx);
+        FixMovesLegality(pkm, ctx);
+        FixRelearnMovesLegality(pkm, ctx);
+        FixRegionLegality(pkm, ctx);
 
         var fixMemories = pkm.GetType().GetMethod("FixMemories");
         fixMemories?.Invoke(pkm, null);
     }
 
-    public void FixRegionLegality(PKM pkm, SaveWrapper? save)
+    public void FixHandlingTrainer(PKM pkm, ConvertContext ctx)
+    {
+        var save = ctx.TargetSave;
+        if (save != null)
+        {
+            pkm.HandlingTrainerName = save.OT;
+            pkm.HandlingTrainerGender = save.Gender;
+
+            pkm.CurrentHandler = save.GetSave().IsFromTrainer(pkm) ? (byte)0 : (byte)1;
+        }
+    }
+
+    public void FixRegionLegality(PKM pkm, ConvertContext ctx)
     {
         if (pkm is not IRegionOrigin pkmRg)
             return;
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
         if (legality.la == null || legality.Valid)
             return;
 
         if (!legality.Results.Any(r => !r.Valid && r.Result == LegalityCheckResultCode.GeoHardwareInvalid))
             return;
 
-        if (save != null && save.GetSave() is IRegionOriginReadOnly saveRg)
+        if (ctx.TargetSave != null && ctx.TargetSave.GetSave() is IRegionOriginReadOnly saveRg)
             saveRg.CopyRegionOrigin(pkmRg);
         else
             pkmRg.ClearRegionOrigin();
     }
 
     // Fix each move legality ONLY if an expected one is present
-    public void FixMovesLegality(PKM pkm, SaveWrapper? save = null)
+    public void FixMovesLegality(PKM pkm, ConvertContext ctx)
     {
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
         if (legality.la == null || legality.MovesValid.All(r => r))
         {
             return;
@@ -71,7 +87,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             pkm.SetMove(i, 0);
         }
 
-        legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
 
         List<ushort> newMoves = [];
         IEnumerable<ushort> encounterMoves = [];
@@ -102,64 +118,88 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         pkm.FixMoves();
     }
 
-    public void FixRelearnMovesLegality(PKM pkm, SaveWrapper? save = null)
+    public void FixRelearnMovesLegality(PKM pkm, ConvertContext ctx)
     {
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
-        if (legality.la == null || legality.RelearnValid.All(r => r))
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
+        if (legality.la != null && legality.RelearnValid.Any(r => !r))
         {
-            return;
-        }
 
-        ushort[] moves = [
-            pkm.RelearnMove1,
-            pkm.RelearnMove2,
-            pkm.RelearnMove3,
-            pkm.RelearnMove4,
-        ];
+            ushort[] moves = [
+                pkm.RelearnMove1,
+                pkm.RelearnMove2,
+                pkm.RelearnMove3,
+                pkm.RelearnMove4,
+            ];
 
-        for (var i = 0; i < legality.la.Info.Relearn.Length; i++)
-        {
-            var r = legality.la.Info.Relearn[i];
-            if (r.Valid)
-                continue;
-
-            pkm.SetRelearnMove(i, 0);
-        }
-
-        legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
-
-        List<ushort> newMoves = [];
-        IEnumerable<ushort> encounterMoves = [];
-
-        for (var i = 0; i < legality.la!.Info.Relearn.Length; i++)
-        {
-            var r = legality.la.Info.Relearn[i];
-
-            var move = r.Expect > 0
-                ? r.Expect
-                : moves[i];
-
-            // if duplicate
-            // replace it by first valid one
-            // may be useless with relearn-moves
-            if (newMoves.Contains(move))
+            for (var i = 0; i < legality.la.Info.Relearn.Length; i++)
             {
-                if (!encounterMoves.Any())
-                    encounterMoves = DexDataService.GetEncounterMoves(legality.la.Info);
+                var r = legality.la.Info.Relearn[i];
+                if (r.Valid)
+                    continue;
 
-                move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
+                pkm.SetRelearnMove(i, 0);
             }
 
-            pkm.SetRelearnMove(i, move);
-            if (move > 0)
-                newMoves.Add(move);
+            legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
+
+            List<ushort> newMoves = [];
+            IEnumerable<ushort> encounterMoves = [];
+
+            for (var i = 0; i < legality.la!.Info.Relearn.Length; i++)
+            {
+                var r = legality.la.Info.Relearn[i];
+
+                var move = r.Expect > 0
+                    ? r.Expect
+                    : moves[i];
+
+                // if duplicate
+                // replace it by first valid one
+                // may be useless with relearn-moves
+                if (newMoves.Contains(move))
+                {
+                    if (!encounterMoves.Any())
+                        encounterMoves = DexDataService.GetEncounterMoves(legality.la.Info);
+
+                    move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
+                }
+
+                pkm.SetRelearnMove(i, move);
+                if (move > 0)
+                    newMoves.Add(move);
+            }
+
+            var fixRelearn = pkm.GetType().GetMethod("FixRelearn");
+            fixRelearn?.Invoke(pkm, null);
         }
 
-        var fixRelearn = pkm.GetType().GetMethod("FixRelearn");
-        fixRelearn?.Invoke(pkm, null);
+        if (pkm is PA9 pa9)
+        {
+            legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
+            if (legality.Valid)
+                return;
+
+            var plusMoveResults = legality.Results.Where(r => !r.Valid
+                && r.Identifier == CheckIdentifier.RelearnMove
+                && r.Result == LegalityCheckResultCode.PlusMoveSufficientLevelMissing_0);
+            if (!plusMoveResults.Any())
+                return;
+
+            var permit = pa9.PersonalInfo;
+
+            foreach (var r in plusMoveResults)
+            {
+                var move = r.Argument;
+                var level = r.Argument2;
+
+                var index = permit.PlusMoveIndexes.IndexOf(move);
+
+                pa9.SetMovePlusFlag(index);
+            }
+        }
     }
 
-    public bool FixPokerusLegality(PKM pkm, SaveWrapper? save = null, int recursive = 0)
+    public bool FixPokerusLegality(PKM pkm, ConvertContext ctx, int recursive = 0)
     {
         if (pkm is PK1 || pkm is PB7)
         {
@@ -174,7 +214,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         var initialPokerusDays = pkm.PokerusDays;
         var initialPokerusStrain = pkm.PokerusStrain;
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
         if (legality.Valid)
         {
             return true;
@@ -197,7 +237,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             pkm.PokerusStrain = (pkm.PokerusStrain + 1) % 16;
             if (pkm.PokerusStrain == 0)
                 pkm.PokerusStrain = 1;
-            success = FixPokerusLegality(pkm, save, recursive + 1);
+            success = FixPokerusLegality(pkm, ctx, recursive + 1);
         }
 
         if (!success && recursive == 0)
@@ -209,14 +249,14 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         return success;
     }
 
-    public void FixRibbonLegality(PKM pkm, SaveWrapper? save = null)
+    public void FixRibbonLegality(PKM pkm, ConvertContext ctx)
     {
         if (pkm is GBPKM)
         {
             return;
         }
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
         if (!legality.Valid
             && legality.Results.Any(r => !r.Valid && r.Identifier == CheckIdentifier.Ribbon)
             && legality.la != null
@@ -231,14 +271,14 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         }
     }
 
-    public void FixContestLegality(PKM pkm, SaveWrapper? save = null)
+    public void FixContestLegality(PKM pkm, ConvertContext ctx)
     {
         if (pkm is not IContestStats contest)
         {
             return;
         }
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
         if (legality.Valid)
         {
             return;
@@ -262,9 +302,9 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         }
     }
 
-    public void FixHeldItemLegality(PKM pkm, SaveWrapper? save = null)
+    public void FixHeldItemLegality(PKM pkm, ConvertContext ctx)
     {
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
 
         if (!legality.Valid && legality.Results.Any(r =>
             !r.Valid &&
@@ -276,11 +316,11 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         }
     }
 
-    public void FixBallLegality(PKM pkm, SaveWrapper? save = null)
+    public void FixBallLegality(PKM pkm, ConvertContext ctx)
     {
         bool hasBallIllegality()
         {
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
+            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
             return !legality.Valid && legality.Results.Any(r =>
                 !r.Valid &&
                 r.Identifier == CheckIdentifier.Ball
@@ -432,7 +472,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         pkm.FixMoves();
     }
 
-    public void CopyCommonPropertiesFrom(PKM pkm, PKM pkmSrc, byte generation, PKMRndValues? rndValues)
+    public void CopyCommonPropertiesFrom(PKM pkm, PKM pkmSrc, byte generation, ConvertContext ctx)
     {
         pkm.Species = pkmSrc.Species;
         pkm.Gender = pkmSrc.Gender;
@@ -444,8 +484,8 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         pkm.Nature = pkmSrc.Nature;
         pkm.StatAlignment = pkmSrc.StatAlignment;
 
-        pkm.PID = rndValues?.TargetPkm.PID ?? pkmSrc.PID;
-        pkm.EncryptionConstant = rndValues?.TargetPkm.EncryptionConstant ?? Util.Rand.Rand32();
+        pkm.PID = ctx.TargetPkm?.PID ?? pkmSrc.PID;
+        pkm.EncryptionConstant = ctx.TargetPkm?.EncryptionConstant ?? Util.Rand.Rand32();
 
         pkm.Ability = pkmSrc.Ability;
         pkm.AbilityNumber = pkmSrc.AbilityNumber;
@@ -489,143 +529,36 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         pkm.EV_SPE = pkmSrc.EV_SPE;
     }
 
-    public void FixPID(PKM pkm, bool isShiny, byte form, byte gender, Nature nature, bool checkLegality = false, SaveWrapper? save = null, PKMRndValues? rndValues = null)
+    public void FixPersonalData(
+        PKM pkm,
+        bool isShiny, byte form, byte gender, Nature nature, int ability,
+        bool checkLegality, ConvertContext ctx
+    )
     {
-        if (rndValues?.TargetPkm.GetType() == pkm.GetType())
-        {
-            FixAbility(pkm, rndValues);
-            pkm.PID = rndValues.TargetPkm.PID;
-            if (pkm is GBPKM gbpkm)
-            {
-                if (isShiny)
-                    gbpkm.SetShiny();
-                else
-                    gbpkm.SetPIDGender(gender);
-            }
-            return;
-        }
-
-        var rnd = Util.Rand;
-        var i = 0;
-
-        var initialPID = pkm.PID;
-        var initialAbilityNumber = pkm.AbilityNumber;
-
-        void RefreshEncryptionConstant()
-        {
-            if (pkm.Format >= 6 && (pkm.Gen3 || pkm.Gen4 || pkm.Gen5))
-            {
-                pkm.EncryptionConstant = pkm.PID;
-            }
-        }
-
-        bool hasWrongShiny()
-        {
-            if (pkm is PK1)
-                return false;
-
-            return pkm.IsShiny != isShiny;
-        }
-
-        bool hasWrongForm()
-        {
-            if (pkm is PK1)
-                return false;
-
-            return pkm.Form != form;
-        }
-
-        bool hasWrongGender()
-        {
-            if (pkm is PK1)
-                return false;
-
-            if (!pkm.PersonalInfo.IsDualGender)
-                return false;
-
-            return pkm.Gender != gender;
-        }
-
-        bool hasWrongNature()
-        {
-            if (pkm is GBPKM)
-                return false;
-
-            return pkm.Nature != nature;
-        }
-
-        bool hasPIDFixableIllegality()
-        {
-            if (!checkLegality)
-            {
-                return false;
-            }
-
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), save);
-            return !legality.Valid && legality.Results.Any(r => !r.Valid && (
-                (r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip)
-                || r.Result == LegalityCheckResultCode.AbilityMismatchFlag
-
-            // in theory should be enabled
-            // but it causes infinite-loop with some cases
-            // || r.Result == LegalityCheckResultCode.AbilityMismatchPID
-            ));
-        }
-
-        while (
-            hasWrongShiny()
-            || hasWrongForm()
-            || hasWrongGender()
-            || hasWrongNature()
-            || hasPIDFixableIllegality()
-        )
-        {
-            if (pkm is GBPKM gbpkm)
-            {
-                if (isShiny)
-                {
-                    gbpkm.SetShiny();
-                }
-                else
-                {
-                    gbpkm.SetPIDGender(gender);
-                }
-                break;
-            }
-
-            pkm.PID = EntityPID.GetRandomPID(rnd, pkm.Species, gender, pkm.Version, nature, form, pkm.PID);
-            RefreshEncryptionConstant();
-
-            pkm.RefreshAbility(initialAbilityNumber - 1);
-            FixAbility(pkm, null);
-
-            i++;
-
-            if (i > 10_000_000)
-            {
-                throw new Exception(
-                    $"PID compute stopped after 10^7 failing tries, this PKM may have PID-related illegalities: {pkm.GetType().Name} {pkm.Nickname} #{pkm.Species}"
-                    + $"\nCurrent/Expected: shiny={pkm.IsShiny}/{isShiny} form={pkm.Form}/{form} gender={pkm.Gender}/{gender} nature={pkm.Nature}/{nature} checkLegality?={checkLegality}-{save?.Metadata.FilePath}"
-                    + (checkLegality ? $"\n{legalityAnalysisService.GetLegalitySafe(new(pkm), save).Report("en")}" : "")
-                );
-            }
-        }
-
-        RefreshEncryptionConstant();
+        personalFixer.FixPersonalData(
+            pkm, isShiny, form, gender, nature, ability,
+            checkLegality, ctx
+        );
     }
 
-    public void FixMetLocation(PKM pkm, PKMRndValues? rndValues)
+    // Note: pkm.SetAbility and direct assignments are not reliable
+    public void FixAbility(PKM pkm, ConvertContext ctx)
     {
-        if (rndValues?.TargetPkm.GetType() == pkm.GetType())
+        personalFixer.FixAbility(pkm, ctx);
+    }
+
+    public void FixMetLocation(PKM pkm, ConvertContext ctx)
+    {
+        if (ctx.TargetPkm?.GetType() == pkm.GetType())
         {
-            pkm.Version = rndValues.TargetPkm.Version;
-            pkm.MetLocation = rndValues.TargetPkm.MetLocation;
-            pkm.MetLevel = rndValues.TargetPkm.MetLevel;
-            if (pkm is ICaughtData2 pkm2 && rndValues.TargetPkm is ICaughtData2 target2)
+            pkm.Version = ctx.TargetPkm.Version;
+            pkm.MetLocation = ctx.TargetPkm.MetLocation;
+            pkm.MetLevel = ctx.TargetPkm.MetLevel;
+            if (pkm is ICaughtData2 pkm2 && ctx.TargetPkm is ICaughtData2 target2)
             {
                 pkm2.MetTimeOfDay = target2.MetTimeOfDay;
             }
-            if (pkm is IGroundTile pkmG && rndValues.TargetPkm is IGroundTile targetG)
+            if (pkm is IGroundTile pkmG && ctx.TargetPkm is IGroundTile targetG)
             {
                 pkmG.GroundTile = targetG.GroundTile;
             }
@@ -648,6 +581,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
                 || r.Identifier == CheckIdentifier.Fateful
                 || r.Identifier == CheckIdentifier.GameOrigin
                 || (r.Identifier == CheckIdentifier.Ability && r.Result == LegalityCheckResultCode.AbilityHiddenFail)
+                || r.Result == LegalityCheckResultCode.AbilityMismatch3
             );
             if (customCount > 0)
                 return customCount;
@@ -698,43 +632,6 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         }
     }
 
-    public void FixAbility(PKM pkm, PKMRndValues? rndValues)
-    {
-        if (rndValues?.TargetPkm.GetType() == pkm.GetType())
-        {
-            pkm.SetAbility(rndValues.TargetPkm.Ability);
-            return;
-        }
-
-        Span<int> abilities = stackalloc int[pkm.PersonalInfo.AbilityCount];
-        pkm.PersonalInfo.GetAbilities(abilities);
-
-        var initialAbility = pkm.Ability;
-        var initialAbilityValid = abilities.Contains(initialAbility);
-
-        bool hasAbilityIssue()
-        {
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
-
-            return !legality.Valid && legality.Results.Any(r =>
-                !r.Valid
-                && (
-                    r.Identifier == CheckIdentifier.Ability
-                    && r.Result != LegalityCheckResultCode.AbilityMismatchPID
-                )
-            );
-        }
-
-        for (var i = 0; i < pkm.PersonalInfo.AbilityCount && hasAbilityIssue(); i++)
-        {
-            var current = pkm.PersonalInfo.GetAbilityAtIndex(i);
-            if (current == initialAbility || !initialAbilityValid)
-            {
-                pkm.RefreshAbility(i);
-            }
-        }
-    }
-
     public void FixSID(PKM pkm)
     {
         if (pkm.SID16 == 0)
@@ -762,6 +659,20 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
     private bool SetSuggestedMetLocation(PKM pkm)
     {
+        if (pkm is PB7 && pkm.Version == GameVersion.GO)
+        {
+            pkm.MetLocation = Locations.GO7;
+            pkm.MetLevel = pkm.CurrentLevel;
+            return true;
+        }
+
+        if (pkm.Format >= 8 && pkm.Version == GameVersion.GO)
+        {
+            pkm.MetLocation = Locations.GO8;
+            pkm.MetLevel = pkm.CurrentLevel;
+            return true;
+        }
+
         var encounter = EncounterSuggestion.GetSuggestedMetInfo(pkm);
         if (encounter == null)
             return false;
