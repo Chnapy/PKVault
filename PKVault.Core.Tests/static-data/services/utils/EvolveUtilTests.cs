@@ -6,7 +6,7 @@ using PKVault.Core;
  */
 public class EvolveUtilTests : IAsyncLifetime
 {
-    private StaticEvolvesData evolves;
+    private StaticEvolvesData evolves = [];
 
     public async ValueTask InitializeAsync()
     {

@@ -82,6 +82,7 @@ public class SafTreeMapper(Context appContext)
             .Where(p => p.IsReadPermission)
             .Select(p =>
             {
+                ArgumentNullException.ThrowIfNull(p.Uri);
                 if (!TryGetLocalPath(p.Uri, out var localPath)) return null;
                 return new MappedEntry(localPath, p.Uri, DocumentsContract.IsTreeUri(p.Uri));
             })

@@ -46,7 +46,7 @@ public class MovePkmBankAction(
 
         foreach (var boxId in boxesOccupationDict.Keys)
         {
-            var box = mainBoxes.Find(box => box.Id == boxId);
+            var box = mainBoxes.First(box => box.Id == boxId);
             HashSet<int> unoccupiedSlots = [];
             for (int slot = 0; slot < box.SlotCount; slot++)
             {
@@ -143,7 +143,7 @@ public class MovePkmBankAction(
 
     private async Task<DataActionPayload> SaveToMain(MovePkmBankActionInput input, DataUpdateFlags flags, string pkmId, BoxDTO targetBox, int targetBoxSlot)
     {
-        var saveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
+        var saveLoaders = savesLoadersService.GetLoadersRequired((uint)input.sourceSaveId!);
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
@@ -183,7 +183,7 @@ public class MovePkmBankAction(
         PkmSaveDTO savePkm
     )
     {
-        var saveLoaders = savesLoadersService.GetLoaders(sourceSaveId);
+        var saveLoaders = savesLoadersService.GetLoadersRequired(sourceSaveId);
 
         if (savePkm.Pkm.GetMutablePkm() is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
         {

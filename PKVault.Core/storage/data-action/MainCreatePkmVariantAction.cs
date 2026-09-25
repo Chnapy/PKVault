@@ -51,6 +51,7 @@ public class MainCreatePkmVariantAction(
         input.CreatedPKM = pkmConverted;
 
         var box = await boxLoader.GetDto(pkmVariantOrigin.BoxId);
+        ArgumentNullException.ThrowIfNull(box);
 
         var variant = await pkmVariantLoader.AddEntity(new(
             Id: input.CreatedID,

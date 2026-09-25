@@ -24,8 +24,8 @@ public class MainUpdateBoxAction(
             throw new ArgumentException($"Box slot count should be between 1-300");
         }
 
-        var box = await boxLoader.GetEntity(input.boxId);
-        var bank = await bankLoader.GetEntity(box.BankId);
+        var box = await boxLoader.GetEntityRequired(input.boxId);
+        var bank = await bankLoader.GetEntityRequired(box.BankId);
 
         if (bank.IsExternal)
         {
@@ -34,10 +34,10 @@ public class MainUpdateBoxAction(
 
         var order = input.order;
 
-        if (box!.BankId != input.bankId)
+        if (box.BankId != input.bankId)
         {
             var bankBoxes = (await boxLoader.GetEntitiesByBank(box.BankId)).Values;
-            if (bankBoxes.Count() <= 1)
+            if (bankBoxes.Count <= 1)
             {
                 throw new ArgumentException($"Bank must keep at least 1 box");
             }

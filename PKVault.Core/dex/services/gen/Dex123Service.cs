@@ -2,8 +2,10 @@ using PKHeX.Core;
 
 namespace PKVault.Core;
 
-public class Dex123Service(SaveFile save) : DexGenService(save)
+public class Dex123Service(SaveFile save_) : DexGenService(save_)
 {
+    private readonly SaveFile save = save_;
+
     protected override DexItemForm GetDexItemForm(ushort species, bool isOwned, bool isOwnedShiny, byte form, Gender gender)
     {
         var pi = save.Personal.GetFormEntry(species, form);

@@ -427,8 +427,7 @@ public class ActionService(
         {
             if (saveLoader == null)
             {
-                var pkmVariant = await pkmVariantLoader.GetEntity(pkmId);
-                ArgumentNullException.ThrowIfNull(pkmVariant);
+                var pkmVariant = await pkmVariantLoader.GetEntityRequired(pkmId);
 
                 return await pkmVariantLoader.GetPKM(pkmVariant);
             }

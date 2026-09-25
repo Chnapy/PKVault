@@ -16,7 +16,7 @@ public class DeletePkmVariantAction(
 
         async Task<DataActionPayload> act(string pkmVariantId)
         {
-            var defaultPkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+            var defaultPkmVariant = await pkmVariantLoader.GetEntityRequired(pkmVariantId);
             PkmVariantEntity[] pkmVariantList = input.deleteAllRelatedVariants
                 ? (await pkmVariantLoader.GetEntitiesByBox(defaultPkmVariant.BoxId)).TryGetValue(defaultPkmVariant.BoxSlot, out var dict) ? [.. dict.Values] : []
                 : [defaultPkmVariant];

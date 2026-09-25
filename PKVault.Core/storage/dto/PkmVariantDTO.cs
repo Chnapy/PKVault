@@ -6,8 +6,6 @@ namespace PKVault.Core;
 public record PkmVariantDTO(
     string Id,
     byte Generation,
-    string SettingsLanguage,
-    ImmutablePKM Pkm,
 
     int BoxId,
     int BoxSlot,
@@ -18,19 +16,13 @@ public record PkmVariantDTO(
 
     bool IsFilePresent,
     string Filepath,
-    string FilepathAbsolute,
-
-    [property: JsonIgnore] GameVersionUtil.VersionChecker VersionChecker,
-    Dictionary<ushort, StaticEvolve> Evolves
+    string FilepathAbsolute
 ) : PkmBaseDTO(
     Id,
     Generation,
     BoxId,
     BoxSlot,
-    IsDuplicate: false,
-    SettingsLanguage,
-    Pkm,
-    Evolves
+    IsDuplicate: false
 )
 {
     public bool CanMoveAttachedToSave => CanMoveToSave && AttachedSaveId == null;
@@ -43,4 +35,7 @@ public record PkmVariantDTO(
     public bool CanCreateVariant => !IsExternal && IsMain && IsEnabled;
 
     public IReadOnlyList<GameVersion> CompatibleWithVersions => VersionChecker.GetCompatibleVersionsForSpecies(Pkm.Species);
+
+    [property: JsonIgnore]
+    public GameVersionUtil.VersionChecker VersionChecker { get; init; } = default!;
 }

@@ -16,7 +16,7 @@ public class SaveDeletePkmAction(
 
         async Task<DataActionPayload> act(string pkmId)
         {
-            var saveLoaders = savesLoadersService.GetLoaders(input.saveId);
+            var saveLoaders = savesLoadersService.GetLoadersRequired(input.saveId);
 
             var dto = saveLoaders.Pkms.GetDto(pkmId);
             if (dto == default)

@@ -7,12 +7,13 @@ public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader) :
 {
     protected override async Task<DataActionPayload> Execute(MainDeleteBoxActionInput input, DataUpdateFlags flags)
     {
-        var box = await boxLoader.GetEntity(input.boxId);
+        var box = await boxLoader.GetEntityRequired(input.boxId);
 
         await boxLoader.DeleteEntity(box);
         await boxLoader.NormalizeOrders();
 
-        var bank = await bankLoader.GetEntity(box.BankId);
+        var bank = await bankLoader.GetEntityRequired(box.BankId);
+
         if (bank.View.MainBoxIds.Contains(box.IdInt))
         {
             bank.View = new(

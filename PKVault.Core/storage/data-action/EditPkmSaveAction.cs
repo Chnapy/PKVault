@@ -11,7 +11,7 @@ public class EditPkmSaveAction(
 {
     protected override async Task<DataActionPayload> Execute(EditPkmSaveActionInput input, DataUpdateFlags flags)
     {
-        var saveLoaders = savesLoadersService.GetLoaders(input.saveId);
+        var saveLoaders = savesLoadersService.GetLoadersRequired(input.saveId);
         var pkmSave = saveLoaders.Pkms.GetDto(input.pkmSaveId);
 
         var availableMoves = await actionService.GetPkmAvailableMoves(input.saveId, input.pkmSaveId);

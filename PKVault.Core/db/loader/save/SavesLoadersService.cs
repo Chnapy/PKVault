@@ -7,6 +7,7 @@ namespace PKVault.Core;
 public interface ISavesLoadersService
 {
     public SaveLoadersRecord[] GetAllLoaders();
+    public SaveLoadersRecord GetLoadersRequired(uint saveId);
     public SaveLoadersRecord? GetLoaders(uint saveId);
 
     public IDictionary<uint, SaveWrapper> GetSaveById();
@@ -44,6 +45,13 @@ public class SavesLoadersService(
         return [.. Loaders.Values];
     }
 
+    public SaveLoadersRecord GetLoadersRequired(uint saveId)
+    {
+        var saveLoaders = GetLoaders(saveId);
+        ArgumentNullException.ThrowIfNull(saveLoaders, $"SaveLoaders not found with saveId={saveId}");
+        return saveLoaders;
+    }
+
     public SaveLoadersRecord? GetLoaders(uint saveId)
     {
         if (!Initialized)
@@ -53,6 +61,7 @@ public class SavesLoadersService(
 
         if (!Loaders.TryGetValue(saveId, out var loaders))
         {
+            Log.Warning($"Save loaders not found for saveId={saveId}");
             return null;
         }
         return loaders;

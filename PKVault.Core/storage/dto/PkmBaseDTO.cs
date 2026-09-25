@@ -10,11 +10,7 @@ public abstract record PkmBaseDTO(
     int BoxId,
     int BoxSlot,
 
-    bool IsDuplicate,
-
-    [property: JsonIgnore] string SettingsLanguage,
-    [property: JsonIgnore] ImmutablePKM Pkm,
-    [property: JsonIgnore] Dictionary<ushort, StaticEvolve> Evolves
+    bool IsDuplicate
 ) : IWithId
 {
     public virtual string IdBase => Pkm.GetPKMIdBase(Evolves);
@@ -136,6 +132,15 @@ public abstract record PkmBaseDTO(
     public PKMLoadError? LoadError => Pkm.LoadError;
     public bool HasLoadError => Pkm.HasLoadError;
     public bool IsEnabled => Pkm.IsEnabled;
+
+    [property: JsonIgnore]
+    public string SettingsLanguage { get; init; } = default!;
+
+    [property: JsonIgnore]
+    public ImmutablePKM Pkm { get; init; } = default!;
+
+    [property: JsonIgnore]
+    public Dictionary<ushort, StaticEvolve> Evolves { get; init; } = default!;
 };
 
 public record MoveItem(int Id);

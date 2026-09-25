@@ -9,7 +9,7 @@ public class MainDeleteBankAction(
 {
     protected override async Task<DataActionPayload> Execute(MainDeleteBankActionInput input, DataUpdateFlags flags)
     {
-        var bank = await bankLoader.GetEntity(input.bankId);
+        var bank = await bankLoader.GetEntityRequired(input.bankId);
 
         var banksCount = await bankLoader.Count();
         if (banksCount < 2)
@@ -21,7 +21,7 @@ public class MainDeleteBankAction(
         if (bank.IsDefault)
         {
             var newDefaultBank = await bankLoader.First();
-            newDefaultBank.IsDefault = true;
+            newDefaultBank!.IsDefault = true;
             await bankLoader.UpdateEntity(newDefaultBank);
         }
 

@@ -40,7 +40,7 @@ public class EvolvePkmAction(
 
     private async Task<DataActionPayload> ExecuteForSave(DataUpdateFlags flags, uint saveId, string id)
     {
-        var saveLoaders = savesLoadersService.GetLoaders(saveId);
+        var saveLoaders = savesLoadersService.GetLoadersRequired(saveId);
         var dto = saveLoaders.Pkms.GetDto(id);
         if (dto == default)
         {

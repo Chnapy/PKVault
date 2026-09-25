@@ -1053,9 +1053,9 @@ public class PkmVariantLoaderTests : IAsyncDisposable
 
         await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var entity1 = await loader.GetEntity(idBase1);
-        var entity2 = await loader.GetEntity(idBase2);
-        var entity3 = await loader.GetEntity(idBase3);
+        var entity1 = await loader.GetEntityRequired(idBase1);
+        var entity2 = await loader.GetEntityRequired(idBase2);
+        var entity3 = await loader.GetEntityRequired(idBase3);
 
         entity1.BoxId = "1";
         entity1.BoxSlot = 3;

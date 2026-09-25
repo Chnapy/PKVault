@@ -32,12 +32,12 @@ public class MovePkmAction(
         var sourceBoxId = (await GetPkmSlot(input.sourceSaveId, input.pkmIds[0])).BoxId;
 
         BoxDTO? sourceBox = input.sourceSaveId != null
-            ? (savesLoadersService.GetLoaders((uint)input.sourceSaveId)?.Boxes.GetDto(sourceBoxId))
+            ? savesLoadersService.GetLoadersRequired((uint)input.sourceSaveId).Boxes.GetDto(sourceBoxId)
             : await boxLoader.GetDto(sourceBoxId);
         ArgumentNullException.ThrowIfNull(sourceBox);
 
         BoxDTO? targetBox = input.targetSaveId != null
-            ? (savesLoadersService.GetLoaders((uint)input.targetSaveId)?.Boxes.GetDto(input.targetBoxId))
+            ? savesLoadersService.GetLoadersRequired((uint)input.targetSaveId).Boxes.GetDto(input.targetBoxId)
             : await boxLoader.GetDto(input.targetBoxId);
         ArgumentNullException.ThrowIfNull(targetBox);
 
@@ -107,13 +107,13 @@ public class MovePkmAction(
     {
         if (saveId == null)
         {
-            var mainDto = await pkmVariantLoader.GetEntity(pkmId);
+            var mainDto = await pkmVariantLoader.GetEntityRequired(pkmId);
             return (mainDto.BoxId, mainDto.BoxSlot);
         }
 
-        var saveLoaders = savesLoadersService.GetLoaders((uint)saveId);
+        var saveLoaders = savesLoadersService.GetLoadersRequired((uint)saveId);
         var saveDto = saveLoaders.Pkms.GetDto(pkmId);
-        return (saveDto.BoxId.ToString(), saveDto.BoxSlot);
+        return (saveDto!.BoxId.ToString(), saveDto.BoxSlot);
     }
 
     private async Task<DataActionPayload> MainToMain(MovePkmActionInput input, string pkmVariantId, BoxDTO sourceBox, BoxDTO targetBox, int targetBoxSlot)
@@ -146,8 +146,8 @@ public class MovePkmAction(
 
     private async Task<DataActionPayload> SaveToSave(MovePkmActionInput input, string pkmId, BoxDTO sourceBox, BoxDTO targetBox, int targetBoxSlot)
     {
-        var sourceSaveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
-        var targetSaveLoaders = savesLoadersService.GetLoaders((uint)input.targetSaveId!);
+        var sourceSaveLoaders = savesLoadersService.GetLoadersRequired((uint)input.sourceSaveId!);
+        var targetSaveLoaders = savesLoadersService.GetLoadersRequired((uint)input.targetSaveId!);
 
         var sourcePkmDto = sourceSaveLoaders.Pkms.GetDto(pkmId);
         if (sourcePkmDto == default)
@@ -221,12 +221,12 @@ public class MovePkmAction(
 
     private async Task<DataActionPayload> MainToSave(MovePkmActionInput input, DataUpdateFlags flags, string pkmVariantId, BoxDTO sourceBox, BoxDTO targetBox, int targetBoxSlot)
     {
-        var saveLoaders = savesLoadersService.GetLoaders((uint)input.targetSaveId!);
+        var saveLoaders = savesLoadersService.GetLoadersRequired((uint)input.targetSaveId!);
 
-        var pkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+        var pkmVariant = await pkmVariantLoader.GetEntityRequired(pkmVariantId);
         var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
 
-        var pkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId!, pkmVariant.BoxSlot!)).Values.ToList();
+        var pkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId, pkmVariant.BoxSlot)).Values.ToList();
 
         var pkmVariantForContext = pkmVariants.Find(version => version.Context == saveLoaders.Save.Context);
 
@@ -235,7 +235,7 @@ public class MovePkmAction(
         // and retry action
         if (pkmVariantForContext == default)
         {
-            var mainVariant = pkmVariants.Find(variant => variant.IsMain);
+            var mainVariant = pkmVariants.First(variant => variant.IsMain);
 
             await mainCreatePkmVariantAction.ExecuteWithPayload(new(
                 pkmVariantId: mainVariant.Id,
@@ -303,7 +303,7 @@ public class MovePkmAction(
 
     private async Task<DataActionPayload> SaveToMain(MovePkmActionInput input, DataUpdateFlags flags, string pkmId, BoxDTO sourceBox, BoxDTO targetBox, int targetBoxSlot)
     {
-        var saveLoaders = savesLoadersService.GetLoaders((uint)input.sourceSaveId!);
+        var saveLoaders = savesLoadersService.GetLoadersRequired((uint)input.sourceSaveId!);
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
@@ -350,7 +350,7 @@ public class MovePkmAction(
         List<PkmVariantEntity> relatedPkmVariants
     )
     {
-        var saveLoaders = savesLoadersService.GetLoaders(targetSaveId);
+        var saveLoaders = savesLoadersService.GetLoadersRequired(targetSaveId);
 
         if (!input.attached && relatedPkmVariants.Count > 1)
         {
@@ -430,7 +430,7 @@ public class MovePkmAction(
         PkmSaveDTO savePkm
     )
     {
-        var saveLoaders = savesLoadersService.GetLoaders(sourceSaveId);
+        var saveLoaders = savesLoadersService.GetLoadersRequired(sourceSaveId);
 
         if (savePkm.Pkm.GetMutablePkm() is IShadowCapture savePkmShadow && savePkmShadow.IsShadow)
         {

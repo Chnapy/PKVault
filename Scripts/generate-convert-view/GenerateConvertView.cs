@@ -559,8 +559,6 @@ public partial class GenerateConvertView
     private static PkmVariantDTO GetVariantDTO(ImmutablePKM pkm, Dictionary<ushort, StaticEvolve> evolves) => new(
         Id: "",
         Generation: pkm.Generation,
-        SettingsLanguage: "",
-        Pkm: pkm,
 
         BoxId: 0,
         BoxSlot: 0,
@@ -571,9 +569,12 @@ public partial class GenerateConvertView
 
         IsFilePresent: false,
         Filepath: "",
-        FilepathAbsolute: "",
-
-        VersionChecker,
-        Evolves: evolves
-    );
+        FilepathAbsolute: ""
+    )
+    {
+        SettingsLanguage = "",
+        Pkm = pkm,
+        VersionChecker = VersionChecker,
+        Evolves = evolves,
+    };
 }

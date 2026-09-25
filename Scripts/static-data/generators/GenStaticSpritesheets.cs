@@ -1,18 +1,9 @@
-using Microsoft.Extensions.Logging;
 using PKVault.Core;
 using Serilog;
 using SixLabors.ImageSharp;
-// using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-
-// public record StaticSpritesheetsData(
-//     Dictionary<string, SpriteInfo> Species,
-//     Dictionary<string, SpriteInfo> Items
-// );
-
-// public record SpriteInfo(string SheetName, int X, int Y, int Width, int Height);
 
 /**
  * Generator not used during classic run.
@@ -20,14 +11,16 @@ using SixLabors.ImageSharp.Processing;
  * Generates species and items spritesheets.
  */
 public class GenStaticSpritesheets(
-    IFileIOService fileIOService,
+    IFileIOService fileIOService_,
     StaticSpeciesData staticSpecies, StaticItem[] staticItems
 ) : StaticDataGenerator<StaticSpritesheetsData>(
    jsonTypeInfo: StaticDataJsonContext.Default.StaticSpritesheetsData,
    jsonTypeInfoIndented: new StaticDataJsonContext(JsonIndentedOptions).StaticSpritesheetsData,
-   fileIOService
+   fileIOService_
 )
 {
+    private readonly IFileIOService fileIOService = fileIOService_;
+
     private const string SourcePath = "../pokeapi/sprites";
     private const string CustomSourcePath = "./static-data/generators";
 

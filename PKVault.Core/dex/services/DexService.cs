@@ -25,10 +25,13 @@ public class DexService(
             return [];
         }
 
-        List<SaveWrapper> saves = [.. saveIds.Select(id => id == FakeSaveFile.Default.ID32
-            ? new(FakeSaveFile.Default)
-            : savesLoadersService.GetLoaders(id).Save
-        )];
+        List<SaveWrapper> saves = [.. saveIds
+            .Select(id => id == FakeSaveFile.Default.ID32
+                ? new(FakeSaveFile.Default)
+                : savesLoadersService.GetLoaders(id)?.Save
+            )
+            .OfType<SaveWrapper>()
+        ];
 
         var staticSpecies = await staticDataService.GetStaticSpecies();
 

@@ -93,8 +93,6 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
         var dto = new PkmVariantDTO(
             Id: entity.Id,
             Generation: entity.Generation,
-            SettingsLanguage: language,
-            Pkm: pkm,
 
             BoxId: int.Parse(entity.BoxId),
             BoxSlot: entity.BoxSlot,
@@ -105,11 +103,14 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
 
             IsFilePresent: isFilePresent,
             Filepath: entity.Filepath,
-            FilepathAbsolute: filepathAbsolute,
-
-            VersionChecker: versionChecker,
-            Evolves: evolves
-        );
+            FilepathAbsolute: filepathAbsolute
+        )
+        {
+            SettingsLanguage = language,
+            Evolves = evolves,
+            Pkm = pkm,
+            VersionChecker = versionChecker,
+        };
 
         return dto;
     }

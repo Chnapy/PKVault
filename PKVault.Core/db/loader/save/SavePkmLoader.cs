@@ -45,16 +45,19 @@ public class SavePkmLoader(
     public PkmSaveDTO CreateDTO(SaveWrapper save, ImmutablePKM pkm, int boxId, int boxSlot)
     {
         var dto = new PkmSaveDTO(
-            SettingsLanguage: language,
-            Pkm: pkm,
+            Id: GetPKMId(pkm.GetPKMIdBase(evolves, boxId), boxId, boxSlot),
+            Generation: save.Generation,
 
             BoxId: boxId,
             BoxSlot: boxSlot,
-            IsDuplicate: false,
-
-            Save: save,
-            Evolves: evolves
-        );
+            IsDuplicate: false
+        )
+        {
+            SettingsLanguage = language,
+            Evolves = evolves,
+            Pkm = pkm,
+            Save = save,
+        };
 
         return dto;
     }

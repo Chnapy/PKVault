@@ -113,6 +113,7 @@ public class GenStaticOthers(
             tasks.Add(Task.Run(async () =>
             {
                 var statObj = await pokeApiService.GetStat(statIndex);
+                ArgumentNullException.ThrowIfNull(statObj);
 
                 return new StaticStat(
                     Id: statIndex,
@@ -216,6 +217,7 @@ public class GenStaticOthers(
                             tmpAccuracyUrl = accuracy;
 
                             var versionGroup = await pokeApiService.GetVersionGroup(pastValue.VersionGroup);
+                            ArgumentNullException.ThrowIfNull(versionGroup);
                             byte untilGeneration = (byte) (PokeApiService.GetGenerationValue(versionGroup.Generation.Name) - 1);
 
                             return new StaticMoveGeneration(
@@ -241,7 +243,7 @@ public class GenStaticOthers(
                     && oldCategory != category
                     && !dataUntilGeneration.Any(data => data.UntilGeneration == 3))
                 {
-                    var dataPostG3 = dataUntilGeneration.Find(data => data.UntilGeneration > 3);
+                    var dataPostG3 = dataUntilGeneration.First(data => data.UntilGeneration > 3);
                     dataUntilGeneration.Add(new(
                         UntilGeneration: 3,
                         Type: dataPostG3.Type,
@@ -284,6 +286,7 @@ public class GenStaticOthers(
             {
                 var natureNameEn = GameInfo.Strings.natures[natureId];
                 var natureObj = await pokeApiService.GetNature(natureNameEn);
+                ArgumentNullException.ThrowIfNull(natureObj);
 
                 return new StaticNature(
                     Id: natureId,
@@ -454,6 +457,7 @@ public class GenStaticOthers(
             try
             {
                 var region = await pokeApiService.GetRegion(id);
+                ArgumentNullException.ThrowIfNull(region);
 
                 if (region.MainGeneration == null)
                 {
@@ -655,10 +659,11 @@ public class GenStaticOthers(
                     }
 
                     var versionGroup = await pokeApiService.GetVersionGroup(ver.VersionGroup);
+                    ArgumentNullException.ThrowIfNull(versionGroup);
                     var regions = await Task.WhenAll(versionGroup.Regions.Select(region =>
-                        pokeApiService.GetRegion(region)
+                        pokeApiService.GetRegion(region)!
                     ));
-                    return regions.Select(region => PokeApiService.GetNameForLang(region.Names, lang));
+                    return regions.Select(region => PokeApiService.GetNameForLang(region!.Names, lang));
                 })
             ))
             .SelectMany(v => v).Distinct()];
@@ -681,6 +686,7 @@ public class GenStaticOthers(
                         }
 
                         var versionGroup = await pokeApiService.GetVersionGroup(ver.VersionGroup);
+                        ArgumentNullException.ThrowIfNull(versionGroup);
                         return versionGroup.Pokedexes.Select(pokedex => pokedex.Name);
                     })
             ))
@@ -693,6 +699,7 @@ public class GenStaticOthers(
         static async Task<PokeApi.Models.Version?> FixJapVersionNames(Task<PokeApi.Models.Version?> versionTask)
         {
             var version = await versionTask;
+            ArgumentNullException.ThrowIfNull(version);
             version.Names = [.. version.Names.Select(n =>
             {
                 if (!n.Name1.EndsWith("(J)"))
@@ -706,6 +713,8 @@ public class GenStaticOthers(
         {
             var version1 = await versionTask1;
             var version2 = await versionTask2;
+            ArgumentNullException.ThrowIfNull(version1);
+            ArgumentNullException.ThrowIfNull(version2);
             version1.Names = [.. version1.Names.Select(n =>
             {
                 var name2 = version2.Names.FirstOrDefault(n2 => n2.Language.Name == n.Language.Name)
@@ -875,6 +884,8 @@ public class GenStaticOthers(
             ],
             GameVersion.EFL => [.. GetPokeApiVersion(GameVersion.E), .. GetPokeApiVersion(GameVersion.FRLG)],
             #endregion
+
+            _ => throw new NotImplementedException($"GameVersion not handled, version={version}"),
         };
     }
 

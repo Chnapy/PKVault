@@ -131,10 +131,11 @@ public class StorageQueryService(
         using var scope = sp.CreateScope();
         var pkmVariantLoader = scope.ServiceProvider.GetRequiredService<IPkmVariantLoader>();
 
-        var pkmVariant = await pkmVariantLoader.GetEntity(pkmVariantId);
+        var pkmVariant = await pkmVariantLoader.GetEntityRequired(pkmVariantId);
         var mainPkmVariant = (await pkmVariantLoader.GetEntitiesByBox(pkmVariant.BoxId)).TryGetValue(pkmVariant.BoxSlot, out var pv)
             ? pv.Values.First(p => p.IsMain)
             : null;
+        ArgumentNullException.ThrowIfNull(mainPkmVariant);
 
         var dto1 = await pkmVariantLoader.CreateDTO(mainPkmVariant);
         var dto2 = await pkmVariantLoader.CreateDTO(pkmVariant);

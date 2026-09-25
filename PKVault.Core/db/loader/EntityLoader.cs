@@ -80,6 +80,13 @@ public abstract class EntityLoader<
         return entity == null ? default : await GetDTOFromEntity(entity);
     }
 
+    public async Task<E> GetEntityRequired(string id)
+    {
+        var entity = await GetEntity(id);
+        ArgumentNullException.ThrowIfNull(entity, $"{typeof(E)} not found with id={id}");
+        return entity;
+    }
+
     public virtual async Task<E?> GetEntity(string id)
     {
         var dbSet = await GetDbSet();

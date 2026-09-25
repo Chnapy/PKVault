@@ -5,6 +5,7 @@ public interface IEntityLoader<DTO, E> where DTO : IWithId where E : IEntity
     public Task<Dictionary<string, DTO?>> GetDtosByIds(string[] ids);
     public Task<Dictionary<string, E?>> GetEntitiesByIds(string[] ids);
     public Task<DTO?> GetDto(string id);
+    public Task<E> GetEntityRequired(string id);
     public Task<E?> GetEntity(string id);
     public Task DeleteEntity(E entity);
     public Task<E> AddEntity(E entity);

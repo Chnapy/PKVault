@@ -22,8 +22,7 @@ public class SortPkmAction(
 
     private async Task<DataActionPayload> ExecuteForSave(uint saveId, int fromBoxId, int toBoxId, string pokedexName, bool leaveEmptySlot)
     {
-        var saveLoaders = savesLoadersService.GetLoaders(saveId);
-        ArgumentNullException.ThrowIfNull(saveLoaders);
+        var saveLoaders = savesLoadersService.GetLoadersRequired(saveId);
 
         var boxes = (await GetBoxes(saveId, fromBoxId, toBoxId,
             GetBoxDto: async (id) => saveLoaders.Boxes.GetDto(id),
@@ -89,7 +88,7 @@ public class SortPkmAction(
         var boxesDict = boxes.ToDictionary(p => p.Id);
         var boxesIds = boxes.Select(box => box.IdInt).ToHashSet();
 
-        var bankId = boxes[0].BankId;
+        var bankId = boxes.First().BankId;
         ArgumentNullException.ThrowIfNull(bankId);
 
         var pkms = (await Task.WhenAll(boxesIds.Select(async boxId =>

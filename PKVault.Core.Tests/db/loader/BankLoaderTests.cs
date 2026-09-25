@@ -92,7 +92,7 @@ public class BankLoaderTests : IAsyncDisposable
 
         var loader = await CreateLoader(db);
 
-        var entity = await loader.GetEntity("1");
+        var entity = await loader.GetEntityRequired("1");
 
         entity.Name = "Updated";
 
@@ -122,7 +122,7 @@ public class BankLoaderTests : IAsyncDisposable
 
         var loader = await CreateLoader(db);
 
-        var entity = await loader.GetEntity("1");
+        var entity = await loader.GetEntityRequired("1");
 
         await loader.DeleteEntity(entity);
 

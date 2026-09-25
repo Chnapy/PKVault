@@ -19,14 +19,14 @@ public class MainUpdateBankAction(
             throw new ArgumentException($"Bank name cannot be > 64 characters");
         }
 
-        var bank = await bankLoader.GetEntity(input.bankId);
+        var bank = await bankLoader.GetEntityRequired(input.bankId);
 
         if (bank.IsExternal)
         {
             throw new ArgumentException($"Bank dedicated to external pkms cannot be edited");
         }
 
-        if (bank!.IsDefault && !input.isDefault)
+        if (bank.IsDefault && !input.isDefault)
         {
             throw new ArgumentException($"Bank is-default cannot be unset manually");
         }

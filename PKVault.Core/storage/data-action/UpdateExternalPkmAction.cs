@@ -293,10 +293,10 @@ public class UpdateExternalPkmAction(
 
         var pkmsBoxes = (await boxLoader.GetEntitiesByIds(
             [.. externalPkmsToRemove.Select(pkm => pkm.BoxId).Distinct()]
-        )).Values;
+        )).Values.OfType<BoxEntity>();
 
         var externalBanksToCheck = (IEnumerable<BankEntity>)(await bankLoader.GetEntitiesByIds(
-            [.. pkmsBoxes.Select(box => box!.BankId).Distinct()]
+            [.. pkmsBoxes.Select(box => box.BankId).Distinct()]
         )).Values
         .Where(bank => bank!.IsExternal);
 
@@ -305,7 +305,7 @@ public class UpdateExternalPkmAction(
         .ToHashSet();
 
         var externalBoxesToCheck = pkmsBoxes
-        .Where(box => externalBankIds.Contains(box.BankId));
+            .Where(box => externalBankIds.Contains(box.BankId));
 
         foreach (var box in externalBoxesToCheck)
         {

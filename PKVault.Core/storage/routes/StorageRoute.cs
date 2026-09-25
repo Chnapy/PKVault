@@ -44,7 +44,7 @@ public class StorageController(DataService dataService, StorageQueryService stor
     {
         var pkmsLegality = await storageQueryService.GetPkmsLegality(pkmIds, saveId);
 
-        return pkmsLegality;
+        return pkmsLegality!;
     }
 
     [HttpGet("main/pkm-version/{pkmVariantId}/diff")]

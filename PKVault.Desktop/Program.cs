@@ -226,7 +226,7 @@ class Program
 
     private static void SetupWindow(PhotinoWindow window, string baseUrl)
     {
-        using Stream? iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png");
+        using Stream iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png")!;
 
         var tmpIconFilepath = Path.Combine(Path.GetTempPath(), $"pkvault-icon.png");
 

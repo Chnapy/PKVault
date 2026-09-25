@@ -4,24 +4,18 @@ using PKHeX.Core;
 namespace PKVault.Core;
 
 public record PkmSaveDTO(
-    string SettingsLanguage,
-    ImmutablePKM Pkm,
+    string Id,
+    byte Generation,
 
     int BoxId,
     int BoxSlot,
-    bool IsDuplicate,
-
-    [property: JsonIgnore] SaveWrapper Save,
-    Dictionary<ushort, StaticEvolve> Evolves
+    bool IsDuplicate
 ) : PkmBaseDTO(
-    SavePkmLoader.GetPKMId(Pkm.GetPKMIdBase(Evolves, BoxId), BoxId, BoxSlot),
-    Save.Generation,
+    Id,
+    Generation,
     BoxId,
     BoxSlot,
-    IsDuplicate,
-    SettingsLanguage,
-    Pkm,
-    Evolves
+    IsDuplicate
 )
 {
     public override string IdBase => Pkm.GetPKMIdBase(Evolves, BoxId);
@@ -40,4 +34,7 @@ public record PkmSaveDTO(
     public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
 
     private StorageSlotSource BoxSlotFlags => Save.GetBoxSlotFlags(BoxId, BoxSlot);
+
+    [property: JsonIgnore]
+    public SaveWrapper Save { get; init; } = default!;
 }

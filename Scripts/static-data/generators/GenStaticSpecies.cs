@@ -53,6 +53,7 @@ public class GenStaticSpecies(
             tasks.Add(Task.Run(async () =>
             {
                 var pkmSpeciesObj = await pokeApiService.GetPokemonSpecies(species);
+                ArgumentNullException.ThrowIfNull(pkmSpeciesObj);
                 var generation = PokeApiService.GetGenerationValue(pkmSpeciesObj.Generation.Name);
 
                 PKHeX.Core.Gender[] genders = pkmSpeciesObj.GenderRate switch
@@ -70,10 +71,11 @@ public class GenStaticSpecies(
                 async Task<(Pokemon, PokemonForm[])> getVarietyFormsData(PokemonSpeciesVarieties pkmVariety)
                 {
                     var pkmObj = await pokeApiService.GetPokemon(pkmVariety.Pokemon);
+                    ArgumentNullException.ThrowIfNull(pkmObj);
                     var apiForms = await Task.WhenAll(pkmObj.Forms.Select((formUrl) => pokeApiService.GetPokemonForms(formUrl)));
                     // .ToList().FindAll(form => !form.IsBattleOnly).ToArray();
 
-                    return (pkmObj, apiForms);
+                    return (pkmObj, (PokemonForm[])apiForms!);
                 }
 
                 StaticSpeciesForm getVarietyForm(EntityContext context, Pokemon pkmObj, PokemonForm[] formObjs, int formIndex, StaticSpeciesForm? defaultForm)
@@ -231,7 +233,7 @@ public class GenStaticSpecies(
                     );
                 }
 
-                var defaultVariety = pkmSpeciesObj.Varieties.FirstOrDefault(variety => variety.IsDefault);
+                var defaultVariety = pkmSpeciesObj.Varieties.First(variety => variety.IsDefault);
                 var otherVarieties = pkmSpeciesObj.Varieties.Where(variety => !variety.IsDefault);
 
                 var defaultDataTask = getVarietyFormsData(defaultVariety);
@@ -384,7 +386,7 @@ public class GenStaticSpecies(
                             var data = allDatas.Find(data => data.Item2.Any(predicate));
                             (Pokemon, PokemonForm?, int)? result = data == default ? null : (
                                 data.Item1,
-                                data.Item2.ToList().Find(form => predicate(form))!,
+                                data.Item2.First(form => predicate(form)),
                                 formIndex
                             );
 

@@ -272,7 +272,7 @@ public class BackupService(
         }
         catch (Exception err)
         {
-            Log.Error(err, null);
+            Log.Error(err, $"Error trying to get backup from {path}");
 
             return null;
         }

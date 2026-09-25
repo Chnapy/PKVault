@@ -46,7 +46,7 @@ public class GameVersionUtil
         {
             allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
             .Select(version => {
-                var versionToUse = GameVersionUtil.GetSingleVersion(version);
+                var versionToUse = GetSingleVersion(version);
 
                 if (versionToUse == default)
                 {

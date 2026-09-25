@@ -83,7 +83,7 @@ public class MatcherUtilTests
         mockFileSystem.AddFile("./folder/toto.zip", "content");
         mockFileSystem.AddFile("/storage/emulated/0/save.srm", "content");
 
-        Assert.Equal(3, matcher.GetAllPaths("", []).Length);
+        Assert.Equal(3, matcher.GetAllPaths("", [])!.Length);
 
         Assert.Equal(
             [
