@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Namotion.Reflection;
 using NJsonSchema;
@@ -27,6 +28,7 @@ public class OpenApiGenerator
 #endif
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2070", Justification = "Run only in DEBUG, never in Trimmed context.")]
     private static string GetOpenApiDocument(IEnumerable<CoreRouter.CoreRoute> routes)
     {
         var document = new OpenApiDocument

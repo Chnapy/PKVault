@@ -89,6 +89,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             })) ?? []}
             value={watchType}
             onChange={(value) => value !== null && setValue('type', value)}
+            comboboxProps={{ withinPortal: false }}
         />
 
         <NumberInput
@@ -134,6 +135,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             value={watchBankId}
             onChange={value => value && setValue('bankId', value)}
             disabled={boxes.length <= 1}
+            comboboxProps={{ withinPortal: false }}
         />
     </UIFormCard>;
 };

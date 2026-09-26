@@ -184,7 +184,10 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                         key={item.id}
                         context={canCreateVariantContext}
                         version={otherStorageSave!.displayedVersion}
-                        onCreate={onCreate}
+                        onCreate={async () => {
+                            await onCreate();
+                            reduce();
+                        }}
                     />
                     : <DetailsSaveExpanded
                         key={item.id}

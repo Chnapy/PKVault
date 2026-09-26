@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
@@ -27,9 +28,60 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         FixMovesLegality(pkm, ctx);
         FixRelearnMovesLegality(pkm, ctx);
         FixRegionLegality(pkm, ctx);
+        FixMemories(pkm);
+    }
 
-        var fixMemories = pkm.GetType().GetMethod("FixMemories");
-        fixMemories?.Invoke(pkm, null);
+    private void FixMemories(PKM pkm)
+    {
+        switch (pkm)
+        {
+            case PK6 pk6:
+                pk6.FixMemories();
+                break;
+            case PK7 pk7:
+                pk7.FixMemories();
+                break;
+            case PB7 pb7:
+                pb7.FixMemories();
+                break;
+            case PK8 pk8:
+                pk8.FixMemories();
+                break;
+            case PB8 pb8:
+                pb8.FixMemories();
+                break;
+            case PA8 pa8:
+                pa8.FixMemories();
+                break;
+            case PK9 pk9:
+                pk9.FixMemories();
+                break;
+            case PA9 pa9:
+                pa9.FixMemories();
+                break;
+        }
+    }
+
+    private void FixRelearn(PKM pkm)
+    {
+        switch (pkm)
+        {
+            case G6PKM pk6:
+                pk6.FixRelearn();
+                break;
+            case G8PKM pk8:
+                pk8.FixRelearn();
+                break;
+            case PA8 pa8:
+                pa8.FixRelearn();
+                break;
+            case PK9 pk9:
+                pk9.FixRelearn();
+                break;
+            case PA9 pa9:
+                pa9.FixRelearn();
+                break;
+        }
     }
 
     public void FixHandlingTrainer(PKM pkm, ConvertContext ctx)
@@ -169,8 +221,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
                     newMoves.Add(move);
             }
 
-            var fixRelearn = pkm.GetType().GetMethod("FixRelearn");
-            fixRelearn?.Invoke(pkm, null);
+            FixRelearn(pkm);
         }
 
         if (pkm is PA9 pa9)

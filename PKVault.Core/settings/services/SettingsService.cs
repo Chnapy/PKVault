@@ -185,7 +185,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         {
             CanUpdateSettings = !EnvUtil.DEMO_MODE && sessionService.HasEmptyActionList(),
             CanScanSaves = sessionService.HasEmptyActionList(),
-            CanCreateBackup = !EnvUtil.DEMO_MODE && sessionService.HasEmptyActionList(),
+            CanCreateBackup = !EnvUtil.DEMO_MODE,
         };
     }
 

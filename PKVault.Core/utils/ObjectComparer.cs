@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Serilog;
 
@@ -53,6 +54,7 @@ public static class ObjectComparer
         );
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "type.GetProperties and type.GetFields work with DTOs.")]
     private static Dictionary<string, (object? Value, bool IsArray)> GetObjectMembers(object obj)
     {
         Type type = obj.GetType();
@@ -127,6 +129,7 @@ public static class ObjectComparer
             || Equals(FormatPrimitive(value1NonNull), FormatPrimitive(value2NonNull));
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2067", Justification = "Activator.CreateInstance works at least with primitives.")]
     private static object? GetDefaultValue(Type t)
     {
         if (t == typeof(string)) return "";

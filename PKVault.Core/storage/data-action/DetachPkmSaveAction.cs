@@ -16,8 +16,8 @@ public class DetachPkmSaveAction(
 
         async Task<DataActionPayload> act(string pkmVariantId)
         {
-            var pkmVariantEntity = await pkmVariantLoader.GetEntity(pkmVariantId);
-            var oldSaveId = pkmVariantEntity!.AttachedSaveId;
+            var pkmVariantEntity = await pkmVariantLoader.GetEntityRequired(pkmVariantId);
+            var oldSaveId = pkmVariantEntity.AttachedSaveId;
             if (oldSaveId != null)
             {
                 pkmVariantEntity.AttachedSaveId = null;

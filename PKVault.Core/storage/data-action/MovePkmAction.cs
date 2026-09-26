@@ -464,7 +464,7 @@ public class MovePkmAction(
         input.CreatedVariantIds[inputKey] = pkmVariantEntity.Id;
 
         // if moved to already attached pkm, just update it
-        if (mainPkmAlreadyExists && pkmVariantEntity!.AttachedSaveId != null)
+        if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)
         {
             await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
 

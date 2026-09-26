@@ -1,7 +1,7 @@
 namespace PKVault.Core.backup.routes;
 
 [Route("api/[controller]")]
-public class BackupController(BackupService backupService, DataService dataService, ISessionService sessionService)
+public class BackupController(BackupService backupService, DataService dataService)
 {
     [HttpGet()]
     public List<BackupDTO> GetAll()
@@ -12,11 +12,6 @@ public class BackupController(BackupService backupService, DataService dataServi
     [HttpPost()]
     public async Task<DataDTO> Create()
     {
-        if (!sessionService.HasEmptyActionList())
-        {
-            throw new InvalidOperationException($"Empty action list is required");
-        }
-
         DataUpdateFlags flags = new();
 
         await backupService.CreateBackup("backup_manually", flags);

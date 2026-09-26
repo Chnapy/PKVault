@@ -20,6 +20,7 @@ using System.Web;
 using System.Collections.Specialized;
 using PKVault.Core.OpenApi;
 using System.Net.Mime;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PKVault.Core;
 
@@ -328,6 +329,7 @@ public partial class CoreRouter
         };
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2075", Justification = "Task<T>.Result is known.")]
     private static async Task<object?> UnwrapResultAsync(object? invokeResult)
     {
         if (invokeResult is not Task task)
@@ -342,6 +344,7 @@ public partial class CoreRouter
         return resultProperty.GetValue(task);
     }
 
+    [UnconditionalSuppressMessage("Trimming", "IL2065", Justification = "controllerType.GetMethods() are known.")]
     private static List<CoreRoute> GetAllRoutes()
     {
         List<CoreRoute> routes = [];
