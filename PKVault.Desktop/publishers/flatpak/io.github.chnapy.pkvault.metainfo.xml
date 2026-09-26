@@ -105,23 +105,23 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.3/PKVault.Desktop/publishers/flatpak/snaps/snap_storage.png</image>
       <caption>Collection view</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.3/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_dark.png</image>
       <caption>Dark mode</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.2/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.3/PKVault.Desktop/publishers/flatpak/snaps/snap_storage_details.png</image>
       <caption>Pokémon edit</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.2/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.3/PKVault.Desktop/publishers/flatpak/snaps/snap_dex.png</image>
       <caption>Pokédex</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.2/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
+      <image>https://raw.githubusercontent.com/Chnapy/PKVault/v2.3.3/PKVault.Desktop/publishers/flatpak/snaps/snap_saves.png</image>
       <caption>Saves view</caption>
     </screenshot>
   </screenshots>
@@ -141,6 +141,22 @@
   </developer>
 
   <releases>
+    <release version="2.3.3" date="2026-09-26">
+      <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.3.3</url>
+      <description>
+        <ul>
+          <li>Add "Create backup" button</li>
+          <li>Add button to change main variant</li>
+          <li>Add "diff" button to see differences from main variant</li>
+          <li>Fix failing PKM edit</li>
+          <li>Fix multiple legality issues: ability, origin, relearn-moves, contest, PID</li>
+          <li>Fix LetsGo in-game artifacts post-save</li>
+          <li>Fix Colosseum/XD PKM nickname synchronization</li>
+          <li>Fix Colosseum/XD shadow sprite</li>
+          <li>Reduce legality reports verbosity</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.3.2" date="2026-09-15">
       <url type="details">https://github.com/Chnapy/PKVault/releases/tag/v2.3.2</url>
       <description>
