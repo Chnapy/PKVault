@@ -1,71 +1,88 @@
 
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using PKHeX.Core;
-using PKVault.Core;
 
 public class GameVersionUtil
 {
-    /**
-     * Get a valid single version from any version, including groups.
-     */
-    public static GameVersion GetSingleVersion(GameVersion version)
+    private readonly static ImmutableDictionary<GameVersion, GameVersion> singleVersions = [.. GetAllSingleVersions()];
+
+    private static Dictionary<GameVersion, GameVersion> GetAllSingleVersions()
     {
         HashSet<GameVersion> ignoredVersions = [
-            default,
+            // default
             GameVersion.Any,
             GameVersion.Invalid,
             GameVersion.GO,
             GameVersion.CP,
         ];
 
-        if (ignoredVersions.Contains(version))
+        GameVersion GetSingleVersion(GameVersion version)
         {
-            var context = version.Context;
+            if (ignoredVersions.Contains(version))
+            {
+                var context = version.Context;
 
-            try
-            {
-                return context.GetSingleGameVersion();
+                try
+                {
+                    return context.GetSingleGameVersion();
+                }
+                catch
+                {
+                    return default;
+                }
             }
-            catch
-            {
-                return default;
-            }
+
+            return version.IsValidSavedVersion()
+                ? version
+                : GameUtil.GameVersions.FirstOrDefault(v => !ignoredVersions.Contains(v) && version.ContainsFromLumped(v));
         }
 
-        return version.IsValidSavedVersion()
-            ? version
-            : GameUtil.GameVersions.ToList().Find(v => !ignoredVersions.Contains(v) && version.ContainsFromLumped(v));
+        return Enum.GetValues<GameVersion>().ToDictionary(
+            k => k,
+            GetSingleVersion
+        );
     }
+
+    /**
+     * Get a valid single version from any version, including groups.
+     */
+    public static GameVersion GetSingleVersion(GameVersion version) => singleVersions.TryGetValue(version, out var singleVersion)
+        ? singleVersion
+        : default;
+
+    private static IPersonalTable? GetPersonal(GameVersion version)
+    {
+        version = GetSingleVersion(version);
+
+        return version switch
+        {
+            GameVersion.BATREV => PersonalTable.DP,
+            // default
+            GameVersion.Any => null,
+            _ => GameData.GetPersonal(version),
+        };
+    }
+
+    public static bool IsPresentInGame(GameVersion version, ushort species) => GetPersonal(version)?.IsSpeciesInGame(species) ?? false;
+
+    public static bool IsPresentInGame(GameVersion version, ushort species, byte form) => GetPersonal(version)?.IsPresentInGame(species, form) ?? false;
 
     public class VersionChecker
     {
-        private readonly ConcurrentDictionary<int, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
-        public readonly List<(GameVersion Version, SaveWrapper? Save)> allVersionBlankSaves;
+        private readonly ConcurrentDictionary<string, IReadOnlyList<GameVersion>> compatibleVersionsBySpecies = [];
 
-        public VersionChecker()
+        public IReadOnlyList<GameVersion> GetCompatibleVersionsForPKM(ushort species, byte form)
         {
-            allVersionBlankSaves = [..Enum.GetValues<GameVersion>().ToList()
-            .Select(version => {
-                var versionToUse = GetSingleVersion(version);
-
-                if (versionToUse == default)
-                {
-                    return (version, null!);
-                }
-
-                return (version, new SaveWrapper(BlankSaveFile.Get(versionToUse)));
-            })];
-        }
-
-        public IReadOnlyList<GameVersion> GetCompatibleVersionsForSpecies(ushort species)
-        {
-            if (!compatibleVersionsBySpecies.TryGetValue(species, out var compatibleWithVersions))
+            var key = $"{species}_{form}";
+            if (!compatibleVersionsBySpecies.TryGetValue(key, out var compatibleWithVersions))
             {
-                compatibleWithVersions = [..allVersionBlankSaves.FindAll(entry =>
-                {
-                    return entry.Save != null && entry.Save.IsSpeciesAllowed(species);
-                }).Select(entry => entry.Version).Order()];
-                compatibleVersionsBySpecies.TryAdd(species, compatibleWithVersions);
+                compatibleWithVersions = Enum.GetValues<GameVersion>()
+                    .Where(version => IsPresentInGame(version, species, form))
+                    .Order()
+                    .ToArray();
+
+                compatibleVersionsBySpecies.TryAdd(key, compatibleWithVersions);
             }
             return compatibleWithVersions;
         }

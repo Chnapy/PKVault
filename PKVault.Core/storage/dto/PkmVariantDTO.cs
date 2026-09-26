@@ -34,7 +34,7 @@ public record PkmVariantDTO(
     public override bool CanEvolve => !IsExternal && base.CanEvolve;
     public bool CanCreateVariant => !IsExternal && IsMain && IsEnabled;
 
-    public IReadOnlyList<GameVersion> CompatibleWithVersions => VersionChecker.GetCompatibleVersionsForSpecies(Pkm.Species);
+    public IReadOnlyList<GameVersion> CompatibleWithVersions => VersionChecker.GetCompatibleVersionsForPKM(Pkm.Species, Pkm.Form);
 
     [property: JsonIgnore]
     public GameVersionUtil.VersionChecker VersionChecker { get; init; } = default!;

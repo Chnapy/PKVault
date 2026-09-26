@@ -25,11 +25,9 @@ public class StaticEvolvesLoader
         var data = await StaticEvolvesRichLoader.LoadData();
         ArgumentNullException.ThrowIfNull(data);
 
-        Dictionary<GameVersion, SaveFile> savesByVersion = [];
-
         var staticEvolves = new StaticEvolvesData();
 
-        foreach(var entry in data)
+        foreach (var entry in data)
         {
             var baseSpecies = entry.Key;
 
@@ -45,7 +43,7 @@ public class StaticEvolvesLoader
             if (previousSpecies != default)
                 evolve.PreviousSpecies = previousSpecies;
 
-            foreach(var evoItem in allEvolves)
+            foreach (var evoItem in allEvolves)
             {
                 var trigger = evoItem.Triggers.FirstOrDefault(t => t.EvolutionIsPossible);
                 if (trigger == null)
@@ -55,25 +53,12 @@ public class StaticEvolvesLoader
 
                 foreach (var version in Enum.GetValues<GameVersion>())
                 {
-                    var saveVersion = GameVersionUtil.GetSingleVersion(version);
-                    if (saveVersion == default)
-                    {
-                        continue;
-                    }
-
-                    if (!savesByVersion.TryGetValue(saveVersion, out var saveFile))
-                    {
-                        saveFile = BlankSaveFile.Get(saveVersion);
-                        savesByVersion.Add(saveVersion, saveFile);
-                    }
-
-                    var blankSave = new SaveWrapper(saveFile);
-                    if (!blankSave.IsSpeciesAllowed(evolveSpecies) || !blankSave.IsSpeciesAllowed(baseSpecies))
+                    if (!GameVersionUtil.IsPresentInGame(version, evolveSpecies) || !GameVersionUtil.IsPresentInGame(version, baseSpecies))
                     {
                         // log.LogInformation($"EVOLVE TRADE NOT ALLOWED {species}->{evolveSpecies} v={version}");
                         continue;
                     }
-                    
+
                     if (trigger.Trigger == StaticEvolveRich.Trigger.Trade && trigger.Item != null)
                     {
                         var key = trigger.Item;
@@ -90,7 +75,7 @@ public class StaticEvolvesLoader
                     }
                 }
             }
-                
+
             staticEvolves.Add(baseSpecies, evolve);
         }
 

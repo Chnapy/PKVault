@@ -170,11 +170,6 @@ public partial class GenerateConvertView
 
                 var saveList = saves.Where(s => s?.Version == versionToUse);
                 if (!saveList.Any())
-                    saveList = VersionChecker.allVersionBlankSaves
-                        .Where(s => s.Version == versionToUse && s.Save != null)
-                        .Distinct()
-                        .Select(s => s.Save!);
-                if (!saveList.Any())
                     saveList = [new(BlankSaveFile.Get(versionToUse))];
 
                 var pkms = saveList.SelectMany(save => save.GetAllPKM()).ToArray();
@@ -199,7 +194,7 @@ public partial class GenerateConvertView
         for (ushort species = 1; species < (ushort)Species.MAX_COUNT; species++)
         {
             var versionsSaves = allVersionSaves
-                .Where(entry => entry.Saves.First().IsSpeciesAllowed(species))
+                .Where(entry => entry.Saves.First().Personal.IsSpeciesInGame(species))
                 .ToArray();
 
             for (byte form = 0; form < byte.MaxValue; form++)
@@ -209,8 +204,7 @@ public partial class GenerateConvertView
 
                 var formVersionsSaves = versionsSaves.Where(entry =>
                 {
-                    var pi = entry.Saves.First().Personal[species];
-                    return pi.IsFormWithinRange(form);
+                    return entry.Saves.First().Personal.IsPresentInGame(species, form);
                 })
                 .ToArray();
 

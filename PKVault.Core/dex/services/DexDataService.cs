@@ -38,11 +38,10 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
             pkm.RefreshChecksum();
         });
 
-        SaveWrapper save = new(BlankSaveFile.Get(context, pkm.OriginalTrainerName));
-        var version = save.Version;
+        var version = context.GetSingleGameVersion();
         var pi = pkm.PersonalInfo;
 
-        if (!save.IsSpeciesAllowed(species))
+        if (!GameVersionUtil.IsPresentInGame(version, species, form))
         {
             return GetMoves(context - 1, species, form);
         }
@@ -131,7 +130,7 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
         learnableMoves = learnableMoves.OrderBy(l => l.Value).ToDictionary();
 
         if (learnableMoves.Count == 0)
-            Console.WriteLine("NO LEARNABLE FOR " + save.Context + " " + evo);
+            Console.WriteLine("NO LEARNABLE FOR " + context + " " + evo);
 
         var inheritMoves = learnSource.GetInheritMoves(species, form).ToArray()
             .Where(move => !learnableMoves.ContainsKey(move));

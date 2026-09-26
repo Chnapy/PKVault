@@ -607,8 +607,7 @@ public class PkmConvertServiceTests
             }
         }
 
-        var pt = GameData.GetPersonal(pkm.Context.GetSingleGameVersion());
-        Assert.True(pt.IsSpeciesInGame(pkm.Species));
+        Assert.True(GameVersionUtil.IsPresentInGame(pkm.Context.GetSingleGameVersion(), pkm.Species, pkm.Form));
 
         AssertWithDebug("species", pkm.Species);
         AssertWithDebug("form", pkm.Form);

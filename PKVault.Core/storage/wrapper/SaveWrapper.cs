@@ -223,11 +223,6 @@ public class SaveWrapper(SaveFile Save)
         return (LanguageID)Save.Language;
     }
 
-    public bool IsSpeciesAllowed(ushort species)
-    {
-        return species <= Save.MaxSpeciesID && Save.Personal.IsSpeciesInGame(species);
-    }
-
     // public ImmutableSave Update(Action<SaveFile> mutator)
     // {
     //     var clone = Save.Clone();
