@@ -16,65 +16,12 @@ public class GenStaticEvolvesRich(
 
         // List<string> tmp = [];
 
-        async Task<EvolutionChainEvolvesTo> GetFixedChain(EvolutionChainEvolvesTo chain)
-        {
-            var species = (ushort)PokeApiService.GetIdFromUrl(chain.Species.Url);
-
-            if (species == 808)
-            {
-                if (chain.EvolvesTo.Count > 0)
-                    throw new Exception($"Expect #808 to have evolves missing, but array is not empty, maybe remove this code");
-
-                var melmetalPokemon = await pokeApiService.GetPokemon(809);
-                ArgumentNullException.ThrowIfNull(melmetalPokemon);
-
-                return new()
-                {
-                    Species = chain.Species,
-                    IsBaby = chain.IsBaby,
-                    EvolutionDetails = [],
-                    EvolvesTo = [
-                        new()
-                        {
-                            Species = melmetalPokemon.Species,
-                            IsBaby = false,
-                            EvolutionDetails = [
-                                new()
-                                {
-                                    Trigger = new()
-                                    {
-                                        Name = "use-item",
-                                    },
-                                    Item = new()
-                                    {
-                                        Name = "meltan-candy",
-                                    },
-                                    AdditionalProperties = {
-                                        {"item-count", 400}
-                                    },
-                                }
-                            ],
-                            EvolvesTo = [],
-                            AdditionalProperties = new Dictionary<string, object>()
-                        }
-                    ],
-                    AdditionalProperties = chain.AdditionalProperties
-                };
-            }
-
-            return chain;
-        }
-
         async Task<int> GetFormId(NamedApiResource? resource, int defaultForm)
         {
             if (resource == null)
                 return defaultForm;
 
-            var pkm = await pokeApiService.GetPokemon(resource);
-            var formUrl = pkm?.Forms.First().Url;
-            return formUrl == null
-                ? defaultForm
-                : PokeApiService.GetIdFromUrl(formUrl);
+            return PokeApiService.GetIdFromUrl(resource.Url);
         }
 
         StaticEvolveRich.RelativePhysicalStats? GetRelativePhysicalStats(int? value) => value switch
@@ -96,8 +43,6 @@ public class GenStaticEvolvesRich(
 
         async Task actChain(EvolutionChainEvolvesTo chain)
         {
-            chain = await GetFixedChain(chain);
-
             var species = (ushort)PokeApiService.GetIdFromUrl(chain.Species.Url);
 
             if (!staticEvolves.TryGetValue(species, out var speciesEvolveByFormId))
@@ -118,8 +63,8 @@ public class GenStaticEvolvesRich(
 
                 foreach (var details in evolveTo.EvolutionDetails)
                 {
-                    var baseForm = await GetFormId(details.BaseForm, species);
-                    var evolveForm = await GetFormId(details.EvolvedForm, evolveSpecies);
+                    var baseForm = await GetFormId(details.RequiredPokemonForm, species);
+                    var evolveForm = await GetFormId(details.EvolvedPokemonForm, evolveSpecies);
 
                     speciesEvolveByFormId.TryGetValue(baseForm, out var speciesEvolve);
                     if (speciesEvolve == null)
@@ -287,6 +232,16 @@ public class GenStaticEvolvesRich(
                         {
                             Trigger = StaticEvolveRich.Trigger.LevelUp,
                             GimmighoulCoins = true
+                        },
+                        "meltan-candies" => triggerObj with
+                        {
+                            Trigger = StaticEvolveRich.Trigger.UseItem,
+                            Item = "meltan-candy",
+                            MinItemCount = 400
+                        },
+                        "in-battle-level-up" => triggerObj with
+                        {
+                            Trigger = StaticEvolveRich.Trigger.LevelUp,
                         },
                         "other" => triggerObj with
                         {
