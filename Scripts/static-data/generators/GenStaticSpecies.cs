@@ -148,53 +148,25 @@ public class GenStaticSpecies(
 
                     var frontDefaultUrl = formObj.Sprites.FrontDefault;
                     var frontShinyUrl = formObj.Sprites.FrontShiny;
+                    var frontFemaleUrl = formObj.Sprites.FrontFemale ?? frontDefaultUrl;
+                    var frontShinyFemaleUrl = formObj.Sprites.FrontShinyFemale ?? frontShinyUrl;
 
-                    if (formName != "mega")
-                    {
-                        frontDefaultUrl ??= pkmObj.Sprites.FrontDefault;
-                        frontShinyUrl ??= pkmObj.Sprites.FrontShiny;
-                    }
+                    frontDefaultUrl ??= pkmObj.Sprites.FrontDefault;
+                    frontShinyUrl ??= pkmObj.Sprites.FrontShiny;
+                    frontFemaleUrl ??= pkmObj.Sprites.FrontFemale ?? frontDefaultUrl;
+                    frontShinyFemaleUrl ??= pkmObj.Sprites.FrontShinyFemale ?? frontShinyUrl;
 
-                    string? spriteFemale;
-                    // = (maleOnly || !formObj.IsDefault || formObj.IsMega) ? null : (
-                    //     pkmObj.Sprites.FrontFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale
-                    // );
-                    string? spriteShinyFemale;
-                    // = (maleOnly || !formObj.IsDefault || formObj.IsMega) ? null : (
-                    //     pkmObj.Sprites.FrontShinyFemale != null ? GetGHProxyUrl(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale
-                    // );
-                    var spriteDefault = (
-                        frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : null
-                    );
-                    var spriteShiny = (
-                        frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : null
-                    );
+                    var spriteDefault = frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : null;
+                    var spriteShiny = frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : null;
+                    var spriteFemale = frontFemaleUrl != null ? GetPokeapiRelativePath(frontFemaleUrl) : null;
+                    var spriteShinyFemale = frontShinyFemaleUrl != null ? GetPokeapiRelativePath(frontShinyFemaleUrl) : null;
 
                     if (formName != "mega")
                     {
                         spriteDefault ??= defaultForm?.SpriteDefault;
                         spriteShiny ??= defaultForm?.SpriteShiny;
-                    }
-
-                    if (formName == "")
-                    {
-                        spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontFemale) : defaultForm?.SpriteFemale;
-                        spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontShinyFemale) : defaultForm?.SpriteShinyFemale;
-                    }
-                    else
-                    {
-                        spriteFemale = pkmObj.Sprites.FrontFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontFemale) : spriteDefault;
-                        spriteShinyFemale = pkmObj.Sprites.FrontShinyFemale != null ? GetPokeapiRelativePath(pkmObj.Sprites.FrontShinyFemale) : spriteShiny;
-                    }
-
-
-                    if (spriteDefault == null && formName != "mega")
-                    {
-                        spriteDefault = frontDefaultUrl != null ? GetPokeapiRelativePath(frontDefaultUrl) : defaultForm?.SpriteDefault;
-                    }
-                    if (spriteShiny == null && formName != "mega")
-                    {
-                        spriteShiny = frontShinyUrl != null ? GetPokeapiRelativePath(frontShinyUrl) : defaultForm?.SpriteShiny;
+                        spriteFemale ??= defaultForm?.SpriteFemale;
+                        spriteShinyFemale ??= defaultForm?.SpriteShinyFemale;
                     }
 
                     var hasGenderDifferences = generation > 3
@@ -221,9 +193,9 @@ public class GenStaticSpecies(
                         Id: formObj.Id,
                         Name: name,
                         SpriteDefault: spriteDefault ?? "",
-                        SpriteFemale: spriteFemale,
+                        SpriteFemale: spriteFemale == spriteDefault ? null : spriteFemale,
                         SpriteShiny: spriteShiny ?? "",
-                        SpriteShinyFemale: spriteShinyFemale,
+                        SpriteShinyFemale: spriteShinyFemale == spriteShiny ? null : spriteShinyFemale,
                         SpriteShadow: generation == 3 && species == (ushort)Species.Lugia
                             ? GetLugiaShadowSprite()
                             : null,

@@ -71,7 +71,14 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
 
         using var fileStream = fileSystem.File.OpenRead(path);
 
-        return await JsonSerializer.DeserializeAsync(fileStream, jsonTypeInfo);
+        try
+        {
+            return await JsonSerializer.DeserializeAsync(fileStream, jsonTypeInfo);
+        }
+        catch (JsonException ex)
+        {
+            throw new JsonException($"JsonException with file {path}", ex);
+        }
     }
 
     public IArchive ReadZip(string path)

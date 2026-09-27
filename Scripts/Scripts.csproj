@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="NJsonSchema.CodeGeneration.TypeScript" Version="11.6.1" />
-    <PackageReference Include="PokeApi.Models" Version="[1.0.147]" />
+    <PackageReference Include="PokeApi.Models" Version="[1.0.177]" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="DiffPlex" Version="1.9.0" />
 
