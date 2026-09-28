@@ -9,17 +9,17 @@ public interface IPkmConvertService
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, ConvertContext? ctx);
 }
 
-public class PkmConvertService(ISettingsService settingsService, ILegalityAnalysisService legalityAnalysisService) : IPkmConvertService
+public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
 {
-    private readonly PKMConverterUtils pkmConverterUtils = new(legalityAnalysisService);
-    private readonly PK2Converter pk2Converter = new(new(legalityAnalysisService));
-    private readonly PK3Converter pk3Converter = new(new(legalityAnalysisService));
-    private readonly PK4Converter pk4Converter = new(new(legalityAnalysisService));
-    private readonly PK5Converter pk5Converter = new(new(legalityAnalysisService));
-    private readonly PK6Converter pk6Converter = new(new(legalityAnalysisService));
-    private readonly PK7Converter pk7Converter = new(new(legalityAnalysisService));
-    private readonly PK8Converter pk8Converter = new(new(legalityAnalysisService));
-    private readonly PK9Converter pk9Converter = new(new(legalityAnalysisService));
+    private readonly PKMConverterUtils pkmConverterUtils = new();
+    private readonly PK2Converter pk2Converter = new(new());
+    private readonly PK3Converter pk3Converter = new(new());
+    private readonly PK4Converter pk4Converter = new(new());
+    private readonly PK5Converter pk5Converter = new(new());
+    private readonly PK6Converter pk6Converter = new(new());
+    private readonly PK7Converter pk7Converter = new(new());
+    private readonly PK8Converter pk8Converter = new(new());
+    private readonly PK9Converter pk9Converter = new(new());
 
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context)
     {

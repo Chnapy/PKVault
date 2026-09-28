@@ -12,9 +12,9 @@ public interface IPkmSharePropertiesService
  * Share properties from a PKM source to a PKM target,
  * handling all convert requirements and contexts differences.
  */
-public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILegalityAnalysisService legalityAnalysisService) : IPkmSharePropertiesService
+public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : IPkmSharePropertiesService
 {
-    private readonly PKMConverterUtils utils = new(legalityAnalysisService);
+    private readonly PKMConverterUtils utils = new();
 
     public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save)
     {
@@ -437,11 +437,11 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, ILe
             targetPb7b.Stat_CP = targetPb7b.CalcCP;
         }
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(targetPkm));
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(targetPkm));
         var args = new RibbonVerifierArguments(
-            legality.la!.Info.Entity,
-            legality.la.EncounterMatch,
-            legality.la.Info.EvoChainsAllGens
+            la.Info.Entity,
+            la.EncounterMatch,
+            la.Info.EvoChainsAllGens
         );
         RibbonApplicator.FixInvalidRibbons(args);
 

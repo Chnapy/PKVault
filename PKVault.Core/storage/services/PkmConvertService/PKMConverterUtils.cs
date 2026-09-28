@@ -12,9 +12,9 @@ public record ConvertContext(
     SaveWrapper? TargetSave
 );
 
-public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
+public class PKMConverterUtils
 {
-    private readonly PKMPersonalFixer personalFixer = new(legalityAnalysisService);
+    private readonly PKMPersonalFixer personalFixer = new();
 
     public void FixCommonLegalityIssues(PKM pkm, ConvertContext ctx)
     {
@@ -101,11 +101,11 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         if (pkm is not IRegionOrigin pkmRg)
             return;
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-        if (legality.la == null || legality.Valid)
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+        if (la.Valid)
             return;
 
-        if (!legality.Results.Any(r => !r.Valid && r.Result == LegalityCheckResultCode.GeoHardwareInvalid))
+        if (!la.Results.Any(r => !r.Valid && r.Result == LegalityCheckResultCode.GeoHardwareInvalid))
             return;
 
         if (ctx.TargetSave != null && ctx.TargetSave.GetSave() is IRegionOriginReadOnly saveRg)
@@ -117,8 +117,8 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
     // Fix each move legality ONLY if an expected one is present
     public void FixMovesLegality(PKM pkm, ConvertContext ctx)
     {
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-        if (legality.la == null || legality.MovesValid.All(r => r))
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+        if (la.Info.Moves.All(r => r.Valid))
         {
             return;
         }
@@ -130,23 +130,23 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             pkm.Move4,
         ];
 
-        for (var i = 0; i < legality.la.Info.Moves.Length; i++)
+        for (var i = 0; i < la.Info.Moves.Length; i++)
         {
-            var r = legality.la.Info.Moves[i];
+            var r = la.Info.Moves[i];
             if (r.Valid)
                 continue;
 
             pkm.SetMove(i, 0);
         }
 
-        legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
+        la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
 
         List<ushort> newMoves = [];
         IEnumerable<ushort> encounterMoves = [];
 
-        for (var i = 0; i < legality.la!.Info.Moves.Length; i++)
+        for (var i = 0; i < la.Info.Moves.Length; i++)
         {
-            var r = legality.la.Info.Moves[i];
+            var r = la.Info.Moves[i];
 
             var move = r.Expect > 0
                 ? r.Expect
@@ -157,7 +157,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             if (newMoves.Contains(move))
             {
                 if (!encounterMoves.Any())
-                    encounterMoves = DexDataService.GetEncounterMoves(legality.la.Info);
+                    encounterMoves = DexDataService.GetEncounterMoves(la.Info);
 
                 move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
             }
@@ -172,8 +172,8 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
     public void FixRelearnMovesLegality(PKM pkm, ConvertContext ctx)
     {
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-        if (legality.la != null && legality.RelearnValid.Any(r => !r))
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+        if (la.Info.Relearn.Any(r => !r.Valid))
         {
 
             ushort[] moves = [
@@ -183,23 +183,23 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
                 pkm.RelearnMove4,
             ];
 
-            for (var i = 0; i < legality.la.Info.Relearn.Length; i++)
+            for (var i = 0; i < la.Info.Relearn.Length; i++)
             {
-                var r = legality.la.Info.Relearn[i];
+                var r = la.Info.Relearn[i];
                 if (r.Valid)
                     continue;
 
                 pkm.SetRelearnMove(i, 0);
             }
 
-            legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
+            la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
 
             List<ushort> newMoves = [];
             IEnumerable<ushort> encounterMoves = [];
 
-            for (var i = 0; i < legality.la!.Info.Relearn.Length; i++)
+            for (var i = 0; i < la.Info.Relearn.Length; i++)
             {
-                var r = legality.la.Info.Relearn[i];
+                var r = la.Info.Relearn[i];
 
                 var move = r.Expect > 0
                     ? r.Expect
@@ -211,7 +211,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
                 if (newMoves.Contains(move))
                 {
                     if (!encounterMoves.Any())
-                        encounterMoves = DexDataService.GetEncounterMoves(legality.la.Info);
+                        encounterMoves = DexDataService.GetEncounterMoves(la.Info);
 
                     move = encounterMoves.FirstOrDefault(m => m > 0 && !newMoves.Contains(m));
                 }
@@ -226,11 +226,11 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
         if (pkm is PA9 pa9)
         {
-            legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-            if (legality.Valid)
+            la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+            if (la.Valid)
                 return;
 
-            var plusMoveResults = legality.Results.Where(r => !r.Valid
+            var plusMoveResults = la.Results.Where(r => !r.Valid
                 && r.Identifier == CheckIdentifier.RelearnMove
                 && r.Result == LegalityCheckResultCode.PlusMoveSufficientLevelMissing_0);
             if (!plusMoveResults.Any())
@@ -265,13 +265,13 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
         var initialPokerusDays = pkm.PokerusDays;
         var initialPokerusStrain = pkm.PokerusStrain;
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-        if (legality.Valid)
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+        if (la.Valid)
         {
             return true;
         }
 
-        var miscIssues = legality.Results.Where(r => !r.Valid && r.Identifier == CheckIdentifier.Misc);
+        var miscIssues = la.Results.Where(r => !r.Valid && r.Identifier == CheckIdentifier.Misc);
 
         var daysIssue = miscIssues.FirstOrDefault(r => r.Result == LegalityCheckResultCode.PokerusDaysLEQ_0);
         var strainIssue = miscIssues.FirstOrDefault(r => r.Result == LegalityCheckResultCode.PokerusStrainUnobtainable_0);
@@ -307,16 +307,15 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             return;
         }
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-        if (!legality.Valid
-            && legality.Results.Any(r => !r.Valid && r.Identifier == CheckIdentifier.Ribbon)
-            && legality.la != null
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+        if (!la.Valid
+            && la.Results.Any(r => !r.Valid && r.Identifier == CheckIdentifier.Ribbon)
         )
         {
             var args = new RibbonVerifierArguments(
-                legality.la.Info.Entity,
-                legality.la.EncounterMatch,
-                legality.la.Info.EvoChainsAllGens
+                la.Info.Entity,
+                la.EncounterMatch,
+                la.Info.EvoChainsAllGens
             );
             RibbonApplicator.FixInvalidRibbons(args);
         }
@@ -329,13 +328,13 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             return;
         }
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-        if (legality.Valid)
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+        if (la.Valid)
         {
             return;
         }
 
-        var invalidMemories = legality.Results.Where(r => !r.Valid
+        var invalidMemories = la.Results.Where(r => !r.Valid
             && r.Identifier == CheckIdentifier.Memory);
 
         if (invalidMemories.Any(r => r.Result == LegalityCheckResultCode.ContestZero))
@@ -355,9 +354,9 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
     public void FixHeldItemLegality(PKM pkm, ConvertContext ctx)
     {
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
 
-        if (!legality.Valid && legality.Results.Any(r =>
+        if (!la.Valid && la.Results.Any(r =>
             !r.Valid &&
             r.Identifier == CheckIdentifier.HeldItem &&
             r.Result == LegalityCheckResultCode.ItemUnreleased
@@ -371,8 +370,8 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
     {
         bool hasBallIllegality()
         {
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-            return !legality.Valid && legality.Results.Any(r =>
+            var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+            return !la.Valid && la.Results.Any(r =>
                 !r.Valid &&
                 r.Identifier == CheckIdentifier.Ball
             );
@@ -437,7 +436,7 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
     public void CopyMovesFrom(PKM pkm, PKM pkmSrc)
     {
-        var srcLegality = legalityAnalysisService.GetLegalitySafe(new(pkmSrc));
+        var srcLa = LegalityAnalysisService.GetLegalitySafeRaw(new(pkmSrc));
 
         (ushort Move, int PPUps)[] srcMoves = [
             (pkmSrc.Move1, pkmSrc.Move1_PPUps),
@@ -483,11 +482,10 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
         // log.LogInformation($"MOVES = {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}");
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
-        if (legality.la == null
-            || legality.MovesValid.All(r => r)
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
+        if (la.Info.Moves.All(r => r.Valid)
             // all moves are wrong, or empty
-            || legality.la.Info.Moves.All(r =>
+            || la.Info.Moves.All(r =>
                 r.Info.Method == LearnMethod.Empty
                 || r.Info.Method == LearnMethod.Unobtainable
                 || r.Info.Method == LearnMethod.UnobtainableExpect)
@@ -496,16 +494,16 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
             return;
         }
 
-        for (var i = 0; i < legality.MovesValid.Length; i++)
+        for (var i = 0; i < la.Info.Moves.Length; i++)
         {
-            if (legality.MovesValid[i])
+            if (la.Info.Moves[i].Valid)
                 continue;
 
             // if move was already invalid, keep it like that
-            if (!srcLegality.MovesValid[i])
+            if (!srcLa.Info.Moves[i].Valid)
                 continue;
 
-            var r = legality.la.Info.Moves[i];
+            var r = la.Info.Moves[i];
 
             if (r.Info.Method == LearnMethod.Unobtainable)
             {
@@ -618,12 +616,12 @@ public class PKMConverterUtils(ILegalityAnalysisService legalityAnalysisService)
 
         int countLocationIllegalities()
         {
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
+            var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
 
-            if (legality.Valid)
+            if (la.Valid)
                 return 0;
 
-            var invalidResults = legality.Results.Where(r => !r.Valid);
+            var invalidResults = la.Results.Where(r => !r.Valid);
             if (!invalidResults.Any())
                 return 0;
 

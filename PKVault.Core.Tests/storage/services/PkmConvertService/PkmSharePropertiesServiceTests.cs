@@ -19,10 +19,9 @@ public class PkmSharePropertiesServiceTests
             )
         ));
 
-        var legalityAnalysisService = new LegalityAnalysisService(mockSettingsService.Object);
-        var pkmConvertService = new PkmConvertService(mockSettingsService.Object, legalityAnalysisService);
+        var pkmConvertService = new PkmConvertService(mockSettingsService.Object);
 
-        return new(pkmConvertService, legalityAnalysisService);
+        return new(pkmConvertService);
     }
 
     [Fact]

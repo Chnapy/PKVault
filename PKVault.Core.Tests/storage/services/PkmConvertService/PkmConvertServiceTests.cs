@@ -59,7 +59,7 @@ public class PkmConvertServiceTests
             )
         ));
 
-        return new(mockSettingsService.Object, new LegalityAnalysisService(mockSettingsService.Object));
+        return new(mockSettingsService.Object);
     }
 
     private void SetupPKDirectory(string folderName)

@@ -61,11 +61,9 @@ public class ActionServiceTests
             {saveWrapper.Object.Id, saveWrapper.Object}
         });
 
-        var legalityAnalysisService = new LegalityAnalysisService(mockSettingsService.Object);
-
         return new(
             sp: sp,
-            pkmUpdateService: new(legalityAnalysisService),
+            pkmUpdateService: new(),
             backupService: new(
                 sp: sp,
                 mockTimeProvider.Object,
