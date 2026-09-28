@@ -70,7 +70,9 @@ export const DetailsAttachedButton: React.FC = () => {
     const attachedSave = pkmVariantAttachedSaveId ? saveInfosQuery.data?.data[ pkmVariantAttachedSaveId ] : undefined;
     const attachedStorageName = attachedSave
         ? <>{staticData.versions[ attachedSave.displayedVersion ]?.name} ({attachedSave.trainerName})</>
-        : 'PKVault';
+        : pkmVariantAttachedSaveId
+            ? undefined
+            : 'PKVault';
 
     const onClick = () => {
         navigate({
@@ -115,15 +117,18 @@ export const DetailsAttachedButton: React.FC = () => {
         controlLabel={t('storage.actions.go-attached')}
         loading={attachedLoading}
         onClick={onClick}
+        disabled={!attachedStorageName}
         leftSection={
             <Group wrap='nowrap' gap='sm'>
                 <UIPokedexIcons.Attached size='xs' />
-                <UIGameImg version={attachedSave?.displayedVersion ?? null} size={20} />
+                {attachedStorageName
+                    ? <UIGameImg version={attachedSave?.displayedVersion ?? null} size={20} />
+                    : <UIPokedexIcons.Warn size='xs' />}
             </Group>
         }
         size='compact-sm'
         mt='auto'
     >
-        {attachedStorageName}
+        {attachedStorageName ?? 'Attached save not found'}
     </UIButton>;
 };
