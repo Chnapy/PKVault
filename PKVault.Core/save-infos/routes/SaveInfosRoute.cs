@@ -82,8 +82,6 @@ public class SaveInfosController(
 
         DataUpdateFlags flags = new();
 
-        List<string> savePaths = [];
-
         for (var i = 0; i < saveFiles.Length; i++)
         {
             var saveFile = saveFiles[i];
@@ -104,27 +102,13 @@ public class SaveInfosController(
 
             var save = await savesLoadersService.CheckSaveData(fileBytes, filename, overwrite);
             ArgumentException.ThrowIfNullOrWhiteSpace(save.Metadata.FilePath);
-            savePaths.Add(save.Metadata.FilePath);
+
+            await savesLoadersService.UploadSaveWithoutCheck(save.Metadata.FilePath, fileBytes);
 
             flags.SaveInfos = true;
             flags.Saves.UseSave(save.Id).SavePkms.All = true;
             flags.Saves.UseSave(save.Id).SaveBoxes = true;
             flags.Dex.All = true;
-        }
-
-        for (var i = 0; i < saveFiles.Length; i++)
-        {
-            var saveFile = saveFiles[i];
-            var savePath = savePaths[i];
-
-            byte[] fileBytes;
-            using (var ms = new MemoryStream())
-            {
-                await saveFile.Stream.CopyToAsync(ms);
-                fileBytes = ms.ToArray();
-            }
-
-            await savesLoadersService.UploadSaveWithoutCheck(savePath, fileBytes);
         }
 
         await savesLoadersService.Setup(flags);
