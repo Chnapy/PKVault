@@ -3,7 +3,7 @@ using Serilog;
 
 namespace PKVault.Core;
 
-public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
+public class PKMPersonalFixer
 {
     // Fix PID and related personal data: Shiny, Form, Gender, Nature, Ability
     public void FixPersonalData(
@@ -94,8 +94,8 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
             if (!checkLegality)
                 return false;
 
-            var legality = legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave);
-            return !legality.Valid && legality.Results.Any(r => !r.Valid && (
+            var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
+            return !la.Valid && la.Results.Any(r => !r.Valid && (
                 r.Identifier == CheckIdentifier.EC && r.Result == LegalityCheckResultCode.TransferEncryptGen6BitFlip
 
                 // may causes infinite-loop with some cases (PK3), so it is capped
@@ -146,7 +146,7 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
             + $" ability={pkm.Ability}/{ability} ({pkm.AbilityNumber}/{initialAbilityNumber}) index={pkm.PersonalInfo.GetIndexOfAbility(ability)} checkLegality={checkLegality}"
             + $" available={pkm.PersonalInfo.GetAbilityAtIndex(0)}/{pkm.PersonalInfo.GetAbilityAtIndex(1)}"
             + $"\nversion={pkm.Version} origin={new ImmutablePKM(pkm).GetOriginMetLocation("en")} / {pkm.MetLevel} {pkm.Move1}/{pkm.Move2}/{pkm.Move3}/{pkm.Move4}"
-            + $"\n{legalityAnalysisService.GetLegalitySafe(new(pkm), ctx.TargetSave).Report("en")}";
+            + $"\n{LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave).Report("en")}";
 
         // for debug purpose only
         void CheckIfWrongData(Func<bool> fn)
@@ -269,10 +269,10 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
             }
         }
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
 
         // handle AbilityMismatchFlag (G3 specific case)
-        if (HasG3AbilityMismatchFlag(pkm, legality))
+        if (HasG3AbilityMismatchFlag(pkm, la))
         {
             // we just switch index
             pkm.SetAbilityIndex(GetAbilityIndex(pkm.AbilityNumber) == 0 ? 1 : 0);
@@ -296,14 +296,14 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
         if (pkm.Ability != expectedAbility)
             return true;
 
-        var legality = legalityAnalysisService.GetLegalitySafe(new(pkm));
-        if (legality.Valid)
+        var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm));
+        if (la.Valid)
             return false;
 
-        if (HasG3AbilityMismatchFlag(pkm, legality))
+        if (HasG3AbilityMismatchFlag(pkm, la))
             return true;
 
-        return legality.Results.Any(r => !r.Valid
+        return la.Results.Any(r => !r.Valid
             && r.Identifier == CheckIdentifier.Ability
 
             // more PID issue than ability one
@@ -317,13 +317,13 @@ public class PKMPersonalFixer(ILegalityAnalysisService legalityAnalysisService)
         );
     }
 
-    private bool HasG3AbilityMismatchFlag(PKM pkm, LegalityAnalysisWrapper legality)
+    private bool HasG3AbilityMismatchFlag(PKM pkm, LegalityAnalysis la)
     {
         if (pkm is G3PKM
             && pkm.PersonalInfo.AbilityCount > 1
             && pkm.PersonalInfo.GetAbilityAtIndex(0) == pkm.PersonalInfo.GetAbilityAtIndex(1))
         {
-            if (!legality.Valid && legality.Results.Any(r => !r.Valid && r.Result == LegalityCheckResultCode.AbilityMismatchFlag))
+            if (!la.Valid && la.Results.Any(r => !r.Valid && r.Result == LegalityCheckResultCode.AbilityMismatchFlag))
                 return true;
         }
 
