@@ -7,13 +7,14 @@ import { updateCacheMutationResponse } from '../../data/util/update-cache-mutati
 import { MoveProvider, type MoveProviderProps } from '../../ui/interaction/move/context/move-provider';
 import { getDropPositions } from '../../ui/interaction/move/hooks/get-drop-positions';
 import { SelectProvider, type SelectProviderProps } from '../../ui/interaction/select/context/select-provider';
+import { useStorageModeContext } from '../../ui/inventory/context/storage-mode-context';
 import { filterIsDefined } from '../../util/filter-is-defined';
 import { useCanMove } from './hooks/use-can-move';
 import { useDroppableValidation } from './hooks/use-droppable-validation';
 import { type MoveContainerValue, type MoveParams, containerFns } from './move-container-fns';
 
 const useFilterStartDragIds: MoveProviderProps<MoveContainerValue, MoveParams>[ 'useFilterStartDragIds' ] = (container, ids) => {
-    const canMoveFn = useCanMove(container.saveId ?? null, ids);
+    const canMoveFn = useCanMove(container, ids);
 
     return params => canMoveFn(params?.attached ?? false);
 };
@@ -51,8 +52,12 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
     const queryClient = useQueryClient();
     const errorsOnMutationResponse = BackendErrorsContext.useOnMutationResponse();
 
+    const { useMoveStore } = useStorageModeContext();
+
     return React.useCallback(async (source, target) => {
         const sourceContainer = containerFns.getContainerValue(source.containerId);
+
+        const storageMode = useMoveStore.getState().state;
 
         console.log('drop', sourceContainer, source, target)
 
@@ -60,6 +65,11 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
 
         if (pkmIds.length === 0) {
             console.log('no pkm-ids')
+            return;
+        }
+
+        if (storageMode === 'inventory') {
+            console.log('it was items, stop here');
             return;
         }
 
@@ -107,7 +117,7 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                 break;
             };
         }
-    }, [ errorsOnMutationResponse, queryClient ]);
+    }, [ errorsOnMutationResponse, queryClient, useMoveStore ]);
 };
 
 export type MoveSelectImplProviderProps = {

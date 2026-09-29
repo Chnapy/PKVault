@@ -15,10 +15,12 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
 {
     public static readonly int OrderGap = 10;
 
-    public static bool CanIdReceivePkm(int boxId, GameVersion version) => 
-        // ZA party is unstable, moving should be disabled
-        (version != GameVersion.ZA && boxId == (int)BoxType.Party)
-        || boxId >= (int)BoxType.Box;
+    public static bool CanIdReceivePkm(int boxId, GameVersion version) => boxId != (int)BoxType.Inventory
+        && (
+            // ZA party is unstable, moving should be disabled
+            (version != GameVersion.ZA && boxId == (int)BoxType.Party)
+            || boxId >= (int)BoxType.Box
+        );
 
     /**
      * Scoped box cannot interact with non-scoped boxes.
@@ -72,6 +74,7 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
             SlotCount: entity.SlotCount,
             Order: entity.Order,
             BankId: entity.BankId,
+            InventoryType: entity.InventoryType,
             WallpaperName,
             Version
         );

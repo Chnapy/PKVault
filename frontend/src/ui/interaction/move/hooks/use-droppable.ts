@@ -38,7 +38,7 @@ export const useDroppable = <C>(target: MoveTargetInput<C>): UseDroppableReturn 
             ? state.slotsStates.rootItems[ targetContainerHash ]
             : state.slotsStates.items[ targetContainerHash ]?.[ target.targetPosition.toString() ];
         if (!slotState) {
-            console.log('not found', targetContainerHash, target.targetPosition, state.slotsStates.items)
+            console.warn('not found', targetContainerHash, target, state.slotsStates.items)
             return {
                 isDroppable: true,
                 clickable: false,

@@ -3,10 +3,12 @@ import { useRouter } from '@tanstack/react-router';
 import React from 'react';
 import { getPkmSaveIndexOptions } from '../../../data/hooks/use-pkm-save-index';
 import { getPkmVariantIndexOptions } from '../../../data/hooks/use-pkm-variant-index';
+import { BoxType } from '../../../data/sdk/model';
 import { getSaveInfosGetAllQueryOptions } from '../../../data/sdk/save-infos/save-infos.gen';
-import { getStorageGetBoxesQueryOptions, getStorageGetMainBanksQueryOptions, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../../data/sdk/storage/storage.gen';
+import { getStorageGetBoxesQueryOptions, getStorageGetInventoryItemsQueryOptions, getStorageGetMainBanksQueryOptions, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../translate/i18n';
 import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui/interaction/move/state/move-state';
+import { useStorageModeContext } from '../../../ui/inventory/context/storage-mode-context';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { BankContext } from '../../bank/bank-context';
 import { getFinalBox } from '../../panel/hooks/utils/get-final-box';
@@ -39,14 +41,16 @@ export const useDroppableValidation = () => {
 
     const { t } = useTranslate();
 
+    const { useMoveStore } = useStorageModeContext();
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     type QuerySelectData<O> = O extends UseQueryOptions<any, any, infer D>
         ? D
         : never;
 
     const getCommonData = React.useCallback((source: MoveSource<MoveParams>) => {
-        const sourceContainer = source && containerFns.getContainerValue(source.containerId);
-        const sourceSaveId = sourceContainer?.saveId;
+        const sourceContainer = containerFns.getContainerValue(source.containerId);
+        const sourceSaveId = sourceContainer.saveId;
 
         const search = router.latestLocation.search;
 
@@ -68,6 +72,9 @@ export const useDroppableValidation = () => {
             mainBoxes: getStorageGetBoxesQueryOptions(),
             sourcePkmSaveIndex: sourceSaveId
                 ? getPkmSaveIndexOptions(sourceSaveId)
+                : null,
+            sourceInventory: sourceContainer.type === 'inventory-item'
+                ? getStorageGetInventoryItemsQueryOptions({ saveId: sourceSaveId ?? undefined })
                 : null,
             saveInfosAll: getSaveInfosGetAllQueryOptions(),
             sourceBoxes: getStorageGetBoxesQueryOptions({ saveId: sourceSaveId ?? undefined }),
@@ -104,18 +111,25 @@ export const useDroppableValidation = () => {
                     return {
                         ...storage,
                         boxId: box?.idInt,
+                        isInventory: box?.type === BoxType.Inventory,
                     };
                 })
-                .map(({ saveId, boxId }): MoveContainerValue => saveId
+                .map(({ saveId, boxId, isInventory }): MoveContainerValue => isInventory
                     ? {
-                        type: 'save-item',
-                        saveId,
+                        type: 'inventory-item',
+                        saveId: saveId ?? undefined,
                         boxId: String(boxId),
                     }
-                    : {
-                        type: 'main-item',
-                        boxId: String(boxId),
-                    })
+                    : saveId
+                        ? {
+                            type: 'save-item',
+                            saveId,
+                            boxId: String(boxId),
+                        }
+                        : {
+                            type: 'main-item',
+                            boxId: String(boxId),
+                        })
                 .map((targetContainer, i) => [
                     targetContainer,
                     storagesOptions[ i ]!,
@@ -123,6 +137,7 @@ export const useDroppableValidation = () => {
         };
 
         return {
+            sourceContainer,
             sourceSaveId,
             queriesOptions,
             getItemsContainers,
@@ -154,10 +169,13 @@ export const useDroppableValidation = () => {
 
     const validate = React.useCallback((source: MoveSource<MoveParams>): DraggingSlotsStates => {
         const {
+            sourceContainer,
             sourceSaveId,
             queriesOptions,
             getItemsContainers,
         } = getCommonData(source);
+
+        const mode = useMoveStore.getState().state;
 
         const attached = source?.params?.attached ?? false;
 
@@ -179,6 +197,7 @@ export const useDroppableValidation = () => {
             pkmVariantIndex,
             mainBoxes,
             sourcePkmSaveIndex,
+            sourceInventory,
             saveInfosAll,
             sourceBoxes,
             banks,
@@ -195,13 +214,19 @@ export const useDroppableValidation = () => {
             return emptySlotStates;
         }
 
-        const sourcePkmIndex = sourceSaveId
-            ? sourcePkmSaveIndex
-            : pkmVariantIndex;
+        const getSlot = (id: string) => {
+            if (sourceContainer.type === 'inventory-item')
+                return Object.values(sourceInventory?.data ?? {}).findIndex(item => item.id === id);
 
-        const firstSourceSlot = sourcePkmIndex?.data.byId[ firstId ]?.boxSlot;
+            const index = sourceSaveId
+                ? sourcePkmSaveIndex?.data.byId
+                : pkmVariantIndex.data.byId;
+            return index?.[ id ]?.boxSlot;
+        };
+
+        const firstSourceSlot = getSlot(firstId);
         if (firstSourceSlot === undefined) {
-            console.error('drop-validation - no-first-slot')
+            console.error('drop-validation - no-first-slot', { source })
             return emptySlotStates;
         }
 
@@ -274,6 +299,7 @@ export const useDroppableValidation = () => {
                     allTargetSlots.map(targetSlot => {
                         const slotInfosList = sourceIds.flatMap((sourceId): SlotInfos[] => {
                             return buildSlotInfosSlot(
+                                mode,
                                 Number(targetContainer.boxId),
                                 targetSlot,
                                 firstSourceSlot,
@@ -282,6 +308,7 @@ export const useDroppableValidation = () => {
                                 targetContainer.saveId,
                                 pkmVariantIndex!.data,
                                 sourceSaveId ? sourcePkmSaveIndex!.data : undefined,
+                                sourceInventory?.data,
                                 targetContainer.saveId ? targetPkmSaveIndex?.data : undefined,
                                 saveInfosAll!.data ?? {},
                                 Object.fromEntries(
@@ -298,6 +325,8 @@ export const useDroppableValidation = () => {
                             slotInfosList,
                             pkmVariantIndex!.data,
                         );
+
+                        console.log('drop-results', targetContainer, targetSlot, data);
 
                         return [
                             targetSlot,
@@ -318,7 +347,7 @@ export const useDroppableValidation = () => {
             rootItems: bankSlotStates,
             items: itemSlotStates,
         };
-    }, [ getCommonData, queryClient, t ]);
+    }, [ getCommonData, queryClient, t, useMoveStore ]);
 
     return {
         validate,

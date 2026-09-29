@@ -70,6 +70,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             data={Object.entries(BoxType).map(([ key, value ]) => ({
                 value,
                 label: switchUtil(key as keyof typeof BoxType, {
+                    Inventory: 'INVENTORY_TODO',
                     Box: t('storage.box.edit.type.box'),
                     SurpriseTrade: t('storage.box.edit.type.surprisetrade'),
                     PGL: t('storage.box.edit.type.pgl'),

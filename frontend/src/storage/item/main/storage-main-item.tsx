@@ -95,6 +95,11 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, isShiny, nSparkle, isShadow, isExternal, heldItem } = mainVariant;
 
+        const heldItemNode = heldItem > 0 && <ItemImg
+            version={contextVersion}
+            item={heldItem}
+        />;
+
         return <StorageItem
             id={id}
             selected={selected}
@@ -119,13 +124,11 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                 nbrVariants={variants.length}
                 hasDisabledVariant={hasDisabledVariant}
                 attached={!!attachedVariant}
-                heldItem={heldItem > 0 && <ItemImg
-                    version={contextVersion}
-                    item={heldItem}
-                />}
+                heldItem={heldItemNode}
                 canEvolve={canEvolve}
                 needSynchronize={canSynchronize}
             />}
+            heldItem={heldItemNode}
             onClick={() => navigate({
                 search: search => {
                     const alreadySelected = search.selected

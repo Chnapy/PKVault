@@ -1,4 +1,5 @@
 import React from 'react';
+import { BoxType } from '../../data/sdk/model';
 import { useStorageGetBoxes } from '../../data/sdk/storage/storage.gen';
 import { Route } from '../../routes/storage';
 import type { PopoverTargetChildProps } from '../../ui/popover/target-open-popover';
@@ -9,6 +10,7 @@ import { StoragePanelBoxList } from './box-list/storage-panel-box-list';
 import { StoragePanelFooter } from './footer/storage-panel-footer';
 import { StoragePanelGameList } from './game-list/storage-panel-game-list';
 import { useCurrentStorageWithFallback } from './hooks/use-current-storage-with-fallback';
+import { StoragePanelInventoryItems } from './items/storage-panel-inventory-items';
 import { StoragePanelItems } from './items/storage-panel-items';
 
 export const StoragePanel: React.FC<PopoverTargetChildProps> = (popoverProps) => {
@@ -18,11 +20,11 @@ export const StoragePanel: React.FC<PopoverTargetChildProps> = (popoverProps) =>
 
     const navigate = Route.useNavigate();
 
-    const saveBoxesQuery = useStorageGetBoxes({ saveId: saveId ?? undefined }, { query: { enabled: !!saveId } });
-    const saveBox = saveBoxesQuery.data?.data.find(box => box.idInt === boxId);
+    const boxesQuery = useStorageGetBoxes({ saveId });
+    const box = boxesQuery.data?.data.find(box => box.idInt === boxId);
 
-    const backgroundImageUrl = saveBox?.wallpaperName
-        ? getBoxBackgroundUrl(saveBox.wallpaperName)
+    const backgroundImageUrl = box?.wallpaperName
+        ? getBoxBackgroundUrl(box.wallpaperName)
         : undefined;
 
     const storageWithoutBox = !(storage.isPending && storage.isEnabled) && saveId !== undefined && boxId === undefined;
@@ -52,6 +54,10 @@ export const StoragePanel: React.FC<PopoverTargetChildProps> = (popoverProps) =>
         backgroundImageUrl={backgroundImageUrl}
         {...popoverProps}
     >
-        {hasStorage && <StoragePanelItems />}
+        {hasStorage && box && (
+            box.type === BoxType.Inventory
+                ? <StoragePanelInventoryItems />
+                : <StoragePanelItems />
+        )}
     </UIStoragePanel>;
 };

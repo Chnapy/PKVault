@@ -17,6 +17,12 @@ export type MoveContainerValue =
         saveId?: undefined;
         boxId?: undefined;
         bankId: string;
+    }
+    | {
+        type: 'inventory-item';
+        saveId?: number;
+        boxId: string;
+        bankId?: undefined;
     };
 
 export type MoveParams = {
@@ -28,7 +34,8 @@ const getContainerHash = ({ type, saveId, boxId, bankId }: MoveContainerValue): 
 };
 
 const getContainerValue = (hash: string): MoveContainerValue => {
-    const [ type, saveId, boxId = '', bankId = '' ] = hash.split('---');
+    const [ type, saveId, boxId = '', bankId = '', inventoryRaw = '' ] = hash.split('---');
+    const inventory = Boolean(inventoryRaw);
 
     switch (type as MoveContainerValue[ 'type' ]) {
         case 'main-item':
@@ -46,6 +53,12 @@ const getContainerValue = (hash: string): MoveContainerValue => {
             return {
                 type: 'bank',
                 bankId,
+            };
+        case 'inventory-item':
+            return {
+                type: 'inventory-item',
+                saveId: saveId ? Number(saveId) : undefined,
+                boxId,
             };
     }
 };

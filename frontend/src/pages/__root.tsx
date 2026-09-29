@@ -9,6 +9,7 @@ import { WelcomeDialog } from '../help/welcome-dialog';
 import { ActionsPanel } from '../storage/actions/actions-panel';
 import { MoveSelectImplProvider } from '../storage/move/move-select-impl-provider';
 import { useTranslate } from '../translate/i18n';
+import { StorageModeProvider } from '../ui/inventory/context/storage-mode-provider';
 import { UIAppLayout } from '../ui/layout/app-layout/ui-app-layout';
 import { UIFooter } from '../ui/layout/footer/ui-footer';
 
@@ -29,19 +30,21 @@ export const RootPage: React.FC = () => {
 
   return (
     <HistoryContext.Provider>
-      <MoveSelectImplProvider>
-        <UIAppLayout
-          header={<Header />}
-          bottom={<ActionsPanel />}
-          footer={<UIFooter />}
-        >
-          <Outlet />
+      <StorageModeProvider>
+        <MoveSelectImplProvider>
+          <UIAppLayout
+            header={<Header />}
+            bottom={<ActionsPanel />}
+            footer={<UIFooter />}
+          >
+            <Outlet />
 
-          <HelpDialog />
-          <WelcomeDialog />
-          <FlatpakMigrateDialog />
-        </UIAppLayout>
-      </MoveSelectImplProvider>
+            <HelpDialog />
+            <WelcomeDialog />
+            <FlatpakMigrateDialog />
+          </UIAppLayout>
+        </MoveSelectImplProvider>
+      </StorageModeProvider>
     </HistoryContext.Provider>
   );
 };

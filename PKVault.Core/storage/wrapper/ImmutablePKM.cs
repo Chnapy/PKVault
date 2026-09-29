@@ -289,6 +289,10 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         return pkm.Nickname.Replace('’', '\'').Replace(' ', '\'');
     }
 
+    public bool CanHeldItem => Pkm.Format >= 2
+        && Pkm is not PB7
+        && Pkm is not PA8;
+
     public bool IsSpeciesValid => Species > 0 && Species < GameInfo.Strings.Species.Count;
 
     public PKMLoadError? LoadError => loadError;

@@ -81,6 +81,11 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
 
         const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, isShiny, nSparkle, isEgg, isShadow, canEvolve } = savePkm;
 
+        const heldItemNode = savePkm.heldItem > 0 && <ItemImg
+            version={contextVersion}
+            item={savePkm.heldItem}
+        />;
+
         return <StorageItem
             id={id}
             selected={selected}
@@ -120,10 +125,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 isN={nSparkle}
                 isStarter={savePkm.isStarter}
                 isDuplicate={savePkm.isDuplicate}
-                heldItem={savePkm.heldItem > 0 && <ItemImg
-                    version={contextVersion}
-                    item={savePkm.heldItem}
-                />}
+                heldItem={heldItemNode}
                 warning={!!pkmLegality && !pkmLegality.isValid}
                 level={savePkm.level}
                 party={savePkm.party >= 0 ? savePkm.party : undefined}
@@ -131,6 +133,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 attached={isAttached}
                 needSynchronize={canSynchronize}
             />}
+            heldItem={heldItemNode}
         />;
     }),
 );

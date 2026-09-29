@@ -107,6 +107,23 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
                 currentOrder++;
             });
 
+        foreach (var pouch in save.GetSave().Inventory.Pouches)
+        {
+            var id = GetInventoryBoxId(pouch.Type);
+            boxes.Add(id.ToString(), new()
+            {
+                Id = id.ToString(),
+                IdInt = id,
+                Name = pouch.Type.ToString(),
+                Type = BoxType.Inventory,
+                InventoryType = pouch.Type,
+                SlotCount = pouch.Items.Length,
+                Order = currentOrder,
+                BankId = ""
+            });
+            currentOrder++;
+        }
+
         using var scope = sp.CreateScope();
         var boxLoader = scope.ServiceProvider.GetRequiredService<IBoxLoader>();
 
@@ -145,6 +162,8 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
 
         return null;
     }
+
+    public static int GetInventoryBoxId(InventoryType type) => 100 + (byte)type;
 
     private static string GetWallpaperResourceName(GameVersion version, int index)
     {

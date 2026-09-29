@@ -1,6 +1,7 @@
 import type { PkmSaveIndexes } from '../../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../../data/hooks/use-pkm-variant-index';
-import type { BoxDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BoxDTO, SaveInfosDTO, StorageGetInventoryItems200 } from '../../../../data/sdk/model';
+import type { StorageMode } from '../../../../ui/inventory/context/storage-mode-context';
 import type { ValidateMainToMainSlot } from '../rules/validate-main-to-main';
 import type { ValidateMainToSaveSlot } from '../rules/validate-main-to-save';
 import type { ValidateSaveToMainSlot } from '../rules/validate-save-to-main';
@@ -15,6 +16,7 @@ export type SlotInfosSlot =
 type MoveDirectionSlot = SlotInfosSlot[ 'direction' ];
 
 export const buildSlotInfosSlot = (
+    mode: StorageMode,
     dropBoxId: number,
     dropBoxSlot: number,
     firstSourceSlot: number,
@@ -23,6 +25,7 @@ export const buildSlotInfosSlot = (
     targetSaveId: number | null | undefined,
     pkmVariantIndexes: PkmVariantIndexes | undefined,
     sourcePkmSaveIndexes: PkmSaveIndexes | undefined,
+    sourceInventory: StorageGetInventoryItems200 | undefined,
     targetPkmSaveIndexes: PkmSaveIndexes | undefined,
     savesById: Record<number, SaveInfosDTO>,
     sourceBoxes: Record<number, BoxDTO>,
@@ -33,16 +36,18 @@ export const buildSlotInfosSlot = (
     switch (direction) {
         case 'main-to-main': {
             const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
-            if (!sourcePkm) {
+            const sourceItem = sourceInventory?.[ sourceId ];
+            const source = sourcePkm ?? sourceItem;
+            if (!source) {
                 return [];
             }
 
-            const sourceBox = sourceBoxes[ sourcePkm.boxId ];
+            const sourceBox = sourceBoxes[ source.boxId ];
 
-            const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
+            const targetSlot = dropBoxSlot + (source.boxSlot - firstSourceSlot);
             const targetBox = targetBoxes[ dropBoxId ];
 
-            const targetPkmVariants = pkmVariantIndexes.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
+            const targetPkmVariants = pkmVariantIndexes?.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
             const normalizedTargetPkmMains = targetPkmVariants.length === 0 ? [ undefined ] : targetPkmVariants;
 
             if (!sourceBox || !targetBox) {
@@ -50,6 +55,7 @@ export const buildSlotInfosSlot = (
             }
 
             return normalizedTargetPkmMains.map(targetPkm => ({
+                mode,
                 direction: 'main-to-main',
                 sourcePkm,
                 sourceBox,
@@ -60,13 +66,15 @@ export const buildSlotInfosSlot = (
         };
         case 'main-to-save': {
             const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
-            if (!sourcePkm) {
+            const sourceItem = sourceInventory?.[ sourceId ];
+            const source = sourcePkm ?? sourceItem;
+            if (!source) {
                 return [];
             }
 
-            const sourceBox = sourceBoxes[ sourcePkm.boxId ];
+            const sourceBox = sourceBoxes[ source.boxId ];
 
-            const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
+            const targetSlot = dropBoxSlot + (source.boxSlot - firstSourceSlot);
             const targetSave = savesById[ targetSaveId! ];
             const targetBox = targetBoxes[ dropBoxId ];
             const targetPkm = targetPkmSaveIndexes?.byBox[ dropBoxId ]?.[ targetSlot ];
@@ -76,6 +84,7 @@ export const buildSlotInfosSlot = (
             }
 
             return [ {
+                mode,
                 direction: 'main-to-save',
                 sourcePkm,
                 sourceBox,
@@ -87,14 +96,16 @@ export const buildSlotInfosSlot = (
         };
         case 'save-to-main': {
             const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
-            if (!sourcePkm || !sourceSaveId) {
+            const sourceItem = sourceInventory?.[ sourceId ];
+            const source = sourcePkm ?? sourceItem;
+            if (!source || !sourceSaveId) {
                 return [];
             }
 
-            const sourceBox = sourceBoxes[ sourcePkm.boxId ];
+            const sourceBox = sourceBoxes[ source.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
 
-            const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
+            const targetSlot = dropBoxSlot + (source.boxSlot - firstSourceSlot);
             const targetBox = targetBoxes[ dropBoxId ];
 
             if (!sourceBox || !sourceSave || !targetBox) {
@@ -105,6 +116,7 @@ export const buildSlotInfosSlot = (
             const normalizedTargetPkmMains = targetPkmVariants.length === 0 ? [ undefined ] : targetPkmVariants;
 
             return normalizedTargetPkmMains.map(targetPkm => ({
+                mode,
                 direction: 'save-to-main',
                 sourceSave,
                 sourcePkm,
@@ -116,14 +128,16 @@ export const buildSlotInfosSlot = (
         };
         case 'save-to-save': {
             const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
-            if (!sourcePkm || !sourceSaveId || !targetSaveId) {
+            const sourceItem = sourceInventory?.[ sourceId ];
+            const source = sourcePkm ?? sourceItem;
+            if (!source || !sourceSaveId || !targetSaveId) {
                 return [];
             }
 
-            const sourceBox = sourceBoxes[ sourcePkm.boxId ];
+            const sourceBox = sourceBoxes[ source.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
 
-            const targetSlot = dropBoxSlot + (sourcePkm.boxSlot - firstSourceSlot);
+            const targetSlot = dropBoxSlot + (source.boxSlot - firstSourceSlot);
             const targetSave = savesById[ targetSaveId ];
             const targetBox = targetBoxes[ dropBoxId ];
             const targetPkm = targetPkmSaveIndexes?.byBox[ dropBoxId ]?.[ targetSlot ];
@@ -133,6 +147,7 @@ export const buildSlotInfosSlot = (
             }
 
             return [ {
+                mode,
                 direction: 'save-to-save',
                 sourceSave,
                 sourcePkm,

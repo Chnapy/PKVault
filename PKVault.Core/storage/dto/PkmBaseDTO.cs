@@ -129,6 +129,8 @@ public abstract record PkmBaseDTO(
         }
     }
 
+    public bool CanHeldItem => Pkm.CanHeldItem;
+
     public PKMLoadError? LoadError => Pkm.LoadError;
     public bool HasLoadError => Pkm.HasLoadError;
     public bool IsEnabled => Pkm.IsEnabled;

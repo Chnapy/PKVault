@@ -759,6 +759,40 @@
         }
       }
     },
+    "/api/storage/inventory": {
+      "get": {
+        "tags": [
+          "Storage"
+        ],
+        "operationId": "Storage_GetInventoryItems",
+        "parameters": [
+          {
+            "name": "saveId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/InventoryItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/storage/main/bank": {
       "get": {
         "tags": [
@@ -2930,6 +2964,9 @@
           "bankId": {
             "type": "string"
           },
+          "inventoryType": {
+            "$ref": "#/components/schemas/InventoryType"
+          },
           "wallpaperName": {
             "type": "string"
           },
@@ -2953,6 +2990,7 @@
         "description": "",
         "x-enumNames": [
           "Box",
+          "Inventory",
           "SurpriseTrade",
           "PGL",
           "Scripted",
@@ -2970,6 +3008,7 @@
         ],
         "enum": [
           0,
+          10,
           -42,
           -41,
           -31,
@@ -2984,6 +3023,46 @@
           -3,
           -2,
           -1
+        ]
+      },
+      "InventoryType": {
+        "type": "integer",
+        "description": "",
+        "x-enumNames": [
+          "None",
+          "Items",
+          "KeyItems",
+          "TMHMs",
+          "Medicine",
+          "Berries",
+          "Balls",
+          "BattleItems",
+          "MailItems",
+          "PCItems",
+          "FreeSpace",
+          "ZCrystals",
+          "Candy",
+          "Treasure",
+          "Ingredients",
+          "MegaStones"
+        ],
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
         ]
       },
       "DataDTOStateOfDictionaryOfStringAndPkmVariantDTO": {
@@ -3147,6 +3226,7 @@
           "canMoveToSave",
           "canEdit",
           "canEvolve",
+          "canHeldItem",
           "hasLoadError",
           "isEnabled"
         ],
@@ -3433,6 +3513,9 @@
             "type": "boolean"
           },
           "canEvolve": {
+            "type": "boolean"
+          },
+          "canHeldItem": {
             "type": "boolean"
           },
           "loadError": {
@@ -4739,6 +4822,54 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "InventoryItemDTO": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "item",
+          "name",
+          "type",
+          "version",
+          "count",
+          "boxId",
+          "boxSlot",
+          "canBeHeld"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "item": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/InventoryType"
+          },
+          "version": {
+            "$ref": "#/components/schemas/GameVersion"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "boxId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "boxSlot": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "canBeHeld": {
+            "type": "boolean"
           }
         }
       },

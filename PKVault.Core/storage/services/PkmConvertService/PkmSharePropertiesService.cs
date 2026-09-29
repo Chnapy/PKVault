@@ -156,10 +156,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
             }
         }
 
-        if (source.Format >= 2
-            && sourcePkm is not PB7
-            && sourcePkm is not PA8
-        )
+        if (source.CanHeldItem)
         {
             utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context, resultPkm.Version);
         }

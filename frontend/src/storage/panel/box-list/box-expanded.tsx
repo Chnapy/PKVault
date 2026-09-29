@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePkmIndex } from '../../../data/hooks/use-pkm-index';
 import { BoxType } from '../../../data/sdk/model';
-import { useStorageDeleteMainBox } from '../../../data/sdk/storage/storage.gen';
+import { useStorageDeleteMainBox, useStorageGetInventoryItems } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
 import { UIBoxExpanded, type UIBoxExpandedProps } from '../../../ui/storage/storage-panel/box-list/ui-box-expanded';
 import { useSelectCallback } from '../../../util/use-select-callback';
@@ -32,12 +32,22 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
                 Object.entries(data.data.byBox[ box.idInt ] ?? {}).map(([ slot, pkm ]) => [ slot, !!pkm ])
             );
         }, [ box ]),
+        { enabled: box?.type !== BoxType.Inventory }
     );
 
-    const boxPkms = pkmsQuery.data;
+    const inventoryQuery = useStorageGetInventoryItems({ saveId }, {
+        query: {
+            select: useSelectCallback(data => Object.values(data.data).filter(item => item.type === box?.inventoryType), [ box?.inventoryType ]),
+            enabled: box?.type === BoxType.Inventory
+        }
+    });
+
+    const boxItems = box?.type === BoxType.Inventory
+        ? inventoryQuery.data?.map(() => true)
+        : pkmsQuery.data as Record<number, boolean> | undefined;
 
     const slotsStates = box
-        ? new Array(box.slotCount).fill(0).map((_, i) => !!boxPkms?.[ i ])
+        ? new Array(box.slotCount).fill(0).map((_, i) => !!boxItems?.[ i ])
         : [];
 
     const editPanelContent = saveId

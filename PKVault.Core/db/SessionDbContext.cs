@@ -14,6 +14,7 @@ public class SessionDbContext(
     public DbSet<BankEntity> Banks { get; set; }
     public DbSet<BoxEntity> Boxes { get; set; }
     public DbSet<PkmVariantEntity> PkmVersions { get; set; }
+    public DbSet<InventoryItemEntity> InventoryItems { get; set; }
     public DbSet<DexFormEntity> Pokedex { get; set; }
     public DbSet<PkmFileEntity> PkmFiles { get; set; }
     public DbSet<MetaEntity> Metas { get; set; }
@@ -21,6 +22,7 @@ public class SessionDbContext(
     public DataUpdateFlagsState BanksFlags = new();
     public DataUpdateFlagsState BoxesFlags = new();
     public DataUpdateFlagsState PkmVariantsFlags = new();
+    public DataUpdateFlagsState InventoryItemsFlags = new();
     public DataUpdateFlagsState DexFlags = new();
 
     // The following configures EF to create a Sqlite database file in the
@@ -115,6 +117,13 @@ public class SessionDbContext(
             entity.HasKey(p => p.Filepath);
         });
 
+        modelBuilder.Entity<InventoryItemEntity>(entity =>
+        {
+            entity.HasKey(p => p.Id);
+
+            entity.HasIndex(p => p.Type);
+        });
+
         modelBuilder.Entity<DexFormEntity>(entity =>
         {
             entity.HasKey(p => p.Id);
@@ -171,6 +180,9 @@ public class SessionDbContext(
                     break;
                 case DexFormEntity dex:
                     DexFlags.Ids.Add(dex.Species.ToString());
+                    break;
+                case InventoryItemEntity item:
+                    InventoryItemsFlags.Ids.Add(item.Id);
                     break;
             }
         }

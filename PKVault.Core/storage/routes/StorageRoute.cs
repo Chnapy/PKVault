@@ -39,6 +39,14 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return savePkms;
     }
 
+    [HttpGet("inventory")]
+    public async Task<Dictionary<string, InventoryItemDTO>> GetInventoryItems(uint? saveId = null)
+    {
+        return saveId == null
+            ? []
+            : await storageQueryService.GetSaveInventory((uint)saveId);
+    }
+
     [HttpGet("pkm/legality")]
     public async Task<Dictionary<string, PkmLegalityDTO>> GetPkmsLegality(string[] pkmIds, uint? saveId)
     {

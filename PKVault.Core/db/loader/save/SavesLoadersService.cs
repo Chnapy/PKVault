@@ -314,12 +314,13 @@ public class SavesLoadersService(
 
         var boxLoader = new SaveBoxLoader(save, sp);
         var pkmLoader = new SavePkmLoader(pkmConvertService, language, evolves, save);
+        var inventoryLoader = new SaveInventoryLoader(save, settingsService);
 
         duplicates ??= loaders.TryGetValue(save.Id, out var existingSave)
             ? existingSave.Duplicates
             : [];
 
-        loaders[save.Id] = new(save, boxLoader, pkmLoader, duplicates);
+        loaders[save.Id] = new(save, boxLoader, pkmLoader, inventoryLoader, duplicates);
     }
 
     public async Task<SaveWrapper> CheckSaveData(byte[] fileBytes, string filename, bool overwrite)
@@ -372,5 +373,6 @@ public record SaveLoadersRecord(
     SaveWrapper Save,
     ISaveBoxLoader Boxes,
     ISavePkmLoader Pkms,
+    ISaveInventoryLoader Inventory,
     SaveInfosDTO[] Duplicates
 );

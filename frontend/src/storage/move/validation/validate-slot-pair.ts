@@ -24,7 +24,9 @@ export const validateSlotPair = (
         }
 
         case 'main-to-save': {
-            const relatedPkmVariants = pkmVariantIndexes.byBox[ info.sourcePkm.boxId ]?.[ info.sourcePkm.boxSlot ] ?? [];
+            const relatedPkmVariants = info.sourcePkm
+                ? pkmVariantIndexes.byBox[ info.sourcePkm.boxId ]?.[ info.sourcePkm.boxSlot ] ?? []
+                : [];
             const context = info.targetPkm?.context ?? info.targetSave.context;
 
             const sourceForContext = relatedPkmVariants.find(variant => variant.context === context);
