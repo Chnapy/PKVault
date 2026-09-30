@@ -106,6 +106,12 @@ public class StorageQueryService(
         return saveLoaders.Inventory.GetAllDtos();
     }
 
+    public async Task<Dictionary<string, InventoryItemDTO>> GetMainInventory()
+    {
+        // TODO
+        return [];
+    }
+
     public async Task<Dictionary<string, PkmLegalityDTO?>> GetPkmsLegality(string[] pkmIds, uint? saveId)
     {
         using var scope = sp.CreateScope();

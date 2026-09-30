@@ -253,6 +253,7 @@ export const ActionLabel: React.FC<DataActionPayload> = ({ type, parameters }) =
         [ DataActionType.DETACH_PKM_SAVE ]: ActionLabelMap.DetachPkm,
         [ DataActionType.EDIT_PKM_VERSION ]: ActionLabelMap.EditPkmVariant,
         [ DataActionType.EDIT_PKM_SAVE ]: ActionLabelMap.EditPkmSave,
+        [ DataActionType.MOVE_ITEM ]: () => null,   // TODO
         [ DataActionType.SET_PKM_VERSION_MAIN ]: ActionLabelMap.SetPkmVariantMain,
         [ DataActionType.DELETE_PKM_VERSION ]: ActionLabelMap.DeletePkmVariant,
         [ DataActionType.SAVE_DELETE_PKM ]: ActionLabelMap.DeletePkmSave,

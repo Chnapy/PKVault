@@ -54,7 +54,7 @@ public class PK2Converter(PKMConverterUtils utils)
 
         utils.FixSID(pk3);
 
-        utils.CopyHeldItemFrom(pk3, pk2.HeldItem, pk2.Context, pk2.Version);
+        utils.CopyHeldItemFrom(pk3, pk2.HeldItem, pk2.Version);
 
         utils.FixMetLocation(pk3, ctx);
 

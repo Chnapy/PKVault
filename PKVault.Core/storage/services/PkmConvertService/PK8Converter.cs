@@ -47,7 +47,7 @@ public class PK8Converter(PKMConverterUtils utils)
         pk8.CopyRibbonSetMemory6(pk9);
         pk8.CopyRibbonSetCommon7(pk9);
 
-        utils.CopyHeldItemFrom(pk9, pk8.HeldItem, pk8.Context, pk8.Version);
+        utils.CopyHeldItemFrom(pk9, pk8.HeldItem, pk8.Version);
 
         utils.FixAbility(pk9, ctx);
 
@@ -95,7 +95,7 @@ public class PK8Converter(PKMConverterUtils utils)
         pk8.CopyRibbonSetMemory6(pb8);
         pk8.CopyRibbonSetCommon7(pb8);
 
-        utils.CopyHeldItemFrom(pb8, pk8.HeldItem, pk8.Context, pk8.Version);
+        utils.CopyHeldItemFrom(pb8, pk8.HeldItem, pk8.Version);
 
         utils.FixAbility(pb8, ctx);
 
@@ -189,7 +189,7 @@ public class PK8Converter(PKMConverterUtils utils)
         pk8.CopyRibbonSetMemory6(pk7);
         pk8.CopyRibbonSetCommon7(pk7);
 
-        utils.CopyHeldItemFrom(pk7, pk8.HeldItem, pk8.Context, pk8.Version);
+        utils.CopyHeldItemFrom(pk7, pk8.HeldItem, pk8.Version);
 
         utils.FixAbility(pk7, ctx);
 
@@ -239,7 +239,7 @@ public class PK8Converter(PKMConverterUtils utils)
         pb8.CopyRibbonSetMemory6(pk8);
         pb8.CopyRibbonSetCommon7(pk8);
 
-        utils.CopyHeldItemFrom(pk8, pb8.HeldItem, pb8.Context, pb8.Version);
+        utils.CopyHeldItemFrom(pk8, pb8.HeldItem, pb8.Version);
 
         utils.FixAbility(pk8, ctx);
 
@@ -289,7 +289,7 @@ public class PK8Converter(PKMConverterUtils utils)
         pa8.CopyRibbonSetMemory6(pk8);
         pa8.CopyRibbonSetCommon7(pk8);
 
-        utils.CopyHeldItemFrom(pk8, pa8.HeldItem, pa8.Context, pa8.Version);
+        utils.CopyHeldItemFrom(pk8, pa8.HeldItem, pa8.Version);
 
         utils.FixAbility(pk8, ctx);
 

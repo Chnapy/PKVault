@@ -52,6 +52,9 @@ export const useActionDescription = () => {
                     save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : null,
                     name: parameters[ 1 ],
                 }),
+            [ DataActionType.MOVE_ITEM ]: () =>
+                // TODO
+                'TODO',
             [ DataActionType.SET_PKM_VERSION_MAIN ]: () =>
                 t('storage.save-actions.type.main-set-pkm-main', {
                     name: parameters[ 0 ],

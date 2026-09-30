@@ -411,27 +411,39 @@ public class PKMConverterUtils
         }
     }
 
-    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, GameVersion srcVersion)
     {
-        pkm.HeldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcContext, pkm.Context);
+        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, pkm.Version);
 
-        CopyHeldItemByStringFrom(pkm, srcHeldItem, srcContext, srcVersion);
+        if (heldItem != null)
+            pkm.HeldItem = (int)heldItem;
     }
 
-    public void CopyHeldItemByStringFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public static int? ConvertHeldItem(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
     {
-        if (srcHeldItem > 0 && pkm.HeldItem == 0)
-        {
-            var stringsSrc = GameInfo.Strings.GetItemStrings(srcContext, srcVersion);
-            var stringsDest = GameInfo.Strings.GetItemStrings(pkm.Context, pkm.Version);
+        if (srcHeldItem == 0)
+            return 0;
 
-            var strSrc = stringsSrc[srcHeldItem];
-            var strDestIndex = stringsDest.ToList().FindIndex(str => str == strSrc);
-            if (strDestIndex > 0)
-            {
-                pkm.HeldItem = strDestIndex;
-            }
-        }
+        var heldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcVersion.Context, targetVersion.Context);
+        if (heldItem == 0)
+            return ConvertHeldItemByString(srcHeldItem, srcVersion, targetVersion);
+        return heldItem;
+    }
+
+    public static int? ConvertHeldItemByString(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    {
+        if (srcHeldItem == 0)
+            return 0;
+
+        var stringsSrc = GameInfo.Strings.GetItemStrings(srcVersion.Context, srcVersion);
+        var stringsDest = GameInfo.Strings.GetItemStrings(targetVersion.Context, targetVersion);
+
+        var strSrc = stringsSrc[srcHeldItem];
+        var strDestIndex = stringsDest.ToList().FindIndex(str => str == strSrc);
+        if (strDestIndex > 0)
+            return strDestIndex;
+
+        return null;
     }
 
     public void CopyMovesFrom(PKM pkm, PKM pkmSrc)

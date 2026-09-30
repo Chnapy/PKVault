@@ -69,5 +69,8 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
         case 'main-to-same-bank': return undefined;
         case 'same-pkm-id': return undefined;
         case 'bank-external': return t('storage.move.bank-external');
+        // TODO
+        default:
+            return reason;
     }
 };

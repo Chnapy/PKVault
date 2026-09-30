@@ -35,4 +35,5 @@ public enum DataActionType
     DATA_NORMALIZE,
     UPDATE_EXTERNAL_PKM,
     SET_PKM_VERSION_MAIN,
+    MOVE_ITEM,
 }

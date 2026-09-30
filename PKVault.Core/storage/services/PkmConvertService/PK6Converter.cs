@@ -45,7 +45,7 @@ public class PK6Converter(PKMConverterUtils utils)
         pk6.CopyRibbonSetCommon4(pk5);
         pk6.CopyRibbonSetEvent4(pk5);
 
-        utils.CopyHeldItemFrom(pk5, pk6.HeldItem, pk6.Context, pk6.Version);
+        utils.CopyHeldItemFrom(pk5, pk6.HeldItem, pk6.Version);
 
         utils.FixAbility(pk5, ctx);
 

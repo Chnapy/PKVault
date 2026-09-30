@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { BackendErrorsContext } from '../../data/backend-errors-context';
 import { getCachedPkmIndex } from '../../data/hooks/use-pkm-index';
-import { storageMovePkm, storageMovePkmBank } from '../../data/sdk/storage/storage.gen';
+import { storageMovePkm, storageMovePkmBank, storageMoveItem } from '../../data/sdk/storage/storage.gen';
 import { updateCacheMutationResponse } from '../../data/util/update-cache-mutation-response';
 import { MoveProvider, type MoveProviderProps } from '../../ui/interaction/move/context/move-provider';
 import { getDropPositions } from '../../ui/interaction/move/hooks/get-drop-positions';
@@ -61,15 +61,32 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
 
         console.log('drop', sourceContainer, source, target)
 
-        const pkmIds = Array.from(source.ids);
+        const sourceIds = Array.from(source.ids);
 
-        if (pkmIds.length === 0) {
-            console.log('no pkm-ids')
+        if (sourceIds.length === 0) {
+            console.log('no ids')
             return;
         }
 
         if (storageMode === 'inventory') {
-            console.log('it was items, stop here');
+            console.log('it was items');
+
+            const sourceItemIds = sourceContainer.type === 'inventory-item' ? sourceIds : [];
+            const sourcePkmIds = sourceContainer.type === 'inventory-item' ? [] : sourceIds;
+            const targetPkmId = target.targetContainer.type === 'inventory-item' ? undefined : target.targetId;
+
+            try {
+                const response = await storageMoveItem({
+                    sourceSaveId: sourceContainer.saveId ?? null,
+                    sourceItemIds,
+                    sourcePkmIds,
+                    targetSaveId: target.targetContainer.saveId ?? null,
+                    targetPkmId,
+                });
+                updateCacheMutationResponse(queryClient, response);
+            } catch (err) {
+                errorsOnMutationResponse(undefined, err as Error);
+            }
             return;
         }
 
@@ -80,7 +97,7 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
 
                 try {
                     const response = await storageMovePkmBank({
-                        pkmIds,
+                        pkmIds: sourceIds,
                         bankId: target.targetContainer.bankId,
                         sourceSaveId: sourceContainer.saveId ?? null,
                         attached: source.params?.attached ?? false,
@@ -92,18 +109,18 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                 break;
             };
             default: {
-                const targetBoxSlots = pkmIds
+                const targetBoxSlots = sourceIds
                     .map(id => target.targetAllPositions[ id ])
                     .filter(filterIsDefined);
 
-                if (targetBoxSlots.length !== pkmIds.length) {
-                    console.log('diff pkm-ids <-> target-slots', pkmIds.length, targetBoxSlots.length)
+                if (targetBoxSlots.length !== sourceIds.length) {
+                    console.log('diff pkm-ids <-> target-slots', sourceIds.length, targetBoxSlots.length)
                     return;
                 }
 
                 try {
                     const response = await storageMovePkm({
-                        pkmIds,
+                        pkmIds: sourceIds,
                         sourceSaveId: sourceContainer.saveId ?? null,
                         targetSaveId: target.targetContainer.saveId ?? null,
                         targetBoxId: target.targetContainer.boxId,

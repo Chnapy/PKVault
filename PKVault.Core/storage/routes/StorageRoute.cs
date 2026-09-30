@@ -85,6 +85,18 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
+    [HttpPut("move/item")]
+    public async Task<DataDTO> MoveItem(
+        uint? sourceSaveId,
+        string[] sourcePkmIds, string[] sourceItemIds,
+        uint? targetSaveId, string? targetPkmId = null
+    )
+    {
+        var flags = await actionService.MoveItem(sourceSaveId, sourcePkmIds, sourceItemIds, targetSaveId, targetPkmId);
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
+    }
+
     [HttpPost("main/box")]
     public async Task<DataDTO> CreateMainBox(string bankId)
     {
