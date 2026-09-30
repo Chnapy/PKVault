@@ -1,8 +1,9 @@
 import { Group, ThemeIcon } from '@mantine/core';
 import { BoxIcon, CalendarSyncIcon, ChevronsRight, CircleSmallIcon, Database, ImportIcon, LandmarkIcon, LinkIcon, MoveIcon, PenIcon, PlusCircleIcon, RefreshCcw, SortDescIcon, TrashIcon, UnlinkIcon } from 'lucide-react';
 import type React from 'react';
-import { DataActionType, EntityContext, type DataActionPayload } from '../../data/sdk/model';
+import { DataActionType, EntityContext, GameVersion, type DataActionPayload } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
+import { ItemImg } from '../../img/item-img';
 import { SpeciesImg } from '../../img/species-img';
 import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
 import { UIPokedexIcons } from '../../ui/pokedex/icons/ui-pokedex-icons';
@@ -96,6 +97,18 @@ const ActionLabelMap = {
             {attached && <ThemeIcon variant='transparent' color='gray' size='xs' fz='sm'>
                 <LinkIcon />
             </ThemeIcon>}
+        </>;
+    },
+    MoveItem: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
+        const item = Number(parameters[ 0 ]);
+        const version = parameters[ 1 ] as GameVersion;
+
+        return <>
+            <ItemImg item={item} version={version} />
+
+            <ThemeIcon variant='transparent' color='gray' size='xs' fz='sm'>
+                <MoveIcon />
+            </ThemeIcon>
         </>;
     },
     DetachPkm: ({ parameters }: Pick<DataActionPayload, 'parameters'>) => {
@@ -253,7 +266,7 @@ export const ActionLabel: React.FC<DataActionPayload> = ({ type, parameters }) =
         [ DataActionType.DETACH_PKM_SAVE ]: ActionLabelMap.DetachPkm,
         [ DataActionType.EDIT_PKM_VERSION ]: ActionLabelMap.EditPkmVariant,
         [ DataActionType.EDIT_PKM_SAVE ]: ActionLabelMap.EditPkmSave,
-        [ DataActionType.MOVE_ITEM ]: () => null,   // TODO
+        [ DataActionType.MOVE_ITEM ]: ActionLabelMap.MoveItem,
         [ DataActionType.SET_PKM_VERSION_MAIN ]: ActionLabelMap.SetPkmVariantMain,
         [ DataActionType.DELETE_PKM_VERSION ]: ActionLabelMap.DeletePkmVariant,
         [ DataActionType.SAVE_DELETE_PKM ]: ActionLabelMap.DeletePkmSave,

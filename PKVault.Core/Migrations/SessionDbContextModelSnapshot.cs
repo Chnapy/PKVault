@@ -144,6 +144,12 @@ namespace PKVault.Core.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("BoxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BoxSlot")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Count")
                         .HasColumnType("INTEGER");
 

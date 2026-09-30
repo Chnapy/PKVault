@@ -326,7 +326,7 @@ export const useDroppableValidation = () => {
                             pkmVariantIndex!.data,
                         );
 
-                        console.log('drop-results', targetContainer, targetSlot, data);
+                        // console.log('drop-results', targetContainer, targetSlot, data);
 
                         return [
                             targetSlot,

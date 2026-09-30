@@ -1,5 +1,8 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { filterIsDefined } from '../../util/filter-is-defined';
+import { getPkmLegalityQueryKey, type PkmLegalityQueryData } from '../hooks/use-pkm-legality';
+import { updatePkmSaveCache } from '../hooks/use-pkm-save-index';
+import { updatePkmVariantCache } from '../hooks/use-pkm-variant-index';
 import { responseBackSchema, type ResponseBack } from '../mutator/custom-instance';
 import { getBackupGetAllQueryKey, type backupGetAllResponseSuccess } from '../sdk/backup/backup.gen';
 import { getDexGetAllQueryKey, type dexGetAllResponseSuccess } from '../sdk/dex/dex.gen';
@@ -10,15 +13,14 @@ import { getStaticDataGetQueryKey, type staticDataGetResponseSuccess } from '../
 import {
     getStorageGetActionsQueryKey,
     getStorageGetBoxesQueryKey,
+    getStorageGetInventoryItemsQueryKey,
     getStorageGetMainBanksQueryKey,
     getStorageGetSavePkmsQueryKey,
     type storageGetActionsResponseSuccess,
     type storageGetBoxesResponseSuccess,
+    type storageGetInventoryItemsResponseSuccess
 } from '../sdk/storage/storage.gen';
 import { getWarningsGetWarningsQueryKey, type warningsGetWarningsResponseSuccess } from '../sdk/warnings/warnings.gen';
-import { getPkmLegalityQueryKey, type PkmLegalityQueryData } from '../hooks/use-pkm-legality';
-import { updatePkmSaveCache } from '../hooks/use-pkm-save-index';
-import { updatePkmVariantCache } from '../hooks/use-pkm-variant-index';
 
 type QueryDataBase = {
     status: number;
@@ -47,6 +49,7 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
         mainBanks,
         mainBoxes,
         mainPkmVariants,
+        mainInventoryItems,
         dex,
         mainPkmLegalities,
         saves,
@@ -86,6 +89,19 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
 
     if (mainPkmVariants) {
         updatePkmVariantCache(client, mainPkmVariants);
+    }
+
+    if (mainInventoryItems) {
+        const inventoryQueryData: storageGetInventoryItemsResponseSuccess = {
+            status: 200,
+            headers: new Headers(),
+            data: mainInventoryItems,
+        };
+
+        client.setQueryData(getStorageGetInventoryItemsQueryKey(), inventoryQueryData);
+
+        // TODO required when saveId is specified as variable
+        client.setQueryData(getStorageGetInventoryItemsQueryKey({ saveId: undefined }), inventoryQueryData);
     }
 
     if (dex) {
@@ -140,6 +156,14 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
 
             if (saveData.savePkmLegality) {
                 applyPkmLegalities(client, saveData.saveId, saveData.savePkmLegality.data ?? {});
+            }
+
+            if (saveData.saveInventoryItems) {
+                client.setQueryData(getStorageGetInventoryItemsQueryKey({ saveId: saveData.saveId }), {
+                    status: 200,
+                    headers: new Headers(),
+                    data: saveData.saveInventoryItems,
+                } satisfies storageGetInventoryItemsResponseSuccess);
             }
         });
     }

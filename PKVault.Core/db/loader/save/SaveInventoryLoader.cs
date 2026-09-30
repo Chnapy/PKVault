@@ -71,10 +71,10 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         return dto;
     }
 
-    private void WriteDto(InventoryItemDTO dto)
-    {
-        WriteItem(dto.Item, (count) => dto.Count);
-    }
+    // private void WriteDto(InventoryItemDTO dto)
+    // {
+    //     WriteItem(dto.Item, (count) => dto.Count);
+    // }
 
     private void WriteItem(int item, Func<int, int> countFn)
     {

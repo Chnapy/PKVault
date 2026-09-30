@@ -9,4 +9,6 @@ public class InventoryItemEntity : IEntity
     public required InventoryType Type { get; init; }
     public required GameVersion Version { get; init; }
     public required int Count { get; set; }
+    public required int BoxId { get; set; }
+    public required int BoxSlot { get; set; }
 }

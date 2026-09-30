@@ -123,6 +123,7 @@ public class Program
         services.AddScoped<IBoxLoader, BoxLoader>();
         services.AddScoped<IPkmVariantLoader, PkmVariantLoader>();
         services.AddScoped<IPkmFileLoader, PkmFileLoader>();
+        services.AddScoped<IInventoryLoader, InventoryLoader>();
         services.AddScoped<IDexLoader, DexLoader>();
         services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons
 

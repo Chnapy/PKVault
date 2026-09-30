@@ -10,7 +10,7 @@ using PKVault.Core;
 namespace PKVault.Core.Migrations
 {
     [DbContext(typeof(SessionDbContext))]
-    [Migration("20260929104017_AddInventoryItemTable")]
+    [Migration("20260930185434_AddInventoryItemTable")]
     partial class AddInventoryItemTable
     {
         /// <inheritdoc />
@@ -146,6 +146,12 @@ namespace PKVault.Core.Migrations
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("BoxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BoxSlot")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Count")
                         .HasColumnType("INTEGER");

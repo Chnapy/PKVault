@@ -38,7 +38,7 @@ public class EditPkmVariantAction(
 
         await pkmVariantLoader.UpdateEntity(pkmVariantEntity, pkm);
 
-        await ShareChangesToVariantsAndAttached(pkmVariantEntity, pkm);
+        await ShareChangesToVariantsAndAttached(pkmVariantEntity, pkm, flags);
 
         return new(
             type: DataActionType.EDIT_PKM_VERSION,
@@ -46,7 +46,7 @@ public class EditPkmVariantAction(
         );
     }
 
-    public async Task ShareChangesToVariantsAndAttached(PkmVariantEntity pkmVariantEntity, ImmutablePKM pkm)
+    public async Task ShareChangesToVariantsAndAttached(PkmVariantEntity pkmVariantEntity, ImmutablePKM pkm, DataUpdateFlags flags)
     {
         var relatedPkmVariants = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList()
             .FindAll(value => value.Id != pkmVariantEntity.Id);
@@ -69,7 +69,7 @@ public class EditPkmVariantAction(
 
         if (attachedVariant != null)
         {
-            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedVariant.Id, attachedVariant.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedVariant.Id, attachedVariant.AttachedSavePkmIdBase!)]), flags);
         }
     }
 

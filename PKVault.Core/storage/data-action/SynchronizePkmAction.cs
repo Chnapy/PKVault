@@ -143,7 +143,7 @@ public class SynchronizePkmAction(
         }
     }
 
-    public async Task SynchronizePkmVariantToSave(SynchronizePkmActionInput input)
+    public async Task SynchronizePkmVariantToSave(SynchronizePkmActionInput input, DataUpdateFlags flags)
     {
         if (input.pkmVariantAndPkmSaveIds.Length == 0)
         {
@@ -205,6 +205,7 @@ public class SynchronizePkmAction(
             };
 
             saveLoaders.Pkms.WriteDto(savePkm);
+            flags.Saves.UseSave(saveLoaders.Save.Id).SavePkms.Ids.Add(savePkm.Id);
         }
 
         foreach (var (pkmVariantId, savePkmIdBase) in input.pkmVariantAndPkmSaveIds)

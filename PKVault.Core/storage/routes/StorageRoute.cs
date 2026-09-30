@@ -43,7 +43,7 @@ public class StorageController(DataService dataService, StorageQueryService stor
     public async Task<Dictionary<string, InventoryItemDTO>> GetInventoryItems(uint? saveId = null)
     {
         return saveId == null
-            ? []
+            ? await storageQueryService.GetMainInventory()
             : await storageQueryService.GetSaveInventory((uint)saveId);
     }
 

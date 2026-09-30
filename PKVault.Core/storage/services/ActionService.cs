@@ -400,6 +400,7 @@ public class ActionService(
                 ..db.PkmVariantsFlags.Ids,
             ]
         };
+        flags.MainInventoryItems |= db.InventoryItemsFlags.All || db.InventoryItemsFlags.Ids.Count > 0;
         flags.Dex = new()
         {
             All = flags.Dex.All || db.DexFlags.All,

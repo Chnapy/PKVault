@@ -108,8 +108,11 @@ public class StorageQueryService(
 
     public async Task<Dictionary<string, InventoryItemDTO>> GetMainInventory()
     {
-        // TODO
-        return [];
+        var inventoryLoader = sp.GetRequiredService<IInventoryLoader>();
+
+        var dtos = await inventoryLoader.GetAllDtos();
+
+        return dtos.ToDictionary(dto => dto.Id);
     }
 
     public async Task<Dictionary<string, PkmLegalityDTO?>> GetPkmsLegality(string[] pkmIds, uint? saveId)
