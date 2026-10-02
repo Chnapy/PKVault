@@ -1,12 +1,17 @@
 import { Checkbox } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { getCachedPkmIndex } from '../data/hooks/use-pkm-index';
 import { getCachedPkmSaveIndex } from '../data/hooks/use-pkm-save-index';
 import { getCachedPkmVariantIndex } from '../data/hooks/use-pkm-variant-index';
+import { BoxType } from '../data/sdk/model';
+import { getStorageGetInventoryItemsQueryKey, useStorageGetBoxes, type storageGetInventoryItemsResponseSuccess } from '../data/sdk/storage/storage.gen';
 import { useSelectContext, useSelectContextActions } from '../ui/interaction/select/context/use-select-context';
 import { filterIsDefined } from '../util/filter-is-defined';
 import type { MoveContainerValue } from './move/move-container-fns';
+
+const getCachedInventoryItems = (client: QueryClient, saveId: number | null) =>
+    client.getQueryData<Partial<storageGetInventoryItemsResponseSuccess>>(getStorageGetInventoryItemsQueryKey({ saveId }));
 
 export const StorageSelectCheckbox: React.FC<{
     saveId: number | null;
@@ -15,33 +20,49 @@ export const StorageSelectCheckbox: React.FC<{
 } & Checkbox.Props> = ({ saveId, boxId, disabled, ...rest }) => {
     const queryClient = useQueryClient();
 
-    const { useSelectStore } = useSelectContext<MoveContainerValue>();
+    const { useSelectStore, getContainerHash } = useSelectContext<MoveContainerValue>();
     const { addId, clear } = useSelectContextActions<MoveContainerValue>();
 
-    const container: MoveContainerValue = saveId
+    const box = useStorageGetBoxes({ saveId }).data?.data.find(box => box.idInt === boxId);
+
+    const isInventory = box?.type === BoxType.Inventory;
+
+    const container: MoveContainerValue = isInventory
         ? {
-            type: 'save-item',
-            saveId,
+            type: 'inventory-item',
+            saveId: saveId ?? undefined,
             boxId: String(boxId),
         }
-        : {
-            type: 'main-item',
-            boxId: String(boxId),
-        };
+        : saveId
+            ? {
+                type: 'save-item',
+                saveId,
+                boxId: String(boxId),
+            }
+            : {
+                type: 'main-item',
+                boxId: String(boxId),
+            };
+    const containerHash = getContainerHash(container);
 
-    const state = useSelectStore(({ ids }): 'none' | 'none-disabled' | 'all' | 'intermediate' => {
+    const state = useSelectStore(({ container, ids }): 'none' | 'none-disabled' | 'all' | 'intermediate' => {
         if (ids.size === 0)
             return 'none';
 
-        const pkmsIndex = getCachedPkmIndex(queryClient, saveId);
-        if (!pkmsIndex?.data)
+        if (containerHash !== container)
+            return 'none';
+
+        const boxItemsLength = isInventory
+            ? Object.values(getCachedInventoryItems(queryClient, saveId)?.data ?? {})
+                .filter(item => item.boxId === boxId)
+                .length
+            : Object.values(getCachedPkmIndex(queryClient, saveId)?.data?.byBox[ boxId ] ?? {})
+                .length;
+
+        if (boxItemsLength === 0)
             return 'none-disabled';
 
-        const boxPkmsCount = Object.values(pkmsIndex.data.byBox[ boxId ] ?? {}).length;
-        if (boxPkmsCount === 0)
-            return 'none-disabled';
-
-        return boxPkmsCount === ids.size
+        return boxItemsLength === ids.size
             ? 'all'
             : 'intermediate';
     });
@@ -59,15 +80,23 @@ export const StorageSelectCheckbox: React.FC<{
                         break;
                     case 'none':
                     case 'intermediate': {
-                        const boxPkms = saveId
-                            ? Object.values(getCachedPkmSaveIndex(queryClient, saveId)?.data?.byBox[ boxId ] ?? {})
-                            : Object.values(getCachedPkmVariantIndex(queryClient)?.data?.byBox[ boxId ] ?? {})
-                                .map(variants => variants.find(v => v.isMain))
-                                .filter(filterIsDefined);
+                        if (isInventory) {
+                            const ids = Object.values(getCachedInventoryItems(queryClient, saveId)?.data ?? {})
+                                .filter(item => item.boxId === boxId)
+                                .map(item => item.id);
 
-                        const ids = boxPkms.map(pkm => pkm.id);
+                            addId(container, ids);
+                        } else {
+                            const boxPkms = saveId
+                                ? Object.values(getCachedPkmSaveIndex(queryClient, saveId)?.data?.byBox[ boxId ] ?? {})
+                                : Object.values(getCachedPkmVariantIndex(queryClient)?.data?.byBox[ boxId ] ?? {})
+                                    .map(variants => variants.find(v => v.isMain))
+                                    .filter(filterIsDefined);
 
-                        addId(container, ids);
+                            const ids = boxPkms.map(pkm => pkm.id);
+
+                            addId(container, ids);
+                        }
                         break;
                     }
                     case 'all':

@@ -6,7 +6,6 @@ import { getPkmVariantIndexOptions } from '../../../data/hooks/use-pkm-variant-i
 import { BoxType } from '../../../data/sdk/model';
 import { getSaveInfosGetAllQueryOptions } from '../../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetBoxesQueryOptions, getStorageGetInventoryItemsQueryOptions, getStorageGetMainBanksQueryOptions, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../../data/sdk/storage/storage.gen';
-import { useStaticData } from '../../../hooks/use-static-data';
 import { useTranslate } from '../../../translate/i18n';
 import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui/interaction/move/state/move-state';
 import { useStorageModeContext } from '../../../ui/inventory/context/storage-mode-context';
@@ -15,6 +14,7 @@ import { BankContext } from '../../bank/bank-context';
 import { getFinalBox } from '../../panel/hooks/utils/get-final-box';
 import { useCurrentStorage } from '../../panel/storage-panel-context';
 import { containerFns, type MoveContainerValue, type MoveParams } from '../move-container-fns';
+import type { IsItemCompatibleFn } from '../validation/rules/validate-common';
 import { buildSlotInfosBank } from '../validation/slot-infos/build-slot-infos-bank';
 import { buildSlotInfosSlot } from '../validation/slot-infos/build-slot-infos-slot';
 import type { SlotInfos } from '../validation/types';
@@ -32,7 +32,7 @@ const emptySlotStates: DraggingSlotsStates = {
  * This hook expect data to be already fetched, for performance concerns.
  * Its trigger is done only when move state pass from idle to dragging.
  */
-export const useDroppableValidation = () => {
+export const useDroppableValidation = (isItemCompatible: IsItemCompatibleFn) => {
     const getStorageLeft = useCurrentStorage('left').getStorage;
     const getStorageRight = useCurrentStorage('right').getStorage;
 
@@ -41,8 +41,6 @@ export const useDroppableValidation = () => {
     const queryClient = useQueryClient();
 
     const { t } = useTranslate();
-
-    const staticData = useStaticData();
 
     const { useMoveStore } = useStorageModeContext();
 
@@ -250,6 +248,7 @@ export const useDroppableValidation = () => {
                         sourceSaveId,
                         pkmVariantIndex!.data,
                         sourceSaveId ? sourcePkmSaveIndex!.data : undefined,
+                        sourceInventory?.data,
                         saveInfosAll!.data,
                         Object.fromEntries(
                             sourceBoxes!.data.map(box => [ box.idInt, box ]) ?? []
@@ -264,7 +263,7 @@ export const useDroppableValidation = () => {
                     { attached },
                     slotInfosList,
                     pkmVariantIndex!.data,
-                    staticData,
+                    isItemCompatible,
                 );
 
                 return [
@@ -329,7 +328,7 @@ export const useDroppableValidation = () => {
                             { attached },
                             slotInfosList,
                             pkmVariantIndex!.data,
-                            staticData,
+                            isItemCompatible,
                         );
 
                         // console.log('drop-results', targetContainer, targetSlot, data);
@@ -353,7 +352,7 @@ export const useDroppableValidation = () => {
             rootItems: bankSlotStates,
             items: itemSlotStates,
         };
-    }, [ getCommonData, queryClient, staticData, t, useMoveStore ]);
+    }, [ getCommonData, isItemCompatible, queryClient, t, useMoveStore ]);
 
     return {
         validate,

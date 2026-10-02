@@ -20,8 +20,7 @@ public class MovePkmBankAction(
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
 
-        var bank = (await bankLoader.GetEntity(input.bankId))
-            ?? throw new ArgumentException($"Bank not found");
+        var bank = await bankLoader.GetEntityRequired(input.bankId);
 
         if (bank.IsExternal)
         {

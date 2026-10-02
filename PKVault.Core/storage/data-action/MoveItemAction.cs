@@ -62,10 +62,10 @@ public class MoveItemAction(
             var targetPkmDto = targetSaveLoader.Pkms.GetDto(targetPkmId);
             ArgumentNullException.ThrowIfNull(targetPkmDto);
 
-            if (!targetPkmDto.CanHeldItem)
+            if (!targetPkmDto.CanHeldItem || !targetPkmDto.CanEdit)
                 throw new ArgumentException($"Pkm cannot held item, id={targetPkmDto.Id}");
 
-            var saveConvertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version, targetSaveLoader.Save.Version);
+            var saveConvertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version.Context, [targetSaveLoader.Save.Version]);
 
             var saveTargetPkmPreviousItem = targetPkmDto.HeldItem;
 
@@ -73,7 +73,7 @@ public class MoveItemAction(
             {
                 Pkm = targetPkmDto.Pkm.Update(pkm =>
                 {
-                    pkm.HeldItem = saveConvertedHeldItem;
+                    pkm.HeldItem = saveConvertedHeldItem.Item;
                 })
             };
 
@@ -96,19 +96,19 @@ public class MoveItemAction(
         }
 
         var variant = await pkmVariantLoader.GetEntityRequired(targetPkmId);
-        var pkm = await pkmVariantLoader.GetPKM(variant);
-        var pkmVersion = pkm.Context.GetSingleGameVersion();
+        var variantDto = await pkmVariantLoader.CreateDTO(variant);
+        var pkm = variantDto.Pkm;
 
-        if (!pkm.CanHeldItem)
+        if (!variantDto.CanHeldItem || !variantDto.CanEdit)
             throw new ArgumentException($"Pkm cannot held item, id={variant.Id}");
 
-        var variantConvertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version, pkmVersion);
+        var variantConvertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version.Context, GetVariantGameVersions(variant));
 
         var variantTargetPkmPreviousItem = pkm.HeldItem;
 
         pkm = pkm.Update(pkm =>
         {
-            pkm.HeldItem = variantConvertedHeldItem;
+            pkm.HeldItem = variantConvertedHeldItem.Item;
         });
 
         await pkmVariantLoader.UpdateEntity(variant, pkm);
@@ -116,7 +116,7 @@ public class MoveItemAction(
         if (variantTargetPkmPreviousItem > 0)
         {
             var box = await boxLoader.GetEntityRequired(variant.BoxId);
-            await IncrementInventoryItemCount(sourceSaveId, box.IdInt, variantTargetPkmPreviousItem, pkmVersion, flags);
+            await IncrementInventoryItemCount(sourceSaveId, box.IdInt, variantTargetPkmPreviousItem, variantConvertedHeldItem.Version, flags);
         }
 
         return new(
@@ -141,12 +141,12 @@ public class MoveItemAction(
         {
             var targetSaveLoader = savesLoadersService.GetLoadersRequired((uint)targetSaveId);
 
-            var convertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version, targetSaveLoader.Save.Version);
+            var convertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version.Context, [targetSaveLoader.Save.Version]);
 
             var targetPkmDto = targetSaveLoader.Pkms.GetDto(targetPkmId);
             ArgumentNullException.ThrowIfNull(targetPkmDto);
 
-            if (!targetPkmDto.CanHeldItem)
+            if (!targetPkmDto.CanHeldItem || !targetPkmDto.CanEdit)
                 throw new ArgumentException($"Pkm cannot held item, id={targetPkmDto.Id}");
 
             var targetPkmPreviousItem = targetPkmDto.HeldItem;
@@ -155,7 +155,7 @@ public class MoveItemAction(
             {
                 Pkm = targetPkmDto.Pkm.Update(pkm =>
                 {
-                    pkm.HeldItem = convertedHeldItem;
+                    pkm.HeldItem = convertedHeldItem.Item;
                 })
             };
 
@@ -164,7 +164,7 @@ public class MoveItemAction(
 
             if (targetPkmPreviousItem > 0)
             {
-                await GivePkmItem(sourceSaveId, sourcePkmId, targetPkmPreviousItem, targetSaveLoader.Save.Version, flags);
+                await GivePkmItem(sourceSaveId, sourcePkmId, targetPkmPreviousItem, targetSaveLoader.Save.Context, flags);
             }
 
             return new(
@@ -178,26 +178,26 @@ public class MoveItemAction(
         }
 
         var variant = await pkmVariantLoader.GetEntityRequired(targetPkmId);
-        var pkm = await pkmVariantLoader.GetPKM(variant);
-        var pkmVersion = pkm.Context.GetSingleGameVersion();
+        var variantDto = await pkmVariantLoader.CreateDTO(variant);
+        var pkm = variantDto.Pkm;
 
-        if (!pkm.CanHeldItem)
+        if (!variantDto.CanHeldItem || !variantDto.CanEdit)
             throw new ArgumentException($"Pkm cannot held item, id={variant.Id}");
 
-        var variantConvertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version, pkmVersion);
+        var variantConvertedHeldItem = pkmConverterUtils.ConvertHeldItemRequired(item.Item, item.Version.Context, GetVariantGameVersions(variant));
 
         var variantTargetPkmPreviousItem = pkm.HeldItem;
 
         pkm = pkm.Update(pkm =>
         {
-            pkm.HeldItem = variantConvertedHeldItem;
+            pkm.HeldItem = variantConvertedHeldItem.Item;
         });
 
         await pkmVariantLoader.UpdateEntity(variant, pkm);
 
         if (variantTargetPkmPreviousItem > 0)
         {
-            await GivePkmItem(sourceSaveId, sourcePkmId, variantTargetPkmPreviousItem, pkmVersion, flags);
+            await GivePkmItem(sourceSaveId, sourcePkmId, variantTargetPkmPreviousItem, variantConvertedHeldItem.Version.Context, flags);
         }
 
         return new(
@@ -205,12 +205,12 @@ public class MoveItemAction(
             parameters: [
                 item.Item, item.Version,
                 sourceSaveId == null ? null : item.Version, item.PkmName,
-                pkmVersion, pkm.Nickname
+                variantConvertedHeldItem.Version, pkm.Nickname
             ]
         );
     }
 
-    private async Task<DataActionPayload> InventoryToInventory(
+    public async Task<DataActionPayload> InventoryToInventory(
         uint? sourceSaveId, string[] sourceItemIds,
         uint? targetSaveId, int? targetBoxId,
         DataUpdateFlags flags
@@ -231,7 +231,7 @@ public class MoveItemAction(
         );
     }
 
-    private async Task<DataActionPayload> PkmToInventory(
+    public async Task<DataActionPayload> PkmToInventory(
         uint? sourceSaveId, string[] sourcePkmIds,
         uint? targetSaveId, int? targetBoxId,
         DataUpdateFlags flags
@@ -273,7 +273,7 @@ public class MoveItemAction(
 
         flags.Saves.UseSave((uint)saveId).SaveInventoryItems = true;
 
-        return srcItems.Select(item => saveLoader.Inventory.IncrementItemCount(item.Item, item.Version)).ToArray();
+        return srcItems.Select(item => saveLoader.Inventory.IncrementItemCount(item.Item, item.Version.Context)).ToArray();
     }
 
     private async Task<InventoryItemDTO> DecrementInventoryItemCount(uint? saveId, string itemId, DataUpdateFlags flags)
@@ -298,21 +298,22 @@ public class MoveItemAction(
         return itemIds.Select(saveLoader.Inventory.DecrementItemCount).ToArray();
     }
 
-    private async Task GivePkmItem(uint? saveId, string pkmId, int srcItem, GameVersion srcVersion, DataUpdateFlags flags)
+    private async Task GivePkmItem(uint? saveId, string pkmId, int srcItem, EntityContext srcContext, DataUpdateFlags flags)
     {
         if (saveId == null)
         {
             var variant = await pkmVariantLoader.GetEntityRequired(pkmId);
-            var pkm = await pkmVariantLoader.GetPKM(variant);
+            var variantDto = await pkmVariantLoader.CreateDTO(variant);
+            var pkm = variantDto.Pkm;
 
-            if (!pkm.CanHeldItem)
+            if (!variantDto.CanHeldItem || !variantDto.CanEdit)
                 throw new ArgumentException($"Pkm cannot held item, id={variant.Id}");
 
-            var variantItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcVersion, pkm.Context.GetSingleGameVersion());
+            var variantItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, GetVariantGameVersions(variant));
 
             pkm = pkm.Update(pkm =>
             {
-                pkm.HeldItem = variantItem;
+                pkm.HeldItem = variantItem.Item;
             });
             await pkmVariantLoader.UpdateEntity(variant, pkm);
             await editPkmVariantAction.ShareChangesToVariantsAndAttached(variant, pkm, flags);
@@ -324,21 +325,26 @@ public class MoveItemAction(
         var dto = saveLoader.Pkms.GetDto(pkmId);
         ArgumentNullException.ThrowIfNull(dto);
 
-        if (!dto.CanHeldItem)
+        if (!dto.CanHeldItem || !dto.CanEdit)
             throw new ArgumentException($"Pkm cannot held item, id={dto.Id}");
 
-        var saveItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcVersion, dto.ContextVersion);
+        var saveItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, [saveLoader.Save.Version]);
 
         dto = dto with
         {
             Pkm = dto.Pkm.Update(pkm =>
             {
-                pkm.HeldItem = saveItem;
+                pkm.HeldItem = saveItem.Item;
             })
         };
         saveLoader.Pkms.WriteDto(dto);
         flags.Saves.UseSave((uint)saveId).SavePkms.Ids.Add(dto.Id);
         await editPkmSaveAction.ShareChangesToAttached(dto);
+    }
+
+    private async Task<(int Item, GameVersion Version, string PkmName)> PickPkmItem(uint? saveId, string pkmId, DataUpdateFlags flags)
+    {
+        return (await PickPkmItem(saveId, [pkmId], flags)).First();
     }
 
     private async Task<(int Item, GameVersion Version, string PkmName)[]> PickPkmItem(uint? saveId, string[] pkmIds, DataUpdateFlags flags)
@@ -364,7 +370,11 @@ public class MoveItemAction(
                 await pkmVariantLoader.UpdateEntity(variant, pkm);
                 await editPkmVariantAction.ShareChangesToVariantsAndAttached(variant, pkm, flags);
 
-                variantResults.Add((variantItem, pkm.Context.GetSingleGameVersion(), pkm.Nickname));
+                var version = GetVariantGameVersions(variant).First(version =>
+                    pkmConverterUtils.allSavesAllowedItems[(byte)version].AllowedItems.Contains((ushort)variantItem)
+                );
+
+                variantResults.Add((variantItem, version, pkm.Nickname));
             }
             return variantResults.ToArray();
         }
@@ -392,14 +402,20 @@ public class MoveItemAction(
             flags.Saves.UseSave((uint)saveId).SavePkms.Ids.Add(dto.Id);
             await editPkmSaveAction.ShareChangesToAttached(dto);
 
-            saveResults.Add((saveItem, dto.ContextVersion, dto.Nickname));
+            saveResults.Add((saveItem, saveLoader.Save.Version, dto.Nickname));
         }
 
         return saveResults.ToArray();
     }
 
-    private async Task<(int Item, GameVersion Version, string PkmName)> PickPkmItem(uint? saveId, string pkmId, DataUpdateFlags flags)
+    private GameVersion[] GetVariantGameVersions(PkmVariantEntity variant)
     {
-        return (await PickPkmItem(saveId, [pkmId], flags)).First();
+        if (variant.AttachedSaveId != null)
+        {
+            var saveLoaders = savesLoadersService.GetLoadersRequired((uint)variant.AttachedSaveId);
+            return [saveLoaders.Save.Version];
+        }
+
+        return GameUtil.GameVersions.Where(v => v.Context == variant.Context).ToArray();
     }
 }

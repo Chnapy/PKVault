@@ -9,7 +9,7 @@ public interface ISaveInventoryLoader
     public Dictionary<string, InventoryItemDTO> GetAllDtos();
     public InventoryItemDTO? GetDto(string id);
     public InventoryItemDTO DecrementItemCount(string id);
-    public InventoryItemDTO IncrementItemCount(int srcItem, GameVersion srcVersion);
+    public InventoryItemDTO IncrementItemCount(int srcItem, EntityContext srcContext);
 }
 
 public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsService, PKMConverterUtils pkmConverterUtils) : ISaveInventoryLoader
@@ -60,13 +60,13 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         return dto2 ?? dto;
     }
 
-    public InventoryItemDTO IncrementItemCount(int srcItem, GameVersion srcVersion)
+    public InventoryItemDTO IncrementItemCount(int srcItem, EntityContext srcContext)
     {
-        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcVersion, save.Version);
+        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, [save.Version]);
 
-        WriteItem((int)convertedItem, count => count + 1);
+        WriteItem(convertedItem.Item, count => count + 1);
 
-        var dto = GetAllDtos().Values.First(dto => dto.Item == convertedItem);
+        var dto = GetAllDtos().Values.First(dto => dto.Item == convertedItem.Item);
         return dto;
     }
 

@@ -62,6 +62,7 @@ export const renderHookWithWrapper = <Result, Props>(
                     <ControlsProvider>
                         <StorageModeProvider>
                             <MoveSelectImplProvider
+                                isItemCompatible={() => true}
                                 selectCtx={selectDefaultValue}
                                 moveCtx={moveDefaultValue}
                             >

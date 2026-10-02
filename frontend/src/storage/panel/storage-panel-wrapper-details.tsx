@@ -1,5 +1,6 @@
 import { Stack } from '@mantine/core';
 import React from 'react';
+import { BoxType } from '../../data/sdk/model';
 import { Route } from '../../routes/storage';
 import type { PopoverContext } from '../../ui/interaction/focus-controls/components/popover/context/popover-context';
 import { useMoveContext } from '../../ui/interaction/move/context/use-move-context';
@@ -29,16 +30,22 @@ const useOpened = () => {
         if (!box)
             return false;
 
-        const currentContainer = selectCtx.getContainerHash(saveId
+        const currentContainer = selectCtx.getContainerHash(box.type === BoxType.Inventory
             ? {
-                type: 'save-item',
-                saveId,
+                type: 'inventory-item',
+                saveId: saveId ?? undefined,
                 boxId: box.id,
             }
-            : {
-                type: 'main-item',
-                boxId: box.id,
-            });
+            : saveId
+                ? {
+                    type: 'save-item',
+                    saveId,
+                    boxId: box.id,
+                }
+                : {
+                    type: 'main-item',
+                    boxId: box.id,
+                });
 
         return s.container === currentContainer;
     }) ?? false;

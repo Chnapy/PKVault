@@ -156,7 +156,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, PKM
 
         if (source.CanHeldItem)
         {
-            utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Version);
+            utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context, save?.Version);
         }
 
         if (sourcePkm is IAppliedMarkings)

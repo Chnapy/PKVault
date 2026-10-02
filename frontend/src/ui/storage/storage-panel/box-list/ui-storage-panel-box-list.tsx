@@ -5,6 +5,7 @@ import type { BoxType } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsData, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
+import { useSelectContextActions } from '../../../interaction/select/context/use-select-context';
 import { useStorageMode, useStorageModeContext } from '../../../inventory/context/storage-mode-context';
 import { UIMenu } from '../../../popover/ui-menu';
 import { UIPopover } from '../../../popover/ui-popover';
@@ -30,6 +31,8 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
 
     const { isInCurrentPanel } = useCurrentPanel();
 
+    const { clear } = useSelectContextActions();
+
     const { useMoveStore } = useStorageModeContext();
     const storageMode = useStorageMode().state;
 
@@ -45,12 +48,14 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             value={value}
             data={data}
             onChange={onSelect}
-            // TODO
-            left={<Tooltip label={'Switch Pokémons/Items'} position='bottom-start' opened={openModeTooltip} withArrow arrowSize={6}>
+            left={<Tooltip label={t('storage.mode.switch')} position='bottom-start' opened={openModeTooltip} withArrow arrowSize={6}>
                 <UIActionIcon
                     name='storage-mode'
                     controlLabel={t('action.select')}
-                    onClick={() => useMoveStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default')}
+                    onClick={() => {
+                        clear();
+                        useMoveStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default');
+                    }}
                     variant={storageMode === 'inventory' ? 'filled' : 'default'}
                     color={storageMode === 'inventory' ? 'violet.9' : undefined}
                     size={24}

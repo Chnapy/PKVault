@@ -42,7 +42,7 @@ export const StorageDetails: React.FC = withErrorCatcher('default', () => {
     content={<DetailsContent />}
     actions={!!selectedId && <DetailsActions
       focusOnMount
-      pkmIds={[ selectedId ]}
+      ids={[ selectedId ]}
       saveId={selectedSaveId ?? null}
       deleteAllRelatedVariants={false}
     />}

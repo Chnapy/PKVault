@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { BackendErrorsContext } from '../../data/backend-errors-context';
 import { getCachedPkmIndex } from '../../data/hooks/use-pkm-index';
-import { storageMovePkm, storageMovePkmBank, storageMoveItem } from '../../data/sdk/storage/storage.gen';
+import { storageMoveItem, storageMoveItemBank, storageMovePkm, storageMovePkmBank } from '../../data/sdk/storage/storage.gen';
 import { updateCacheMutationResponse } from '../../data/util/update-cache-mutation-response';
 import { MoveProvider, type MoveProviderProps } from '../../ui/interaction/move/context/move-provider';
 import { getDropPositions } from '../../ui/interaction/move/hooks/get-drop-positions';
@@ -12,6 +12,7 @@ import { filterIsDefined } from '../../util/filter-is-defined';
 import { useCanMove } from './hooks/use-can-move';
 import { useDroppableValidation } from './hooks/use-droppable-validation';
 import { type MoveContainerValue, type MoveParams, containerFns } from './move-container-fns';
+import type { IsItemCompatibleFn } from './validation/rules/validate-common';
 
 const useFilterStartDragIds: MoveProviderProps<MoveContainerValue, MoveParams>[ 'useFilterStartDragIds' ] = (container, ids) => {
     const canMoveFn = useCanMove(container, ids);
@@ -68,76 +69,102 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
             return;
         }
 
-        if (storageMode === 'inventory') {
-            const sourceItemIds = sourceContainer.type === 'inventory-item' ? sourceIds : [];
-            const sourcePkmIds = sourceContainer.type === 'inventory-item' ? [] : sourceIds;
-            const targetPkmId = target.targetContainer.type === 'inventory-item' ? undefined : target.targetId;
+        switch (storageMode) {
+            case 'inventory': {
+                const sourceItemIds = sourceContainer.type === 'inventory-item' ? sourceIds : [];
+                const sourcePkmIds = sourceContainer.type === 'inventory-item' ? [] : sourceIds;
 
-            try {
-                const response = await storageMoveItem({
-                    sourceSaveId: sourceContainer.saveId ?? null,
-                    sourceBoxId: sourceContainer.boxId ?? null,
-                    sourceItemIds,
-                    sourcePkmIds,
-                    targetSaveId: target.targetContainer.saveId ?? null,
-                    targetBoxId: target.targetContainer.boxId ?? null,
-                    targetPkmId,
-                });
-                updateCacheMutationResponse(queryClient, response);
-            } catch (err) {
-                errorsOnMutationResponse(undefined, err as Error);
+                switch (target.targetContainer.type) {
+                    case 'bank': {
+                        try {
+                            const response = await storageMoveItemBank({
+                                sourceSaveId: sourceContainer.saveId ?? null,
+                                sourceItemIds,
+                                sourcePkmIds,
+                                bankId: target.targetContainer.bankId,
+                            });
+                            updateCacheMutationResponse(queryClient, response);
+                        } catch (err) {
+                            errorsOnMutationResponse(undefined, err as Error);
+                        }
+                        break;
+                    }
+                    default: {
+                        const targetPkmId = target.targetContainer.type === 'inventory-item' ? undefined : target.targetId;
+
+                        try {
+                            const response = await storageMoveItem({
+                                sourceSaveId: sourceContainer.saveId ?? null,
+                                sourceBoxId: sourceContainer.boxId ?? null,
+                                sourceItemIds,
+                                sourcePkmIds,
+                                targetSaveId: target.targetContainer.saveId ?? null,
+                                targetBoxId: target.targetContainer.boxId ?? null,
+                                targetPkmId,
+                            });
+                            updateCacheMutationResponse(queryClient, response);
+                        } catch (err) {
+                            errorsOnMutationResponse(undefined, err as Error);
+                        }
+                        break;
+                    }
+                }
+                break;
             }
-            return;
-        }
 
-        switch (target.targetContainer.type) {
-            case 'bank': {
-                if (sourceContainer.bankId === target.targetContainer.bankId)
-                    return;
+            case 'default': {
+                switch (target.targetContainer.type) {
+                    case 'bank': {
+                        if (sourceContainer.bankId === target.targetContainer.bankId)
+                            return;
 
-                try {
-                    const response = await storageMovePkmBank({
-                        pkmIds: sourceIds,
-                        bankId: target.targetContainer.bankId,
-                        sourceSaveId: sourceContainer.saveId ?? null,
-                        attached: source.params?.attached ?? false,
-                    });
-                    updateCacheMutationResponse(queryClient, response);
-                } catch (err) {
-                    errorsOnMutationResponse(undefined, err as Error);
+                        try {
+                            const response = await storageMovePkmBank({
+                                pkmIds: sourceIds,
+                                bankId: target.targetContainer.bankId,
+                                sourceSaveId: sourceContainer.saveId ?? null,
+                                attached: source.params?.attached ?? false,
+                            });
+                            updateCacheMutationResponse(queryClient, response);
+                        } catch (err) {
+                            errorsOnMutationResponse(undefined, err as Error);
+                        }
+                        break;
+                    };
+                    default: {
+                        const targetBoxSlots = sourceIds
+                            .map(id => target.targetAllPositions[ id ])
+                            .filter(filterIsDefined);
+
+                        if (targetBoxSlots.length !== sourceIds.length) {
+                            console.log('diff pkm-ids <-> target-slots', sourceIds.length, targetBoxSlots.length)
+                            return;
+                        }
+
+                        try {
+                            const response = await storageMovePkm({
+                                pkmIds: sourceIds,
+                                sourceSaveId: sourceContainer.saveId ?? null,
+                                targetSaveId: target.targetContainer.saveId ?? null,
+                                targetBoxId: target.targetContainer.boxId,
+                                targetBoxSlots,
+                                attached: source.params?.attached ?? false,
+                            });
+                            updateCacheMutationResponse(queryClient, response);
+                        } catch (err) {
+                            errorsOnMutationResponse(undefined, err as Error);
+                        }
+                        break;
+                    };
                 }
                 break;
-            };
-            default: {
-                const targetBoxSlots = sourceIds
-                    .map(id => target.targetAllPositions[ id ])
-                    .filter(filterIsDefined);
-
-                if (targetBoxSlots.length !== sourceIds.length) {
-                    console.log('diff pkm-ids <-> target-slots', sourceIds.length, targetBoxSlots.length)
-                    return;
-                }
-
-                try {
-                    const response = await storageMovePkm({
-                        pkmIds: sourceIds,
-                        sourceSaveId: sourceContainer.saveId ?? null,
-                        targetSaveId: target.targetContainer.saveId ?? null,
-                        targetBoxId: target.targetContainer.boxId,
-                        targetBoxSlots,
-                        attached: source.params?.attached ?? false,
-                    });
-                    updateCacheMutationResponse(queryClient, response);
-                } catch (err) {
-                    errorsOnMutationResponse(undefined, err as Error);
-                }
-                break;
-            };
+            }
         }
     }, [ errorsOnMutationResponse, queryClient, useMoveStore ]);
 };
 
 export type MoveSelectImplProviderProps = {
+    isItemCompatible: IsItemCompatibleFn;
     selectCtx?: SelectProviderProps<MoveContainerValue>[ 'initialValue' ];
     moveCtx?: Partial<Pick<
         MoveProviderProps<MoveContainerValue, MoveParams>,
@@ -146,9 +173,9 @@ export type MoveSelectImplProviderProps = {
     children: React.ReactNode;
 };
 
-export const MoveSelectImplProvider: React.FC<MoveSelectImplProviderProps> = ({ selectCtx, moveCtx, children }) => {
+export const MoveSelectImplProvider: React.FC<MoveSelectImplProviderProps> = ({ isItemCompatible, selectCtx, moveCtx, children }) => {
     const getTargetAllPositions = useTargetAllPositions();
-    const dragStartComputeSlotStates = useDroppableValidation().validate;
+    const dragStartComputeSlotStates = useDroppableValidation(isItemCompatible).validate;
     const onDrop = useOnDrop();
 
     return <SelectProvider<MoveContainerValue>

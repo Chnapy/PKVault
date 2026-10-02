@@ -14,6 +14,7 @@ import { useCurrentPanel } from '../storage-content/context/ui-panel-context';
 import { UIStorageItemBase } from './base/ui-storage-item-base';
 import type { UIStorageInventoryItemPlaceholderProps } from './placeholder/ui-storage-inventory-item-placeholder';
 import classes from './ui-storage-item.module.css';
+import { getSelectControl } from '../../interaction/focus-controls/common-controls/select-controls';
 
 export type UIStorageInventoryItemProps<C = unknown> =
     & UIStorageInventoryItemPlaceholderProps<C>
@@ -63,6 +64,19 @@ export const UIStorageInventoryItem: React.FC<UIStorageInventoryItemProps> = ({
         disabled: disabled || loading,
     });
 
+    const selectFn = (e: unknown) => {
+        if (checked) {
+            removeId([ id ]);
+        } else {
+            const shiftKey = typeof e === 'object' && !!e && (e as React.MouseEvent).shiftKey;
+            if (shiftKey) {
+                selectFromPreviousSelected(id);
+            } else {
+                addId(container, [ id ]);
+            }
+        }
+    };
+
     const { focusProps, controlProps, controlIcons } = useFocusControls({
         scopeNodeId: nodeId,
         order: globalOrder,
@@ -72,6 +86,12 @@ export const UIStorageInventoryItem: React.FC<UIStorageInventoryItemProps> = ({
             panel.normalizeCurrentPanel();
         },
         controls: [
+            !isDraggingState && !disabled && !loading && getSelectControl({
+                label: t('action.select'),
+                action: e => {
+                    selectFn(e);
+                },
+            }),
             ...dragControls,
             !isDraggingState && !disabled && !loading && {
                 name: 'select',
@@ -88,16 +108,7 @@ export const UIStorageInventoryItem: React.FC<UIStorageInventoryItemProps> = ({
                 },
                 spread: true,
                 action: (e) => {
-                    if (checked) {
-                        removeId([ id ]);
-                    } else {
-                        const shiftKey = typeof e === 'object' && !!e && (e as React.MouseEvent).shiftKey;
-                        if (shiftKey) {
-                            selectFromPreviousSelected(id);
-                        } else {
-                            addId(container, [ id ]);
-                        }
-                    }
+                    selectFn(e);
                 },
             },
         ],
@@ -128,7 +139,7 @@ export const UIStorageInventoryItem: React.FC<UIStorageInventoryItemProps> = ({
     return <>
         <WithControlsIcons
             placement='out'
-            icons={controlIcons('drag', 'drop')}
+            icons={controlIcons('open', 'drag', 'drop')}
             className={classes.uiStorageItem}
         >
             <UIStorageItemBase
@@ -138,7 +149,7 @@ export const UIStorageInventoryItem: React.FC<UIStorageInventoryItemProps> = ({
                 selected={selected}
                 loading={loading}
                 {...focusProps}
-                {...controlProps('drag', 'drop')}
+                {...controlProps('open', 'drag', 'drop')}
                 disabled={disabled || loading}
                 {...buttonProps}
                 ref={ref}

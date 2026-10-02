@@ -8,6 +8,7 @@ public interface IInventoryLoader : IEntityLoader<InventoryItemDTO, InventoryIte
     public InventoryItemDTO CreateDTO(InventoryItemEntity entity);
     public Task<InventoryItemDTO> IncrementItemCount(int item, GameVersion version, int boxId);
     public Task<InventoryItemDTO> DecrementItemCount(string itemId);
+    public Task<int> GetMaxBoxSlot(int boxId);
     public Task NormalizeOrders();
 }
 
@@ -142,6 +143,18 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         var dbSet = await GetDbSet();
 
         return await dbSet.FirstOrDefaultAsync(p => p.ItemKey == itemKey && p.BoxId == boxId);
+    }
+
+    public async Task<int> GetMaxBoxSlot(int boxId)
+    {
+        var dbSet = await GetDbSet();
+
+        var q = dbSet.Where(p => p.BoxId == boxId);
+
+        if (!await q.AnyAsync())
+            return 0;
+
+        return await q.MaxAsync(p => p.BoxSlot);
     }
 
     public async Task<int> GetMaxId()

@@ -7,9 +7,6 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
     const sourcePkm = info?.sourcePkm;
     const targetPkm = info?.targetPkm;
 
-    if (1 === 1)
-        return reason;
-
     switch (reason) {
         case 'not-dragging': return undefined;
         case 'empty-slot-infos': return undefined;
@@ -72,8 +69,10 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
         case 'main-to-same-bank': return undefined;
         case 'same-pkm-id': return undefined;
         case 'bank-external': return t('storage.move.bank-external');
-        // TODO
-        default:
-            return reason;
+        case 'pkm-to-inventory': return t('storage.move.pkm-to-inventory');
+        case 'multiple-items-to-pkm': return t('storage.move.multiple-items-to-pkm');
+        case 'items-to-pkm-empty-slot': return t('storage.move.items-to-pkm-empty-slot');
+        case 'item-same-inventory': return undefined;
+        case 'item-not-compatible': return t('storage.move.item-not-compatible');
     }
 };

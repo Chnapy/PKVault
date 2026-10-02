@@ -1,11 +1,12 @@
-import { BoxType } from '../../../../data/sdk/model';
-import type { StaticData } from '../../../../hooks/use-static-data';
+import { BoxType, GameVersion } from '../../../../data/sdk/model';
 import type { DropValidationResult, SlotInfos } from '../types';
+
+export type IsItemCompatibleFn = (sourceHeldItem: number, sourceVersion: GameVersion, targetVersion: GameVersion) => boolean;
 
 export const validateCommon = (
     slotInfos: SlotInfos,
     attached: boolean,
-    staticData: StaticData,
+    isItemCompatible: IsItemCompatibleFn,
 ): DropValidationResult => {
     switch (slotInfos.mode) {
         case 'inventory': {
@@ -17,11 +18,17 @@ export const validateCommon = (
                     slotInfos,
                 };
 
-            if ((slotInfos.sourcePkm && !slotInfos.sourcePkm.canHeldItem)
-                || (slotInfos.targetPkm && !slotInfos.targetPkm.canHeldItem))
+            if ((slotInfos.sourcePkm && (
+                !slotInfos.sourcePkm.canHeldItem
+                || !slotInfos.sourcePkm.canEdit
+            ))
+                || (slotInfos.targetPkm && (
+                    !slotInfos.targetPkm.canHeldItem
+                    || !slotInfos.targetPkm.canEdit
+                )))
                 return {
                     canDrop: false,
-                    reason: 'item-cannot-be-held',
+                    reason: 'item-not-compatible',
                     slotInfos,
                 };
 
@@ -30,10 +37,7 @@ export const validateCommon = (
             const targetVersion = slotInfos.targetSave?.version ?? slotInfos.targetPkm?.contextVersion;
 
             if (sourceVersion && sourceHeldItem && targetVersion) {
-                const itemKey = staticData.getItemKey(sourceVersion, sourceHeldItem);
-                const isItemCompatible = !itemKey || staticData.isItemCompatible(targetVersion, itemKey);
-
-                if (!isItemCompatible)
+                if (!isItemCompatible(sourceHeldItem, sourceVersion, targetVersion))
                     return {
                         canDrop: false,
                         reason: 'item-not-compatible',

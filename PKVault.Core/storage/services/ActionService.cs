@@ -155,6 +155,21 @@ public class ActionService(
         );
     }
 
+    public async Task<DataUpdateFlags> MoveItemBank(
+        uint? sourceSaveId,
+        string[] sourcePkmIds, string[] sourceItemIds,
+        string bankId
+    )
+    {
+        using var scope = sp.CreateScope();
+
+        return await AddAction(
+            scope,
+            (scope) => scope.ServiceProvider.GetRequiredService<MoveItemBankAction>(),
+            new(sourceSaveId, sourcePkmIds, sourceItemIds, bankId)
+        );
+    }
+
     public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, EntityContext context)
     {
         using var scope = sp.CreateScope();

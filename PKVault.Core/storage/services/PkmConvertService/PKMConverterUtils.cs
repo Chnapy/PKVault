@@ -412,62 +412,88 @@ public class PKMConverterUtils
         }
     }
 
-    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, GameVersion srcVersion)
-    {
-        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, pkm.Version);
-
-        if (heldItem != null)
-            pkm.HeldItem = (ushort)heldItem;
-    }
-
-    public ushort ConvertHeldItemRequired(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion? destVersion)
     {
         if (srcHeldItem == 0)
-            return 0;
+        {
+            pkm.HeldItem = 0;
+            return;
+        }
 
-        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersion);
-        if (heldItem == null || heldItem == 0)
-            throw new ArgumentException($"Held item {srcVersion}/{srcHeldItem} is not compatible with target version {targetVersion}");
-        return (ushort)heldItem;
+        GameVersion[] targetVersions = destVersion != null
+            ? [(GameVersion)destVersion]
+            : GameUtil.GameVersions.Where(v => v.Context == pkm.Context).ToArray();
+
+        var heldItem = ConvertHeldItem(srcHeldItem, srcContext, targetVersions);
+
+        // Console.WriteLine($"CONVERT HELD-ITEM {srcContext}/{srcHeldItem} -> {heldItem.Version}/{heldItem.Item}");
+
+        if (heldItem.Item != 0)
+            pkm.HeldItem = heldItem.Item;
     }
 
-    public ushort? ConvertHeldItem(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    public (ushort Item, GameVersion Version) ConvertHeldItemRequired(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions)
     {
         if (srcHeldItem == 0)
-            return 0;
+            return (0, targetVersions.First());
 
-        ushort? heldItem = (ushort)ItemConverter.GetItemForFormat(srcHeldItem, srcVersion.Context, targetVersion.Context);
-        if (heldItem == 0)
-            heldItem = ConvertHeldItemByString(srcHeldItem, srcVersion, targetVersion);
+        var heldItem = ConvertHeldItem(srcHeldItem, srcContext, targetVersions);
+        if (heldItem.Item == 0)
+            throw new ArgumentException($"Held item {srcContext}/{srcHeldItem} is not compatible with target versions {string.Join(',', targetVersions)}");
+        return heldItem;
+    }
 
-        if (heldItem == null || heldItem == 0)
+    public (ushort Item, GameVersion Version) ConvertHeldItem(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions)
+    {
+        var firstVersion = targetVersions.First();
+        if (srcHeldItem == 0)
+            return (0, firstVersion);
+
+        var heldItem = (
+            Item: (ushort)ItemConverter.GetItemForFormat(srcHeldItem, srcContext, firstVersion.Context),
+            Version: firstVersion
+        );
+        if (heldItem.Item == 0)
+            heldItem = ConvertHeldItemByString(srcHeldItem, srcContext, targetVersions);
+
+        if (heldItem.Item == 0)
             return heldItem;
 
-        var allowedHeldItems = allSavesAllowedItems[(byte)targetVersion].AllowedItems;
-        if (!allowedHeldItems.Contains((ushort)heldItem))
-            return null;
+        foreach (var targetVersion in targetVersions)
+        {
+            var allowedHeldItems = allSavesAllowedItems[(byte)targetVersion].AllowedItems;
+            if (!allowedHeldItems.Contains(heldItem.Item))
+                continue;
+            return (heldItem.Item, targetVersion);
+        }
 
         return heldItem;
     }
 
-    public ushort? ConvertHeldItemByString(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    public (ushort Item, GameVersion Version) ConvertHeldItemByString(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions)
     {
         if (srcHeldItem == 0)
-            return 0;
+            return (0, targetVersions.First());
 
-        var stringsSrc = GameInfo.Strings.GetItemStrings(srcVersion.Context, srcVersion);
-        var stringsDest = GameInfo.Strings.GetItemStrings(targetVersion.Context, targetVersion);
-
+        var stringsSrc = GameInfo.Strings.GetItemStrings(srcContext);
         var strSrc = stringsSrc[srcHeldItem];
-        var strDestIndex = (ushort)stringsDest.ToList().FindIndex(str => str == strSrc);
-        if (strDestIndex <= 0)
-            return null;
 
-        var allowedHeldItems = allSavesAllowedItems[(byte)targetVersion].AllowedItems;
-        if (!allowedHeldItems.Contains(strDestIndex))
-            return null;
+        foreach (var targetVersion in targetVersions)
+        {
+            var stringsDest = GameInfo.Strings.GetItemStrings(targetVersion.Context, targetVersion);
 
-        return strDestIndex;
+            var strDestIndex = (ushort)stringsDest.ToList().FindIndex(str => str == strSrc);
+            if (strDestIndex <= 0)
+                continue;
+
+            var allowedHeldItems = allSavesAllowedItems[(byte)targetVersion].AllowedItems;
+            if (!allowedHeldItems.Contains(strDestIndex))
+                continue;
+
+            return (strDestIndex, targetVersion);
+        }
+
+        return default;
     }
 
     public void CopyMovesFrom(PKM pkm, PKM pkmSrc)

@@ -107,6 +107,7 @@ public class Program
         services.AddScoped<MovePkmAction>();
         services.AddScoped<MovePkmBankAction>();
         services.AddScoped<MoveItemAction>();
+        services.AddScoped<MoveItemBankAction>();
         services.AddScoped<MainCreatePkmVariantAction>();
         services.AddScoped<EditPkmVariantAction>();
         services.AddScoped<EditPkmSaveAction>();

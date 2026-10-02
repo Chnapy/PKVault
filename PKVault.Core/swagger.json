@@ -1417,6 +1417,75 @@
         }
       }
     },
+    "/api/storage/move/item/bank": {
+      "put": {
+        "tags": [
+          "Storage"
+        ],
+        "operationId": "Storage_MoveItemBank",
+        "parameters": [
+          {
+            "name": "sourceSaveId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "sourcePkmIds",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 2
+          },
+          {
+            "name": "sourceItemIds",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "x-position": 3
+          },
+          {
+            "name": "bankId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/storage/move/pkm": {
       "put": {
         "tags": [
