@@ -52,6 +52,8 @@ public class SaveWrapper(SaveFile Save)
     public string PlayTimeString => Save.PlayTimeString;
     public int PlayTimeInSeconds => PlayedSeconds + PlayedMinutes * 60 + PlayedHours * 3600;
 
+    public PlayerBag CreateInventory() => Save.Inventory;
+
     #region Metadata & Limits
     public GameVersion Version => Save.Version;
     public bool ChecksumsValid => Save.ChecksumsValid;

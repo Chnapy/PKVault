@@ -1,7 +1,9 @@
 import { Tabs, Text } from '@mantine/core';
 import React from 'react';
+import { BoxType } from '../../../data/sdk/model';
 import { useStorageCreateMainBox } from '../../../data/sdk/storage/storage.gen';
 import { Route } from '../../../routes/storage';
+import { useStorageMode } from '../../../ui/inventory/context/storage-mode-context';
 import { UIStoragePanelBoxList, type UIBoxData } from '../../../ui/storage/storage-panel/box-list/ui-storage-panel-box-list';
 import { DexSyncAdvancedAction } from '../../advanced-actions/dex-sync-advanced-action';
 import { SortAdvancedAction } from '../../advanced-actions/sort-advanced-action';
@@ -18,11 +20,15 @@ export const StoragePanelBoxList: React.FC = () => {
     const { saveId = null, boxId, bankId } = storage.data ?? {};
     const navigate = Route.useNavigate();
 
+    const storageMode = useStorageMode().state;
+
     const boxCreateMutation = useStorageCreateMainBox();
 
     const boxesQuery = useFilteredBoxes(saveId);
 
     const boxes = (boxesQuery.data?.data ?? []).sort((b1, b2) => b1.order < b2.order ? -1 : 1);
+
+    const selectedBox = boxes.find(box => box.idInt === boxId);
 
     // const isPending = [ storage, boxesQuery ].some(q => q.isPending && q.isEnabled);
 
@@ -79,5 +85,8 @@ export const StoragePanelBoxList: React.FC = () => {
         />)}
         advancedActionSort={boxId !== undefined && <SortAdvancedAction saveId={saveId} boxId={boxId} />}
         advancedDexSync={<DexSyncAdvancedAction saveId={saveId ?? 0} />}
+        openModeTooltip={storageMode === 'default' && selectedBox?.type === BoxType.Inventory
+            ? true
+            : undefined}
     />;
 };

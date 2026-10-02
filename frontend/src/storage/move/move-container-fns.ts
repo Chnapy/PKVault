@@ -34,8 +34,7 @@ const getContainerHash = ({ type, saveId, boxId, bankId }: MoveContainerValue): 
 };
 
 const getContainerValue = (hash: string): MoveContainerValue => {
-    const [ type, saveId, boxId = '', bankId = '', inventoryRaw = '' ] = hash.split('---');
-    const inventory = Boolean(inventoryRaw);
+    const [ type, saveId, boxId = '', bankId = '' ] = hash.split('---');
 
     switch (type as MoveContainerValue[ 'type' ]) {
         case 'main-item':

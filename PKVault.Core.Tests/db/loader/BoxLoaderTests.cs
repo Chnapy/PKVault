@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PKHeX.Core;
 using PKVault.Core;
@@ -40,7 +41,13 @@ public class BoxLoaderTests : IAsyncDisposable
     {
         Mock<IPkmVariantLoader> mockPkmVariantLoader = new();
         mockPkmVariantLoader.Setup(l => l.GetEntitiesByBox(It.IsAny<string>())).ReturnsAsync([]);
-        return new BoxLoader(sessionService.Object, db, mockPkmVariantLoader.Object);
+
+        Mock<IInventoryLoader> inventoryLoader = new();
+        var coll = new ServiceCollection();
+        coll.AddScoped((_) => inventoryLoader.Object);
+        var sp = coll.BuildServiceProvider();
+
+        return new BoxLoader(sessionService.Object, db, mockPkmVariantLoader.Object, sp);
     }
 
     #region CRUD operations

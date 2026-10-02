@@ -1,14 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
+import { BoxType } from '../../data/sdk/model';
 import {
     getStorageGetBoxesQueryKey,
     useStorageGetBoxes,
+    useStorageGetInventoryItems,
     useStorageGetMainBanks,
     useStorageUpdateMainBox,
     type storageGetBoxesResponseSuccess
 } from '../../data/sdk/storage/storage.gen';
 import { UIBoxEdit } from '../../ui/storage/storage-panel/box-list/ui-box-edit';
+import { useSelectCallback } from '../../util/use-select-callback';
 import { BankContext } from '../bank/bank-context';
 
 const queryKeys = [
@@ -36,6 +39,27 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
     const box = boxesQuery.data?.data.find(box => box.id === boxId);
     const boxes = [ ...(boxesQuery.data?.data ?? []) ].filter(b => b.bankId === box?.bankId).sort((b1, b2) => (b1.order < b2.order ? -1 : 1));
 
+    const hasPkmsQuery = usePkmVariantIndex(
+        useSelectCallback(data => {
+            if (!box)
+                return false;
+
+            return Object.values(data.data.byBox[ box.idInt ] ?? {}).length > 0;
+        }, [ box ]),
+        { enabled: box?.type !== BoxType.Inventory }
+    );
+
+    const hasInventoryItemsQuery = useStorageGetInventoryItems({ saveId: null }, {
+        query: {
+            select: useSelectCallback(data => Object.values(data.data)
+                .some(item => item.boxId === box?.idInt),
+                [ box?.idInt ]),
+            enabled: box?.type === BoxType.Inventory,
+        }
+    });
+
+    const hasItems = hasPkmsQuery.data || hasInventoryItemsQuery.data || false;
+
     React.useEffect(() => {
         return () => {
             if (queryDataRef.current) {
@@ -59,6 +83,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
         boxList={boxes.map(({ id, order }) => ({ id, order }))}
         bankList={banksQuery.data?.data.map(({ id, name }) => ({ id, name })) ?? []}
         minSlotCount={minSlotCount}
+        hasItems={hasItems}
         onOrderChange={order => {
             queryKeys.forEach(queryKey => queryClient.setQueryData(queryKey, (data: storageGetBoxesResponseSuccess) => {
                 if (!data)

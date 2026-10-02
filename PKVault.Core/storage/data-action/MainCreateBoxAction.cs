@@ -2,7 +2,8 @@
 namespace PKVault.Core;
 
 public record MainCreateBoxActionInput(
-    string bankId, int? slotCount
+    string bankId, int? slotCount,
+    BoxType type = BoxType.Box, string? name = null
 );
 
 public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBoxActionInput>
@@ -37,13 +38,13 @@ public class MainCreateBoxAction(IBoxLoader boxLoader) : DataAction<MainCreateBo
 
         var id = maxId + 1;
         var order = maxOrder + 1;
-        var name = GetNewName();
+        var name = input.name ?? GetNewName();
 
         var entity = await boxLoader.AddEntity(new()
         {
             Id = id.ToString(),
             IdInt = id,
-            Type = BoxType.Box,
+            Type = input.type,
             Name = name,
             SlotCount = input.slotCount ?? 30,
             Order = order,

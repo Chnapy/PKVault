@@ -35,11 +35,15 @@ public class MovePkmAction(
             ? savesLoadersService.GetLoadersRequired((uint)input.sourceSaveId).Boxes.GetDto(sourceBoxId)
             : await boxLoader.GetDto(sourceBoxId);
         ArgumentNullException.ThrowIfNull(sourceBox);
+        if (sourceBox.Type == BoxType.Inventory)
+            throw new ArgumentException($"Cannot move Pkm from Box Inventory");
 
         BoxDTO? targetBox = input.targetSaveId != null
             ? savesLoadersService.GetLoadersRequired((uint)input.targetSaveId).Boxes.GetDto(input.targetBoxId)
             : await boxLoader.GetDto(input.targetBoxId);
         ArgumentNullException.ThrowIfNull(targetBox);
+        if (targetBox.Type == BoxType.Inventory)
+            throw new ArgumentException($"Cannot move Pkm to Box Inventory");
 
         async Task<DataActionPayload> act(string pkmId, int targetBoxSlot)
         {

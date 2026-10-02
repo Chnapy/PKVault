@@ -1376,13 +1376,31 @@
             "x-position": 4
           },
           {
-            "name": "targetPkmId",
+            "name": "sourceBoxId",
             "in": "query",
             "schema": {
               "type": "string",
               "nullable": true
             },
             "x-position": 5
+          },
+          {
+            "name": "targetBoxId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 6
+          },
+          {
+            "name": "targetPkmId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 7
           }
         ],
         "responses": {
@@ -2116,7 +2134,8 @@
           "pokedexes",
           "maxSpeciesId",
           "maxIV",
-          "maxEV"
+          "maxEV",
+          "allowedHeldItems"
         ],
         "properties": {
           "id": {
@@ -2165,6 +2184,12 @@
           "maxEV": {
             "type": "integer",
             "format": "int32"
+          },
+          "allowedHeldItems": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
           }
         }
       },

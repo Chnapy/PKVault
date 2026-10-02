@@ -13,7 +13,8 @@ public record StaticVersion(
     string[] Pokedexes,
     int MaxSpeciesId,
     int MaxIV,
-    int MaxEV
+    int MaxEV,
+    HashSet<ushort> AllowedHeldItems
 );
 
 public record StaticStat(
@@ -138,5 +139,21 @@ public class StaticOthersLoader
 
             throw;
         }
+    }
+
+    public static Dictionary<byte, (SaveFile? Save, HashSet<ushort> AllowedItems)> GetAllSavesAllowedItems()
+    {
+        return Enum.GetValues<GameVersion>().Select(version =>
+        {
+            var saveVersion = GameVersionUtil.GetSingleVersion(version);
+            var blankSave = saveVersion == default
+                ? null
+                : BlankSaveFile.Get(saveVersion);
+            var allowedItems = blankSave?.HeldItems.ToArray().ToHashSet() ?? [];
+            return (version, blankSave, allowedItems);
+        }).ToDictionary(
+            e => (byte)e.version,
+            e => (e.blankSave, e.allowedItems)
+        );
     }
 }

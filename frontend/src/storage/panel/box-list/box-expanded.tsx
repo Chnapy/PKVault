@@ -22,6 +22,15 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
     const boxes = boxesQuery.data?.data ?? [];
     const box = boxes.find(box => box.id === id);
 
+    const canDelete = () => {
+        if (saveId)
+            return false;
+
+        if (box?.type === BoxType.Inventory)
+            return boxes.filter(box => box.type === BoxType.Inventory).length > 1;
+        return boxes.filter(box => box.type !== BoxType.Inventory).length > 1;
+    };
+
     const pkmsQuery = usePkmIndex(
         saveId,
         useSelectCallback(data => {
@@ -37,8 +46,11 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
 
     const inventoryQuery = useStorageGetInventoryItems({ saveId }, {
         query: {
-            select: useSelectCallback(data => Object.values(data.data).filter(item => item.type === box?.inventoryType), [ box?.inventoryType ]),
-            enabled: box?.type === BoxType.Inventory
+            select: useSelectCallback(data => Object.values(data.data)
+                .filter(item => !box?.inventoryType || item.type === box?.inventoryType)
+                .filter(item => item.boxId === box?.idInt),
+                [ box?.idInt, box?.inventoryType ]),
+            enabled: box?.type === BoxType.Inventory,
         }
     });
 
@@ -54,15 +66,13 @@ export const BoxExpanded: React.FC<BoxExpandedProps> = ({ id, label, selected, o
         ? undefined
         : <StorageBoxEdit boxId={id} />;
 
-    const canDelete = !saveId && boxes.length > 1;
-
     return <UIBoxExpanded
         id={id}
         label={label}
         slotsStates={slotsStates}
         selected={selected}
         onSelect={onSelect}
-        onDelete={canDelete
+        onDelete={canDelete()
             ? (() => boxDeleteMutation.mutateAsync({ boxId: id }))
             : undefined}
         editDropdown={editPanelContent}

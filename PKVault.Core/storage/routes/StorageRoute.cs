@@ -89,10 +89,12 @@ public class StorageController(DataService dataService, StorageQueryService stor
     public async Task<DataDTO> MoveItem(
         uint? sourceSaveId,
         string[] sourcePkmIds, string[] sourceItemIds,
-        uint? targetSaveId, string? targetPkmId = null
+        uint? targetSaveId,
+        string? sourceBoxId = null, string? targetBoxId = null,
+        string? targetPkmId = null
     )
     {
-        var flags = await actionService.MoveItem(sourceSaveId, sourcePkmIds, sourceItemIds, targetSaveId, targetPkmId);
+        var flags = await actionService.MoveItem(sourceSaveId, sourceBoxId, sourcePkmIds, sourceItemIds, targetSaveId, targetBoxId, targetPkmId);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

@@ -6,7 +6,7 @@ export const getBoxTypeColor = (type: BoxType): MantineColor | undefined => {
         case BoxType.Box: return undefined;
         case BoxType.Party: return 'primary.7';
         case BoxType.Daycare: return 'teal';
-        case BoxType.Inventory: return 'purple';
+        case BoxType.Inventory: return 'violet.9';
         default: return 'gray';
     }
 };

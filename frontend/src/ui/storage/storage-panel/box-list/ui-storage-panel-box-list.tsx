@@ -20,10 +20,11 @@ export type UIStoragePanelBoxListProps = Pick<UIExpandableTabsProps<UIBoxData>, 
     onCreate?: () => unknown;
     advancedActionSort: React.ReactNode;
     advancedDexSync: React.ReactNode;
+    openModeTooltip?: boolean;
 };
 
 export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
-    value, data, renderTab, renderExpanded, onSelect, onCreate, advancedActionSort, advancedDexSync
+    value, data, renderTab, renderExpanded, onSelect, onCreate, advancedActionSort, advancedDexSync, openModeTooltip
 }) => {
     const { t } = useTranslate();
 
@@ -44,17 +45,21 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             value={value}
             data={data}
             onChange={onSelect}
-            left={<UIActionIcon
-                name='storage-mode'
-                controlLabel={t('action.select')}
-                onClick={() => useMoveStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default')}
-                variant='default'
-                size={24}
-            >
-                {storageMode === 'inventory'
-                    ? <BackpackIcon style={{ flexShrink: 0 }} />
-                    : <BoxIcon style={{ flexShrink: 0 }} />}
-            </UIActionIcon>}
+            // TODO
+            left={<Tooltip label={'Switch Pokémons/Items'} position='bottom-start' opened={openModeTooltip} withArrow arrowSize={6}>
+                <UIActionIcon
+                    name='storage-mode'
+                    controlLabel={t('action.select')}
+                    onClick={() => useMoveStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default')}
+                    variant={storageMode === 'inventory' ? 'filled' : 'default'}
+                    color={storageMode === 'inventory' ? 'violet.9' : undefined}
+                    size={24}
+                >
+                    {storageMode === 'inventory'
+                        ? <BackpackIcon style={{ flexShrink: 0 }} />
+                        : <BoxIcon style={{ flexShrink: 0 }} />}
+                </UIActionIcon>
+            </Tooltip>}
             renderTab={renderTab}
             renderExpanded={(data, opt) => <Group py='md' px='xs'>
                 {renderExpanded?.(data, opt)}

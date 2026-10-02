@@ -88,6 +88,7 @@ public class Program
         services.AddSingleton<BackupService>();
         services.AddSingleton<ILegalityAnalysisService, LegalityAnalysisService>();
         services.AddSingleton<DataService>();
+        services.AddSingleton<PKMConverterUtils>();
         services.AddSingleton<IPkmConvertService, PkmConvertService>();
         services.AddSingleton<IPkmSharePropertiesService, PkmSharePropertiesService>();
         services.AddSingleton<PkmUpdateService>();

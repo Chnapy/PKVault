@@ -108,7 +108,8 @@ public class StorageQueryService(
 
     public async Task<Dictionary<string, InventoryItemDTO>> GetMainInventory()
     {
-        var inventoryLoader = sp.GetRequiredService<IInventoryLoader>();
+        using var scope = sp.CreateScope();
+        var inventoryLoader = scope.ServiceProvider.GetRequiredService<IInventoryLoader>();
 
         var dtos = await inventoryLoader.GetAllDtos();
 

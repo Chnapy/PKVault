@@ -121,7 +121,8 @@ public class SessionDbContext(
         {
             entity.HasKey(p => p.Id);
 
-            entity.HasIndex(p => p.Type);
+            entity.HasIndex(p => p.ItemKey);
+            entity.HasIndex(p => p.BoxId);
         });
 
         modelBuilder.Entity<DexFormEntity>(entity =>

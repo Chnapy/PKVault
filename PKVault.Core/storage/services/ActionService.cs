@@ -140,9 +140,10 @@ public class ActionService(
     }
 
     public async Task<DataUpdateFlags> MoveItem(
-        uint? sourceSaveId,
+        uint? sourceSaveId, string? sourceBoxId,
         string[] sourcePkmIds, string[] sourceItemIds,
-        uint? targetSaveId, string? targetPkmId
+        uint? targetSaveId, string? targetBoxId,
+        string? targetPkmId
     )
     {
         using var scope = sp.CreateScope();
@@ -150,7 +151,7 @@ public class ActionService(
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<MoveItemAction>(),
-            new(sourceSaveId, sourcePkmIds, sourceItemIds, targetSaveId, targetPkmId)
+            new(sourceSaveId, sourceBoxId, sourcePkmIds, sourceItemIds, targetSaveId, targetBoxId, targetPkmId)
         );
     }
 
@@ -400,7 +401,7 @@ public class ActionService(
                 ..db.PkmVariantsFlags.Ids,
             ]
         };
-        flags.MainInventoryItems |= db.InventoryItemsFlags.All || db.InventoryItemsFlags.Ids.Count > 0;
+        flags.MainInventoryItems = flags.MainInventoryItems || db.InventoryItemsFlags.All || db.InventoryItemsFlags.Ids.Count > 0;
         flags.Dex = new()
         {
             All = flags.Dex.All || db.DexFlags.All,

@@ -102,6 +102,7 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
 
         // TODO required when saveId is specified as variable
         client.setQueryData(getStorageGetInventoryItemsQueryKey({ saveId: undefined }), inventoryQueryData);
+        client.setQueryData(getStorageGetInventoryItemsQueryKey({ saveId: null }), inventoryQueryData);
     }
 
     if (dex) {

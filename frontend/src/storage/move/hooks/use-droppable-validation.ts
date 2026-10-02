@@ -6,6 +6,7 @@ import { getPkmVariantIndexOptions } from '../../../data/hooks/use-pkm-variant-i
 import { BoxType } from '../../../data/sdk/model';
 import { getSaveInfosGetAllQueryOptions } from '../../../data/sdk/save-infos/save-infos.gen';
 import { getStorageGetBoxesQueryOptions, getStorageGetInventoryItemsQueryOptions, getStorageGetMainBanksQueryOptions, type storageGetBoxesResponseSuccess, type storageGetMainBanksResponseSuccess } from '../../../data/sdk/storage/storage.gen';
+import { useStaticData } from '../../../hooks/use-static-data';
 import { useTranslate } from '../../../translate/i18n';
 import type { DraggingSlotsStates, MoveSource, SlotsStates } from '../../../ui/interaction/move/state/move-state';
 import { useStorageModeContext } from '../../../ui/inventory/context/storage-mode-context';
@@ -40,6 +41,8 @@ export const useDroppableValidation = () => {
     const queryClient = useQueryClient();
 
     const { t } = useTranslate();
+
+    const staticData = useStaticData();
 
     const { useMoveStore } = useStorageModeContext();
 
@@ -216,7 +219,7 @@ export const useDroppableValidation = () => {
 
         const getSlot = (id: string) => {
             if (sourceContainer.type === 'inventory-item')
-                return Object.values(sourceInventory?.data ?? {}).findIndex(item => item.id === id);
+                return Object.values(sourceInventory?.data ?? {}).find(item => item.id === id)?.boxSlot;
 
             const index = sourceSaveId
                 ? sourcePkmSaveIndex?.data.byId
@@ -241,6 +244,7 @@ export const useDroppableValidation = () => {
             bankContainers.map(targetContainer => {
                 const slotInfosList = sourceIds.flatMap((sourceId): SlotInfos[] => {
                     return buildSlotInfosBank(
+                        mode,
                         targetContainer.bankId,
                         sourceId,
                         sourceSaveId,
@@ -260,6 +264,7 @@ export const useDroppableValidation = () => {
                     { attached },
                     slotInfosList,
                     pkmVariantIndex!.data,
+                    staticData,
                 );
 
                 return [
@@ -324,6 +329,7 @@ export const useDroppableValidation = () => {
                             { attached },
                             slotInfosList,
                             pkmVariantIndex!.data,
+                            staticData,
                         );
 
                         // console.log('drop-results', targetContainer, targetSlot, data);
@@ -347,7 +353,7 @@ export const useDroppableValidation = () => {
             rootItems: bankSlotStates,
             items: itemSlotStates,
         };
-    }, [ getCommonData, queryClient, t, useMoveStore ]);
+    }, [ getCommonData, queryClient, staticData, t, useMoveStore ]);
 
     return {
         validate,

@@ -153,18 +153,24 @@ namespace PKVault.Core.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("IdInt")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Item")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("ItemKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<byte>("Version")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Type");
+                    b.HasIndex("BoxId");
+
+                    b.HasIndex("ItemKey");
 
                     b.ToTable("InventoryItems");
                 });

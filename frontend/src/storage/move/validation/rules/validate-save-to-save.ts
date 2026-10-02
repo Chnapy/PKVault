@@ -2,7 +2,7 @@ import type { BoxDTO, InventoryItemDTO, PkmSaveDTO, SaveInfosDTO } from '../../.
 import type { DropValidationResult } from '../types';
 import type { ValidateRootSlot } from './validate-root';
 
-type Save = Pick<SaveInfosDTO, 'id' | 'context'>;
+type Save = Pick<SaveInfosDTO, 'id' | 'context' | 'version'>;
 type Box = Pick<BoxDTO, 'canSaveReceivePkm'>;
 type Pkm = Pick<PkmSaveDTO, 'id' | 'canMove' | 'canMoveToSave'>;
 type Item = Pick<InventoryItemDTO, 'id' | 'item' | 'version' | 'count'>;

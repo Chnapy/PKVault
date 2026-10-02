@@ -43,10 +43,12 @@ export const StoragePanelInventoryItems: React.FC = () => {
         query: {
             select: useSelectCallback(data => {
                 const items = Object.values(data.data)
-                    .filter(item => item.type === box?.inventoryType)
+                    .filter(item => !box?.inventoryType || item.type === box?.inventoryType)
+                    .filter(item => item.boxId === box?.idInt)
+                    .sort((i1, i2) => i1.boxSlot - i2.boxSlot)
                     .map(item => item.id);
                 return new Array<''>(getSlotCount()).fill('').map((none, i) => items[ i ] ?? none);
-            }, [ box?.inventoryType, getSlotCount ])
+            }, [ box?.idInt, box?.inventoryType, getSlotCount ])
         }
     });
 
@@ -149,7 +151,7 @@ export const StoragePanelInventoryItems: React.FC = () => {
             style={{
                 position: 'absolute',
                 left: '50%',
-                top: `calc(var(--sprite-species-size-multiplier) * ${96 * 2.5}px)`,
+                top: `calc(var(--sprite-item-size-multiplier) * ${30 * 2.5}px)`,
                 transform: 'translate(-50%,-50%)',
                 pointerEvents: 'none',
             }}

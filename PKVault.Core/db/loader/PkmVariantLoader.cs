@@ -340,6 +340,9 @@ public class PkmVariantLoader : EntityLoader<PkmVariantDTO, PkmVariantEntity>, I
 
         var box = payload.Box;
 
+        if (box.Type == BoxType.Inventory)
+            throw new ArgumentException($"Cannot add PkmVariant in box Inventory");
+
         if (payload.BoxSlot >= box.SlotCount)
         {
             throw new ArgumentException($"Wrong PkmVariant BoxSlot={payload.BoxSlot}, should be less than box.SlotCount={box.SlotCount}");

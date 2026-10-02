@@ -27,6 +27,8 @@ public class SortPkmAction(
         var boxes = (await GetBoxes(saveId, fromBoxId, toBoxId,
             GetBoxDto: async (id) => saveLoaders.Boxes.GetDto(id),
             GetBoxDtoByBank: async (bankId) => saveLoaders.Boxes.GetAllDtos()
+                .Where(dto => dto.Type != BoxType.Inventory)
+                .ToList()
         ))
             .FindAll(box => box.CanSaveReceivePkm);
         var boxesDict = boxes.ToDictionary(p => p.Id);
@@ -82,6 +84,7 @@ public class SortPkmAction(
             GetBoxDtoByBank: async (bankId) =>
             {
                 return [.. (await boxLoader.GetEntitiesByBank(bankId)).Values
+                    .Where(box => box.Type != BoxType.Inventory)
                     .Select(box => boxLoader.CreateDTO(box))];
             }
         );
@@ -158,6 +161,8 @@ public class SortPkmAction(
     {
         var fromBox = await GetBoxDto(fromBoxId.ToString());
         ArgumentNullException.ThrowIfNull(fromBox);
+        if (fromBox.Type == BoxType.Inventory)
+            throw new ArgumentException($"Cannot sort Pkm from Box Inventory");
         var bankId = fromBox.BankId;
         ArgumentNullException.ThrowIfNull(bankId);
 

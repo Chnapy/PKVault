@@ -69,8 +69,6 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
         }
 
         if (storageMode === 'inventory') {
-            console.log('it was items');
-
             const sourceItemIds = sourceContainer.type === 'inventory-item' ? sourceIds : [];
             const sourcePkmIds = sourceContainer.type === 'inventory-item' ? [] : sourceIds;
             const targetPkmId = target.targetContainer.type === 'inventory-item' ? undefined : target.targetId;
@@ -78,9 +76,11 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
             try {
                 const response = await storageMoveItem({
                     sourceSaveId: sourceContainer.saveId ?? null,
+                    sourceBoxId: sourceContainer.boxId ?? null,
                     sourceItemIds,
                     sourcePkmIds,
                     targetSaveId: target.targetContainer.saveId ?? null,
+                    targetBoxId: target.targetContainer.boxId ?? null,
                     targetPkmId,
                 });
                 updateCacheMutationResponse(queryClient, response);

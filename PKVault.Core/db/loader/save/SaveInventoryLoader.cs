@@ -7,23 +7,23 @@ public interface ISaveInventoryLoader
     public bool HasWritten { get; set; }
 
     public Dictionary<string, InventoryItemDTO> GetAllDtos();
+    public InventoryItemDTO? GetDto(string id);
     public InventoryItemDTO DecrementItemCount(string id);
     public InventoryItemDTO IncrementItemCount(int srcItem, GameVersion srcVersion);
-    // public void WriteDto(PouchDTO dto);
-    // public PouchDTO? GetDto(InventoryType type);
 }
 
-public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsService) : ISaveInventoryLoader
+public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsService, PKMConverterUtils pkmConverterUtils) : ISaveInventoryLoader
 {
     public bool HasWritten { get; set; } = false;
 
-    private readonly HashSet<ushort> AllowedHeldItems = save.GetSave().HeldItems.ToArray().ToHashSet();
+    private readonly HashSet<ushort> AllowedItems = pkmConverterUtils.allSavesAllowedItems[(byte)save.Version].AllowedItems;
+    private PlayerBag Inventory = save.CreateInventory();
 
     public Dictionary<string, InventoryItemDTO> GetAllDtos()
     {
         var itemsStrings = GameInfo.GetStrings(settingsService.GetSettings().GetLanguageForPKHeX()).GetItemStrings(save.Context, save.Version);
 
-        return save.GetSave().Inventory.Pouches.SelectMany(pouch =>
+        return Inventory.Pouches.SelectMany(pouch =>
         {
             var currentSlot = -1;
 
@@ -42,7 +42,7 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
                         Count: item.Count,
                         BoxId: SaveBoxLoader.GetInventoryBoxId(pouch.Type),
                         BoxSlot: currentSlot,
-                        CanBeHeld: item.Index <= ushort.MaxValue && AllowedHeldItems.Contains((ushort)item.Index)
+                        CanBeHeld: AllowedItems.Contains((ushort)item.Index)
                     );
                 });
         }).ToDictionary(item => item.Id);
@@ -50,20 +50,19 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
 
     public InventoryItemDTO DecrementItemCount(string id)
     {
-        GetAllDtos().TryGetValue(id, out var dto);
+        var dto = GetDto(id);
         ArgumentNullException.ThrowIfNull(dto);
 
         WriteItem(dto.Item, count => count - 1);
 
-        GetAllDtos().TryGetValue(id, out var dto2);
+        var dto2 = GetDto(id);
 
         return dto2 ?? dto;
     }
 
     public InventoryItemDTO IncrementItemCount(int srcItem, GameVersion srcVersion)
     {
-        var convertedItem = PKMConverterUtils.ConvertHeldItem(srcItem, srcVersion, save.Version);
-        ArgumentNullException.ThrowIfNull(convertedItem);
+        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcVersion, save.Version);
 
         WriteItem((int)convertedItem, count => count + 1);
 
@@ -71,34 +70,46 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         return dto;
     }
 
-    // private void WriteDto(InventoryItemDTO dto)
-    // {
-    //     WriteItem(dto.Item, (count) => dto.Count);
-    // }
-
     private void WriteItem(int item, Func<int, int> countFn)
     {
-        (InventoryType Type, InventoryItem Item) foundItem = default;
-        foreach (var pouch in save.GetSave().Inventory.Pouches)
+        // var items = GameInfo.Sources.GetItemDataSource(save.Version, save.Context, save.GetSave().HeldItems)
+        //     .Select(e => e.Value)
+        //     .Where(value => value <= save.MaxItemID)
+        //     .ToHashSet();
+
+        if (!AllowedItems.Contains((ushort)item))
+            throw new ArgumentException($"Item manipulation not allowed, item={item} version={save.Version}");
+
+        foreach (var pouch in Inventory.Pouches)
         {
-            var found = pouch.Items.FirstOrDefault(i => i.Index == item);
-            if (found != default)
+            InventoryItem found;
+            for (var i = 0; i < pouch.Items.Length; i++)
             {
-                foundItem = (pouch.Type, found);
-                break;
+                found = pouch.Items[i];
+                if (found.Index == item)
+                {
+                    var count = countFn(found.Count);
+
+                    if (!Inventory.IsQuantitySane(pouch.Type, found.Index, ref count, hasNew: true)
+                        || !Inventory.IsLegal(pouch.Type, item, count)
+                    )
+                        throw new Exception($"Count is invalid for item={pouch.Type}/{found.Index} count={count}");
+
+                    found.SetNewDetails(count);
+
+                    Inventory.CopyTo(save.GetSave());
+                    Inventory = save.CreateInventory();
+
+                    return;
+                }
             }
         }
-        ArgumentNullException.ThrowIfNull(foundItem.Item);
-
-        var count = countFn(foundItem.Item.Count);
-
-        if (!save.GetSave().Inventory.IsQuantitySane(foundItem.Type, foundItem.Item.Index, ref count, hasNew: true))
-            throw new Exception($"Count is invalid for item={foundItem.Type}/{foundItem.Item.Index} count={count}");
-
-        foundItem.Item.SetNewDetails(count);
+        throw new ArgumentException();
     }
 
-    // public PouchDTO? GetDto(InventoryType type)
-    // {
-    // }
+    public InventoryItemDTO? GetDto(string id)
+    {
+        var dtos = GetAllDtos();
+        return dtos.TryGetValue(id, out var dto) ? dto : null;
+    }
 }

@@ -7,6 +7,9 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
     const sourcePkm = info?.sourcePkm;
     const targetPkm = info?.targetPkm;
 
+    if (1 === 1)
+        return reason;
+
     switch (reason) {
         case 'not-dragging': return undefined;
         case 'empty-slot-infos': return undefined;

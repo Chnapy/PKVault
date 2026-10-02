@@ -1,6 +1,7 @@
 import type { PkmSaveIndexes } from '../../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../../data/hooks/use-pkm-variant-index';
 import type { BankDTO, BoxDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { StorageMode } from '../../../../ui/inventory/context/storage-mode-context';
 import type { ValidateMainToMainBank } from '../rules/validate-main-to-main';
 import type { ValidateSaveToMainBank } from '../rules/validate-save-to-main';
 
@@ -11,6 +12,7 @@ export type SlotInfosBank =
 type MoveDirectionBank = SlotInfosBank[ 'direction' ];
 
 export const buildSlotInfosBank = (
+    mode: StorageMode,
     dropBankId: string,
     sourceId: string,
     sourceSaveId: number | undefined | null,
@@ -37,6 +39,7 @@ export const buildSlotInfosBank = (
             }
 
             return [ {
+                mode,
                 direction: 'main-to-bank',
                 sourcePkm,
                 sourceBox,
@@ -58,6 +61,7 @@ export const buildSlotInfosBank = (
             }
 
             return [ {
+                mode,
                 direction: 'save-to-bank',
                 sourceSave,
                 sourcePkm,

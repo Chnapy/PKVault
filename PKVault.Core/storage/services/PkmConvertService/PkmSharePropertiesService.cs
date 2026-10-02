@@ -12,10 +12,8 @@ public interface IPkmSharePropertiesService
  * Share properties from a PKM source to a PKM target,
  * handling all convert requirements and contexts differences.
  */
-public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : IPkmSharePropertiesService
+public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, PKMConverterUtils utils) : IPkmSharePropertiesService
 {
-    private readonly PKMConverterUtils utils = new();
-
     public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save)
     {
         var sourcePkm = source.GetMutablePkm();

@@ -1,4 +1,5 @@
 import type { PkmVariantIndexes } from '../../../data/hooks/use-pkm-variant-index';
+import type { StaticData } from '../../../hooks/use-static-data';
 import { validateCommon } from './rules/validate-common';
 import { validateMainToMain } from './rules/validate-main-to-main';
 import { validateMainToSave } from './rules/validate-main-to-save';
@@ -10,11 +11,13 @@ export const validateSlotPair = (
     info: SlotInfos,
     attached: boolean,
     pkmVariantIndexes: PkmVariantIndexes,
+    staticData: StaticData,
 ): DropValidationResult => {
 
     const commonResult = validateCommon(
         info,
         attached,
+        staticData,
     );
     if (!commonResult.canDrop) return commonResult;
 

@@ -46,14 +46,13 @@ public class GenStaticOthers(
         List<Task<StaticVersion>> tasks = [];
         var staticVersions = new Dictionary<int, StaticVersion>();
 
+        var allSavesAllowedItems = StaticOthersLoader.GetAllSavesAllowedItems();
+
         foreach (var version in Enum.GetValues<GameVersion>())
         {
             tasks.Add(Task.Run(async () =>
             {
-                var saveVersion = GameVersionUtil.GetSingleVersion(version);
-                var blankSave = saveVersion == default
-                    ? null
-                    : BlankSaveFile.Get(saveVersion);
+                var (blankSave, allowedItems) = allSavesAllowedItems[(byte)version];
 
                 var versionName = GetVersionName(version);
                 var versionRegion = GetVersionRegionName(version);
@@ -88,7 +87,8 @@ public class GenStaticOthers(
                     Pokedexes: await versionPokedexes,
                     MaxSpeciesId: blankSave?.MaxSpeciesID ?? 0,
                     MaxIV: blankSave?.MaxIV ?? 0,
-                    MaxEV: blankSave?.MaxEV ?? 0
+                    MaxEV: blankSave?.MaxEV ?? 0,
+                    AllowedHeldItems: allowedItems
                 );
             }));
         }

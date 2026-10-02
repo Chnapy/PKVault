@@ -59,7 +59,9 @@ public class PkmConvertServiceTests
             )
         ));
 
-        return new(mockSettingsService.Object);
+        PKMConverterUtils pkmConverterUtils = new();
+
+        return new(mockSettingsService.Object, pkmConverterUtils);
     }
 
     private void SetupPKDirectory(string folderName)
@@ -538,24 +540,24 @@ public class PkmConvertServiceTests
     {
         Dictionary<string, object?> missingData = [];
 
-        void AssertWithDebug(string property, object? expectedValue, bool required = true)
+        void AssertWithDebug(string property, object? pkmValue, bool required = true)
         {
             // avoid string detection
-            if (expectedValue is byte[] eb)
-                expectedValue = eb.Select(v => (int)v).ToArray();
+            if (pkmValue is byte[] eb)
+                pkmValue = eb.Select(v => (int)v).ToArray();
 
             // sort dicts
-            if (expectedValue is IDictionary ed)
-                expectedValue = ((ICollection<string>)ed.Keys).Order().ToDictionary(
+            if (pkmValue is IDictionary ed)
+                pkmValue = ((ICollection<string>)ed.Keys).Order().ToDictionary(
                     k => k,
                     k => ed[k]!
                 );
 
-            var t = expectedValue?.GetType();
-            var expectedValueStr = t != null
-                && (t.IsArray || expectedValue is IList || expectedValue is IDictionary)
-                ? JsonSerializer.Serialize(expectedValue)
-                : expectedValue?.ToString() ?? "null";
+            var t = pkmValue?.GetType();
+            var pkmValueStr = t != null
+                && (t.IsArray || pkmValue is IList || pkmValue is IDictionary)
+                ? JsonSerializer.Serialize(pkmValue)
+                : pkmValue?.ToString() ?? "null";
 
             string elementToString(JsonElement el)
             {
@@ -583,25 +585,25 @@ public class PkmConvertServiceTests
             try
             {
                 if (required)
-                    Assert.Equal(expectedValueStr, elementToString(expectedData.GetProperty(property)));
+                    Assert.Equal(elementToString(expectedData.GetProperty(property)), pkmValueStr);
                 else if (expectedData.TryGetProperty(property, out var value))
-                    Assert.Equal(expectedValueStr, elementToString(value));
+                    Assert.Equal(elementToString(value), pkmValueStr);
             }
             catch (KeyNotFoundException)
             {
-                missingData.TryAdd(property, expectedValue);
+                missingData.TryAdd(property, pkmValue);
             }
             catch (InvalidOperationException)
             {
                 if (required)
-                    missingData.TryAdd(property, expectedValue);
+                    missingData.TryAdd(property, pkmValue);
             }
             catch (Xunit.Sdk.EqualException ex)
             {
                 throw new Xunit.Sdk.XunitException(
                     $"{pkm.GetType().Name}.{property}:"
-                    + $"\n\tExpected: {expectedValueStr}"
-                    + $"\n\tActual:   {elementToString(expectedData.GetProperty(property))}",
+                    + $"\n\tExpected: {elementToString(expectedData.GetProperty(property))}"
+                    + $"\n\tActual:   {pkmValueStr}",
                     ex
                 );
             }

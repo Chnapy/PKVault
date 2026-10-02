@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using PKHeX.Core;
 
 namespace PKVault.Core;
@@ -53,16 +54,19 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
     };
 
     private readonly IPkmVariantLoader pkmVariantLoader;
+    private readonly IServiceProvider sp;
 
     public BoxLoader(
         ISessionServiceMinimal sessionService,
         SessionDbContext db,
-        IPkmVariantLoader _pkmVariantLoader
+        IPkmVariantLoader _pkmVariantLoader,
+        IServiceProvider _sp
     ) : base(
         sessionService, db
     )
     {
         pkmVariantLoader = _pkmVariantLoader;
+        sp = _sp;
     }
 
     public BoxDTO CreateDTO(BoxEntity entity, string? WallpaperName = null, GameVersion? Version = null)
@@ -87,16 +91,28 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
 
     public override async Task DeleteEntity(BoxEntity entity)
     {
-        var pkmsToRemove = await pkmVariantLoader.GetEntitiesByBox(entity.Id);
-        foreach (var pkm in pkmsToRemove.Values.SelectMany(entry => entry.Values))
+        switch (entity.Type)
         {
-            var dto = await pkmVariantLoader.CreateDTO(pkm);
-            if (!dto.CanDelete)
-            {
-                throw new ArgumentException($"PkmVariant cannot be deleted: {dto.Id}");
-            }
+            case BoxType.Inventory:
+                var inventoryLoader = sp.GetRequiredService<IInventoryLoader>();
+                var allItems = await inventoryLoader.GetAllEntities();
+                var itemsToRemove = allItems.Values.Where(item => item.BoxId == entity.IdInt);
+                foreach (var item in itemsToRemove)
+                    await inventoryLoader.DeleteEntity(item);
+                break;
+            default:
+                var pkmsToRemove = await pkmVariantLoader.GetEntitiesByBox(entity.Id);
+                foreach (var pkm in pkmsToRemove.Values.SelectMany(entry => entry.Values))
+                {
+                    var dto = await pkmVariantLoader.CreateDTO(pkm);
+                    if (!dto.CanDelete)
+                    {
+                        throw new ArgumentException($"PkmVariant cannot be deleted: {dto.Id}");
+                    }
 
-            await pkmVariantLoader.DeleteEntity(pkm);
+                    await pkmVariantLoader.DeleteEntity(pkm);
+                }
+                break;
         }
 
         await base.DeleteEntity(entity);

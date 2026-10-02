@@ -98,7 +98,7 @@ public class PK3Converter(PKMConverterUtils utils)
             }
         }
 
-        var convertedHeldItem = PKMConverterUtils.ConvertHeldItemByString(pk3.HeldItem, pk3.Version, pk2.Version);
+        var convertedHeldItem = utils.ConvertHeldItemByString(pk3.HeldItem, pk3.Version, pk2.Version);
         if (convertedHeldItem != null)
             pk2.HeldItem = (int)convertedHeldItem;
 

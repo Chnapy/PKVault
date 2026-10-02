@@ -6,12 +6,17 @@ namespace PKVault.Core;
 public interface IInventoryLoader : IEntityLoader<InventoryItemDTO, InventoryItemEntity>
 {
     public InventoryItemDTO CreateDTO(InventoryItemEntity entity);
+    public Task<InventoryItemDTO> IncrementItemCount(int item, GameVersion version, int boxId);
+    public Task<InventoryItemDTO> DecrementItemCount(string itemId);
     public Task NormalizeOrders();
 }
 
 public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntity>, IInventoryLoader
 {
     private readonly ISettingsService settingsService;
+    private readonly PKMConverterUtils pkmConverterUtils;
+    private readonly StaticDataService staticDataService;
+    private readonly IBoxLoader boxLoader;
 
     private readonly Dictionary<GameVersion, (string[] Names, HashSet<ushort> Allowed)> VersionDataDict = [];
     private string currentLanguage = "";
@@ -19,12 +24,18 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
     public InventoryLoader(
         ISessionServiceMinimal sessionService,
         SessionDbContext db,
-        ISettingsService _settingsService
+        ISettingsService _settingsService,
+        PKMConverterUtils _pkmConverterUtils,
+        StaticDataService _staticDataService,
+        IBoxLoader _boxLoader
     ) : base(
         sessionService, db
     )
     {
         settingsService = _settingsService;
+        pkmConverterUtils = _pkmConverterUtils;
+        staticDataService = _staticDataService;
+        boxLoader = _boxLoader;
     }
 
     public InventoryItemDTO CreateDTO(InventoryItemEntity entity)
@@ -35,7 +46,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
             Id: entity.Id,
             Item: entity.Item,
             Name: entity.Item < Names.Length ? Names[entity.Item] : "",
-            Type: entity.Type,
+            Type: InventoryType.None,
             Version: entity.Version,
             Count: entity.Count,
             BoxId: entity.BoxId,
@@ -58,13 +69,89 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         {
             var itemsStrings = GameInfo.GetStrings(pkhexLang)
                 .GetItemStrings(version.Context, version);
-            var blankSave = BlankSaveFile.Get(version);
-            var allowedHeldItems = blankSave.HeldItems.ToArray().ToHashSet();
+            var (_, allowedHeldItems) = pkmConverterUtils.allSavesAllowedItems[(byte)version];
 
             versionData = (itemsStrings, allowedHeldItems);
             VersionDataDict.Add(version, versionData);
         }
         return versionData;
+    }
+
+    public async Task<InventoryItemDTO> IncrementItemCount(int item, GameVersion version, int boxId)
+    {
+        var entity = await GetEntity(item, version, boxId);
+
+        if (entity == null)
+        {
+            var itemKey = await GetItemKey(item, version);
+            var id = (await GetMaxId()) + 1;
+
+            var dbSet = await GetDbSet();
+            var boxItems = dbSet
+                .Where(e => e.BoxId == boxId);
+            var boxSlot = (await boxItems.AnyAsync())
+                ? (await boxItems.MaxAsync(e => e.BoxSlot)) + 1
+                : 0;
+
+            var box = await boxLoader.GetEntityRequired(boxId.ToString());
+            if (box.Type != BoxType.Inventory)
+                throw new ArgumentException($"Box {boxId} is not type Inventory");
+            if (boxSlot >= box.SlotCount)
+                throw new ArgumentException($"Item slot out of box bounds: {boxSlot}/{box.SlotCount}");
+
+            entity = new()
+            {
+                Id = id.ToString(),
+                IdInt = id,
+                ItemKey = itemKey,
+                Item = item,
+                Version = version,
+                Count = 1,
+                BoxId = boxId,
+                BoxSlot = boxSlot,
+            };
+            await AddEntity(entity);
+        }
+        else
+        {
+            entity.Count++;
+            await UpdateEntity(entity);
+        }
+
+        return CreateDTO(entity);
+    }
+
+    public async Task<InventoryItemDTO> DecrementItemCount(string itemId)
+    {
+        var entity = await GetEntityRequired(itemId);
+
+        entity.Count--;
+
+        if (entity.Count <= 0)
+            await DeleteEntity(entity);
+        else
+            await UpdateEntity(entity);
+
+        return CreateDTO(entity);
+    }
+
+    public async Task<InventoryItemEntity?> GetEntity(int item, GameVersion version, int boxId)
+    {
+        var itemKey = await GetItemKey(item, version);
+
+        var dbSet = await GetDbSet();
+
+        return await dbSet.FirstOrDefaultAsync(p => p.ItemKey == itemKey && p.BoxId == boxId);
+    }
+
+    public async Task<int> GetMaxId()
+    {
+        var dbSet = await GetDbSet();
+
+        if (!await dbSet.AnyAsync())
+            return 0;
+
+        return await dbSet.MaxAsync(p => p.IdInt);
     }
 
     public async Task NormalizeOrders()
@@ -96,6 +183,14 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         }
 
         await db.SaveChangesAsync();
+    }
+
+    private async Task<string> GetItemKey(int item, GameVersion version)
+    {
+        var staticItems = (await staticDataService.GetStaticOthers()).Items;
+
+        var versionItems = staticItems.VersionItems.First(vi => vi.Versions.Contains((byte)version));
+        return versionItems.ComboItems[item];
     }
 
     protected override async Task<InventoryItemDTO> GetDTOFromEntity(InventoryItemEntity entity)

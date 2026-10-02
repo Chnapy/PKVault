@@ -9,17 +9,16 @@ public interface IPkmConvertService
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, Type targetPkmType, ConvertContext? ctx);
 }
 
-public class PkmConvertService(ISettingsService settingsService) : IPkmConvertService
+public class PkmConvertService(ISettingsService settingsService, PKMConverterUtils pkmConverterUtils) : IPkmConvertService
 {
-    private readonly PKMConverterUtils pkmConverterUtils = new();
-    private readonly PK2Converter pk2Converter = new(new());
-    private readonly PK3Converter pk3Converter = new(new());
-    private readonly PK4Converter pk4Converter = new(new());
-    private readonly PK5Converter pk5Converter = new(new());
-    private readonly PK6Converter pk6Converter = new(new());
-    private readonly PK7Converter pk7Converter = new(new());
-    private readonly PK8Converter pk8Converter = new(new());
-    private readonly PK9Converter pk9Converter = new(new());
+    private readonly PK2Converter pk2Converter = new(pkmConverterUtils);
+    private readonly PK3Converter pk3Converter = new(pkmConverterUtils);
+    private readonly PK4Converter pk4Converter = new(pkmConverterUtils);
+    private readonly PK5Converter pk5Converter = new(pkmConverterUtils);
+    private readonly PK6Converter pk6Converter = new(pkmConverterUtils);
+    private readonly PK7Converter pk7Converter = new(pkmConverterUtils);
+    private readonly PK8Converter pk8Converter = new(pkmConverterUtils);
+    private readonly PK9Converter pk9Converter = new(pkmConverterUtils);
 
     public ImmutablePKM ConvertTo(ImmutablePKM sourcePkm, EntityContext context)
     {

@@ -29,6 +29,7 @@ public class MovePkmBankAction(
         }
 
         var mainBoxes = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
+            .Where(box => box.Type != BoxType.Inventory)
             .OrderBy(box => box.Order).ToList();
 
         var boxDict = new Dictionary<int, int[]>();
@@ -82,6 +83,7 @@ public class MovePkmBankAction(
         }
 
         var boxesDict = (await boxLoader.GetAllDtos())
+            .Where(p => p.Type != BoxType.Inventory)
             .ToDictionary(p => p.Id);
 
         async Task<DataActionPayload> act(string pkmId)

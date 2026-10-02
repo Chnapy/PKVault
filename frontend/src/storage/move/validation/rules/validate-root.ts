@@ -1,14 +1,15 @@
-import type { BoxDTO, InventoryItemDTO, PkmBaseDTO } from '../../../../data/sdk/model';
+import type { BoxDTO, InventoryItemDTO, PkmBaseDTO, SaveInfosDTO } from '../../../../data/sdk/model';
 import type { StorageMode } from '../../../../ui/inventory/context/storage-mode-context';
 import type { DropValidationResult } from '../types';
 
 export type ValidateRootSlot = {
     mode: StorageMode;
     sourceBox?: Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
-    sourcePkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'canHeldItem'>;
+    sourcePkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem'>;
     sourceItem?: Pick<InventoryItemDTO, 'boxSlot' | 'id' | 'item' | 'version' | 'count'>;
+    targetSave?: Pick<SaveInfosDTO, 'version'>;
     targetBox?: Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
-    targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'canHeldItem'>;
+    targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem'>;
     targetSlot?: number;
 };
 

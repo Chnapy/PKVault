@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
@@ -15,6 +14,8 @@ public record ConvertContext(
 public class PKMConverterUtils
 {
     private readonly PKMPersonalFixer personalFixer = new();
+    public readonly Dictionary<byte, (SaveFile? Save, HashSet<ushort> AllowedItems)> allSavesAllowedItems =
+        StaticOthersLoader.GetAllSavesAllowedItems();
 
     public void FixCommonLegalityIssues(PKM pkm, ConvertContext ctx)
     {
@@ -416,21 +417,40 @@ public class PKMConverterUtils
         var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, pkm.Version);
 
         if (heldItem != null)
-            pkm.HeldItem = (int)heldItem;
+            pkm.HeldItem = (ushort)heldItem;
     }
 
-    public static int? ConvertHeldItem(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    public ushort ConvertHeldItemRequired(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
     {
         if (srcHeldItem == 0)
             return 0;
 
-        var heldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcVersion.Context, targetVersion.Context);
+        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersion);
+        if (heldItem == null || heldItem == 0)
+            throw new ArgumentException($"Held item {srcVersion}/{srcHeldItem} is not compatible with target version {targetVersion}");
+        return (ushort)heldItem;
+    }
+
+    public ushort? ConvertHeldItem(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    {
+        if (srcHeldItem == 0)
+            return 0;
+
+        ushort? heldItem = (ushort)ItemConverter.GetItemForFormat(srcHeldItem, srcVersion.Context, targetVersion.Context);
         if (heldItem == 0)
-            return ConvertHeldItemByString(srcHeldItem, srcVersion, targetVersion);
+            heldItem = ConvertHeldItemByString(srcHeldItem, srcVersion, targetVersion);
+
+        if (heldItem == null || heldItem == 0)
+            return heldItem;
+
+        var allowedHeldItems = allSavesAllowedItems[(byte)targetVersion].AllowedItems;
+        if (!allowedHeldItems.Contains((ushort)heldItem))
+            return null;
+
         return heldItem;
     }
 
-    public static int? ConvertHeldItemByString(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
+    public ushort? ConvertHeldItemByString(int srcHeldItem, GameVersion srcVersion, GameVersion targetVersion)
     {
         if (srcHeldItem == 0)
             return 0;
@@ -439,11 +459,15 @@ public class PKMConverterUtils
         var stringsDest = GameInfo.Strings.GetItemStrings(targetVersion.Context, targetVersion);
 
         var strSrc = stringsSrc[srcHeldItem];
-        var strDestIndex = stringsDest.ToList().FindIndex(str => str == strSrc);
-        if (strDestIndex > 0)
-            return strDestIndex;
+        var strDestIndex = (ushort)stringsDest.ToList().FindIndex(str => str == strSrc);
+        if (strDestIndex <= 0)
+            return null;
 
-        return null;
+        var allowedHeldItems = allSavesAllowedItems[(byte)targetVersion].AllowedItems;
+        if (!allowedHeldItems.Contains(strDestIndex))
+            return null;
+
+        return strDestIndex;
     }
 
     public void CopyMovesFrom(PKM pkm, PKM pkmSrc)

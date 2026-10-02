@@ -107,7 +107,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
                 currentOrder++;
             });
 
-        foreach (var pouch in save.GetSave().Inventory.Pouches)
+        foreach (var pouch in save.CreateInventory().Pouches)
         {
             var id = GetInventoryBoxId(pouch.Type);
             boxes.Add(id.ToString(), new()

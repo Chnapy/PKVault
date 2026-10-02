@@ -192,10 +192,12 @@ public class UpdateExternalPkmAction(
                 });
             }
 
-            var boxes = await boxLoader.GetEntitiesByBank(bank.Id);
+            var boxes = (await boxLoader.GetEntitiesByBank(bank.Id)).Values
+                .Where(box => box.Type != BoxType.Inventory)
+                .ToArray();
 
-            var boxMaxOrder = boxes.Count > 0
-                ? boxes.Values.Max(b => b.Order)
+            var boxMaxOrder = boxes.Length > 0
+                ? boxes.Max(b => b.Order)
                 : 0;
 
             foreach (var boxName in boxesNames)
@@ -204,7 +206,7 @@ public class UpdateExternalPkmAction(
                     .Where(pb => pb.BoxName == boxName)
                     .ToList();
 
-                var box = boxes.Values.ToList().Find(b => b.Name == boxName);
+                var box = boxes.ToList().Find(b => b.Name == boxName);
                 if (box == null)
                 {
                     boxMaxId++;
