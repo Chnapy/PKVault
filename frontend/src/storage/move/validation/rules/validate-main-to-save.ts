@@ -33,7 +33,7 @@ export const validateMainToSave = (
         };
       }
 
-      if (slotInfos.targetSave && slotInfos.sourcePkm && !slotInfos.sourcePkm.compatibleWithVersions.includes(slotInfos.targetSave.version)) {
+      if (slotInfos.targetSave && slotInfos.sourcePkm && !slotInfos.sourcePkm.compatibleWithVersions.includes(slotInfos.targetSave.displayedVersion)) {
         return {
           canDrop: false,
           reason: 'main-to-save-incompatible-version',

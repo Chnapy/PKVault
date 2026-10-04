@@ -9,14 +9,14 @@ public interface ISaveInventoryLoader
     public Dictionary<string, InventoryItemDTO> GetAllDtos();
     public InventoryItemDTO? GetDto(string id);
     public InventoryItemDTO DecrementItemCount(string id);
-    public InventoryItemDTO IncrementItemCount(int srcItem, EntityContext srcContext);
+    public InventoryItemDTO IncrementItemCount(InventoryType type, int srcItem, EntityContext srcContext);
 }
 
 public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsService, PKMConverterUtils pkmConverterUtils) : ISaveInventoryLoader
 {
     public bool HasWritten { get; set; } = false;
 
-    private readonly HashSet<ushort> AllowedItems = pkmConverterUtils.allSavesAllowedItems[(byte)save.Version].AllowedItems;
+    private readonly HashSet<ushort> AllowedItems = pkmConverterUtils.allSavesAllowedItems[(byte)save.Version].AllowedInventoryItems;
     private PlayerBag Inventory = save.CreateInventory();
 
     public Dictionary<string, InventoryItemDTO> GetAllDtos()
@@ -60,32 +60,39 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         return dto2 ?? dto;
     }
 
-    public InventoryItemDTO IncrementItemCount(int srcItem, EntityContext srcContext)
+    public InventoryItemDTO IncrementItemCount(InventoryType type, int srcItem, EntityContext srcContext)
     {
-        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, [save.Version]);
+        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, [save.Version], held: false);
 
-        WriteItem(convertedItem.Item, count => count + 1);
+        WriteItem(type, convertedItem.Item, count => count + 1);
 
         var dto = GetAllDtos().Values.First(dto => dto.Item == convertedItem.Item);
         return dto;
     }
 
-    private void WriteItem(ushort item, Func<int, int> countFn)
+    private void WriteItem(InventoryType type, ushort item, Func<int, int> countFn)
     {
         foreach (var pouch in Inventory.Pouches)
         {
+            if (pouch.Type != type)
+                continue;
+
             for (var i = 0; i < pouch.Items.Length; i++)
             {
                 var found = pouch.Items[i];
-                if (found.Index != item)
+                if (found.Index != item && found.Index != 0)
                     continue;
+
+                // force for fallback case
+                found.Index = item;
 
                 // all extra checks are done here
                 WriteItem(pouch.Type, i, countFn);
                 return;
             }
+
+            throw new ArgumentException($"Item not found in save inventory, item={item}");
         }
-        throw new ArgumentException($"Item not found in save inventory, item={item}");
     }
 
     private void WriteItem(InventoryType type, int slot, Func<int, int> countFn)

@@ -1378,18 +1378,18 @@
           {
             "name": "sourceBoxId",
             "in": "query",
+            "required": true,
             "schema": {
-              "type": "string",
-              "nullable": true
+              "type": "string"
             },
             "x-position": 5
           },
           {
             "name": "targetBoxId",
             "in": "query",
+            "required": true,
             "schema": {
-              "type": "string",
-              "nullable": true
+              "type": "string"
             },
             "x-position": 6
           },
@@ -2203,8 +2203,7 @@
           "pokedexes",
           "maxSpeciesId",
           "maxIV",
-          "maxEV",
-          "allowedHeldItems"
+          "maxEV"
         ],
         "properties": {
           "id": {
@@ -2253,12 +2252,6 @@
           "maxEV": {
             "type": "integer",
             "format": "int32"
-          },
-          "allowedHeldItems": {
-            "type": "array",
-            "items": {
-              "type": "integer"
-            }
           }
         }
       },
@@ -2756,7 +2749,8 @@
         "additionalProperties": false,
         "required": [
           "versions",
-          "comboItems"
+          "comboInventoryItems",
+          "allowedHeldItems"
         ],
         "properties": {
           "versions": {
@@ -2766,10 +2760,16 @@
               "format": "byte"
             }
           },
-          "comboItems": {
+          "comboInventoryItems": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
+            }
+          },
+          "allowedHeldItems": {
+            "type": "array",
+            "items": {
+              "type": "integer"
             }
           }
         }

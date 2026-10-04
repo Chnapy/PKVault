@@ -140,9 +140,9 @@ public class ActionService(
     }
 
     public async Task<DataUpdateFlags> MoveItem(
-        uint? sourceSaveId, string? sourceBoxId,
+        uint? sourceSaveId, string sourceBoxId,
         string[] sourcePkmIds, string[] sourceItemIds,
-        uint? targetSaveId, string? targetBoxId,
+        uint? targetSaveId, string targetBoxId,
         string? targetPkmId
     )
     {

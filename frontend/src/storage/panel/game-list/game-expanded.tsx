@@ -20,9 +20,9 @@ export const GameExpanded: React.FC<GameExpandedProps> = ({ id, label, imgSrc, o
 
     const save = saveInfosQuery.data?.data[ id ];
 
-    const { context, version, trainerName, trainerGender, tid, playTime, language, path } = save ?? {};
+    const { context, displayedVersion, trainerName, trainerGender, tid, playTime, language, path } = save ?? {};
 
-    const versionObj = staticData.versions[ version ?? '' ];
+    const versionObj = staticData.versions[ displayedVersion ?? '' ];
 
     const hasDuplicates = !!save && save.duplicates.length > 0;
     const hasEdit = !!save && (

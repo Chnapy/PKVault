@@ -43,12 +43,12 @@ export const FilterFromGames: React.FC = () => {
 
       const saveId = +option.value;
       const save = saveInfosQuery.data.data[ saveId ];
-      const name = save && versions[ save.version ]?.name;
+      const name = save && versions[ save.displayedVersion ]?.name;
 
       return <Group wrap='nowrap'>
         {checked && <CheckIcon />}
         <UIGameImg
-          version={save?.version ?? null}
+          version={save?.displayedVersion ?? null}
           size='1lh'
         />
         {save
@@ -64,7 +64,7 @@ export const FilterFromGames: React.FC = () => {
       const save = saveInfosQuery.data.data[ saveId ];
 
       return <UIGameImg
-        version={save?.version ?? null}
+        version={save?.displayedVersion ?? null}
         size='1lh'
       />;
     }}

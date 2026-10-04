@@ -52,7 +52,7 @@ public class GenStaticOthers(
         {
             tasks.Add(Task.Run(async () =>
             {
-                var (blankSave, allowedItems) = allSavesAllowedItems[(byte)version];
+                var (blankSave, _, _) = allSavesAllowedItems[(byte)version];
 
                 var versionName = GetVersionName(version);
                 var versionRegion = GetVersionRegionName(version);
@@ -87,8 +87,7 @@ public class GenStaticOthers(
                     Pokedexes: await versionPokedexes,
                     MaxSpeciesId: blankSave?.MaxSpeciesID ?? 0,
                     MaxIV: blankSave?.MaxIV ?? 0,
-                    MaxEV: blankSave?.MaxEV ?? 0,
-                    AllowedHeldItems: allowedItems
+                    MaxEV: blankSave?.MaxEV ?? 0
                 );
             }));
         }
@@ -332,49 +331,72 @@ public class GenStaticOthers(
     {
         using var _ = Log.Logger.Time($"static-data {lang} process items");
 
+        var allSavesAllowedItems = StaticOthersLoader.GetAllSavesAllowedItems();
+
         List<StaticVersionsItems> VersionItems = [];
         Dictionary<string, StaticItem> Items = [];
 
         // var notFound = new List<string>();
         // log.LogInformation(string.Join('\n', GameInfo.Strings.itemlist.ToList().FindAll(item => item.ToLower().Contains("ball"))));
 
-        List<ComboItem> getItemStrings(GameVersion _version, GameStrings strings)
+        ComboItem[] getInventoryItemStrings(GameVersion _version, GameStrings strings)
         {
-            var version = GameVersionUtil.GetSingleVersion(_version);
-            if (version == default)
+            var (save, allowedInventoryItems, allowedHeldItems) = allSavesAllowedItems[(byte)_version];
+
+            if (save == default)
             {
-                return _version == GameVersion.Any
-                    ? Util.GetCBList(strings.itemlist)
-                    : [];
+                if (_version == GameVersion.Any)
+                {
+                    return Util.GetCBList(strings.itemlist).ToArray();
+                }
+                return [];
             }
 
-            var save = BlankSaveFile.Get(version);
-            var items = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version), save.HeldItems);
-            items.RemoveAll(i => i.Value > save.MaxItemID);
-            return items;
+            var allowedInventoryItemsCombo = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version), allowedInventoryItems.ToArray());
+            allowedInventoryItemsCombo.RemoveAll(i => i.Value > save.MaxItemID);
+
+            return allowedInventoryItemsCombo.OrderBy(i => i.Value).ToArray();
         }
+
+        string GetKey(ComboItem[] allowedInventoryItems, ComboItem[] allowedHeldItemsCombo) =>
+            string.Join('.', allowedInventoryItems.Select(it => $"{it.Text},{it.Value}"))
+            + '_' + string.Join('.', allowedHeldItemsCombo.Select(it => $"{it.Text},{it.Value}"));
+
+        var allVersionsItemStrings = Enum.GetValues<GameVersion>()
+            .ToDictionary(
+                version => version,
+                version =>
+                {
+                    var inventoryItemsEn = getInventoryItemStrings(version, GameInfo.Strings);
+                    var heldItemsEn = inventoryItemsEn.Where(item =>
+                        allSavesAllowedItems[(byte)version].AllowedHeldItems.Contains((ushort)item.Value))
+                        .ToArray();
+                    var key = GetKey(inventoryItemsEn, heldItemsEn);
+
+                    var inventoryItems = GameInfo.CurrentLanguage == pkhexLang
+                        ? inventoryItemsEn
+                        : getInventoryItemStrings(version, GameInfo.GetStrings(pkhexLang));
+
+                    return (ItemsEn: inventoryItemsEn, Items: inventoryItems, Key: key);
+                });
 
         foreach (var version in Enum.GetValues<GameVersion>())
         {
-            var itemlist = getItemStrings(version, GameInfo.Strings);
-            var itemlistStr = string.Join('.', itemlist.Select(it => $"{it.Text},{it.Value}"));
+            var itemlist = allVersionsItemStrings[version].ItemsEn;
 
             var versionItem = VersionItems.FirstOrDefault(st =>
             {
                 var vers = (GameVersion)st.Versions.FirstOrDefault();
-
-                var itemlist2 = getItemStrings(vers, GameInfo.Strings);
-                return itemlist.Count == itemlist2.Count
-                    && itemlistStr == string.Join('.', itemlist2.Select(it => $"{it.Text},{it.Value}"));
+                return allVersionsItemStrings[version].Key == allVersionsItemStrings[vers].Key;
             });
 
             if (versionItem == default)
             {
-                Dictionary<int, string> comboItems = [];
+                Dictionary<ushort, string> comboInventoryItems = [];
                 foreach (var item in itemlist)
                 {
                     var itemNamePokeapi = PokeApiFromPKHeX.GetPokeapiItemName(item.Text);
-                    if (comboItems.TryGetValue(item.Value, out var textPokeapi))
+                    if (comboInventoryItems.TryGetValue((ushort)item.Value, out var textPokeapi))
                     {
                         if (textPokeapi == itemNamePokeapi)
                         {
@@ -383,32 +405,33 @@ public class GenStaticOthers(
 
                         throw new Exception($"Key exists, key={item.Value} existingText={textPokeapi} tryText={itemNamePokeapi}");
                     }
-                    comboItems.Add(item.Value, itemNamePokeapi);
+                    comboInventoryItems.Add((ushort)item.Value, itemNamePokeapi);
                 }
 
                 versionItem = new(
-                    Versions: [],
-                    ComboItems: comboItems
+                        Versions: [],
+                        ComboInventoryItems: comboInventoryItems,
+                        AllowedHeldItems: allSavesAllowedItems[(byte)version].AllowedHeldItems
                 );
                 VersionItems.Add(versionItem);
             }
             versionItem.Versions.Add((byte)version);
         }
 
-        foreach (var (Versions, _) in VersionItems)
+        foreach (var (Versions, _, _) in VersionItems)
         {
             var version = (GameVersion)Versions.First();
-            var itemsEn = getItemStrings(version, GameInfo.Strings);
-            var items = getItemStrings(version, GameInfo.GetStrings(pkhexLang));
+            var itemsEn = allVersionsItemStrings[version].ItemsEn;
+            var items = allVersionsItemStrings[version].Items;
 
-            for (var i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Length; i++)
             {
                 var item = items[i];
 
                 var itemEn = itemsEn.FirstOrDefault(it => it.Value == item.Value);
                 if (itemEn == default)
                 {
-                    Serilog.Log.Error($"Item value not found in default items list, lang={lang} version={version} item={item.Value}/{item.Text}");
+                    Log.Error($"Item value not found in default items list, lang={lang} version={version} item={item.Value}/{item.Text}");
                     continue;
                 }
 

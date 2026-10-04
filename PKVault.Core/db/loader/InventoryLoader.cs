@@ -71,9 +71,9 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         {
             var itemsStrings = GameInfo.GetStrings(pkhexLang)
                 .GetItemStrings(version.Context, version);
-            var (_, allowedHeldItems) = pkmConverterUtils.allSavesAllowedItems[(byte)version];
+            var (_, allowedInventoryItems, _) = pkmConverterUtils.allSavesAllowedItems[(byte)version];
 
-            versionData = (itemsStrings, allowedHeldItems);
+            versionData = (itemsStrings, allowedInventoryItems);
             VersionDataDict.Add(version, versionData);
         }
         return versionData;
@@ -208,7 +208,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         var staticItems = (await staticDataService.GetStaticOthers()).Items;
 
         var versionItems = staticItems.VersionItems.First(vi => vi.Versions.Contains((byte)version));
-        return versionItems.ComboItems[item];
+        return versionItems.ComboInventoryItems[item];
     }
 
     protected override async Task<InventoryItemDTO> GetDTOFromEntity(InventoryItemEntity entity)

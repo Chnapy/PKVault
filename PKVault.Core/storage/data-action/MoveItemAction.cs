@@ -3,10 +3,10 @@ using PKHeX.Core;
 namespace PKVault.Core;
 
 public record MoveItemActionInput(
-    uint? sourceSaveId, string? sourceBoxId,
+    uint? sourceSaveId, string sourceBoxId,
     string[] sourcePkmIds, string[] sourceItemIds,
 
-    uint? targetSaveId, string? targetBoxId,
+    uint? targetSaveId, string targetBoxId,
     string? targetPkmId);
 
 public class MoveItemAction(
@@ -29,8 +29,8 @@ public class MoveItemAction(
         if (input.targetPkmId == null && input.targetSaveId == null && input.targetBoxId == null)
             throw new ArgumentException($"Cannot move items with no targets");
 
-        int? targetBoxId = input.targetBoxId == null ? null : int.Parse(input.targetBoxId);
-        int? sourceBoxId = input.sourceBoxId == null ? null : int.Parse(input.sourceBoxId);
+        var targetBoxId = int.Parse(input.targetBoxId);
+        var sourceBoxId = int.Parse(input.sourceBoxId);
 
         if (input.sourceItemIds.Length > 0 && input.targetPkmId != null)
             return await InventoryToPkm(input.sourceSaveId, sourceBoxId, input.sourceItemIds.First(), input.targetSaveId, input.targetPkmId, flags);
@@ -48,7 +48,7 @@ public class MoveItemAction(
     }
 
     private async Task<DataActionPayload> InventoryToPkm(
-        uint? sourceSaveId, int? sourceBoxId, string sourceItemId,
+        uint? sourceSaveId, int sourceBoxId, string sourceItemId,
         uint? targetSaveId, string targetPkmId,
         DataUpdateFlags flags
     )
@@ -212,7 +212,7 @@ public class MoveItemAction(
 
     public async Task<DataActionPayload> InventoryToInventory(
         uint? sourceSaveId, string[] sourceItemIds,
-        uint? targetSaveId, int? targetBoxId,
+        uint? targetSaveId, int targetBoxId,
         DataUpdateFlags flags
     )
     {
@@ -233,7 +233,7 @@ public class MoveItemAction(
 
     public async Task<DataActionPayload> PkmToInventory(
         uint? sourceSaveId, string[] sourcePkmIds,
-        uint? targetSaveId, int? targetBoxId,
+        uint? targetSaveId, int targetBoxId,
         DataUpdateFlags flags
     )
     {
@@ -252,28 +252,28 @@ public class MoveItemAction(
         );
     }
 
-    private async Task<InventoryItemDTO> IncrementInventoryItemCount(uint? saveId, int? boxId, ushort srcItem, GameVersion srcVersion, DataUpdateFlags flags)
+    private async Task<InventoryItemDTO> IncrementInventoryItemCount(uint? saveId, int boxId, ushort srcItem, GameVersion srcVersion, DataUpdateFlags flags)
     {
         return (await IncrementInventoryItemCount(saveId, boxId, [(srcItem, srcVersion)], flags)).First();
     }
 
-    private async Task<InventoryItemDTO[]> IncrementInventoryItemCount(uint? saveId, int? boxId, (ushort Item, GameVersion Version)[] srcItems, DataUpdateFlags flags)
+    private async Task<InventoryItemDTO[]> IncrementInventoryItemCount(uint? saveId, int boxId, (ushort Item, GameVersion Version)[] srcItems, DataUpdateFlags flags)
     {
         if (saveId == null)
         {
-            ArgumentNullException.ThrowIfNull(boxId);
-
             List<InventoryItemDTO> items = [];
             foreach (var (item, version) in srcItems)
-                items.Add(await inventoryLoader.IncrementItemCount(item, version, (int)boxId));
+                items.Add(await inventoryLoader.IncrementItemCount(item, version, boxId));
             return items.ToArray();
         }
 
         var saveLoader = savesLoadersService.GetLoadersRequired((uint)saveId);
+        var box = saveLoader.Boxes.GetDto(boxId.ToString()!);
+        ArgumentNullException.ThrowIfNull(box?.InventoryType);
 
         flags.Saves.UseSave((uint)saveId).SaveInventoryItems = true;
 
-        return srcItems.Select(item => saveLoader.Inventory.IncrementItemCount(item.Item, item.Version.Context)).ToArray();
+        return srcItems.Select(item => saveLoader.Inventory.IncrementItemCount((InventoryType)box.InventoryType, item.Item, item.Version.Context)).ToArray();
     }
 
     private async Task<InventoryItemDTO> DecrementInventoryItemCount(uint? saveId, string itemId, DataUpdateFlags flags)
@@ -309,7 +309,7 @@ public class MoveItemAction(
             if (!variantDto.CanHeldItem || !variantDto.CanEdit)
                 throw new ArgumentException($"Pkm cannot held item, id={variant.Id}");
 
-            var variantItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, GetVariantGameVersions(variant));
+            var variantItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, GetVariantGameVersions(variant), held: false);
 
             pkm = pkm.Update(pkm =>
             {
@@ -371,7 +371,7 @@ public class MoveItemAction(
                 await editPkmVariantAction.ShareChangesToVariantsAndAttached(variant, pkm, flags);
 
                 var version = GetVariantGameVersions(variant).First(version =>
-                    pkmConverterUtils.allSavesAllowedItems[(byte)version].AllowedItems.Contains((ushort)variantItem)
+                    pkmConverterUtils.allSavesAllowedItems[(byte)version].AllowedInventoryItems.Contains(variantItem)
                 );
 
                 variantResults.Add((variantItem, version, pkm.Nickname));

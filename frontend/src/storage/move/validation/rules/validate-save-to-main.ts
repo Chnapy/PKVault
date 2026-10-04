@@ -6,7 +6,7 @@ type Box = Pick<BoxDTO, 'canSaveReceivePkm'>;
 
 export type ValidateSaveToMainSlot = ValidateRootSlot & {
   direction: 'save-to-main';
-  sourceSave: Pick<SaveInfosDTO, 'version' | 'context'>;
+  sourceSave: Pick<SaveInfosDTO, 'displayedVersion' | 'context'>;
   sourceBox: Box;
   sourcePkm?: Pick<PkmSaveDTO, 'context' | 'idBase' | 'saveId' | 'isEgg' | 'isShadow' | 'canMoveAttachedToMain' | 'canMoveToMain'>;
   sourceItem?: Pick<InventoryItemDTO, 'id' | 'item' | 'version' | 'count'>;

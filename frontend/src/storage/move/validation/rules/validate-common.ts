@@ -34,15 +34,17 @@ export const validateCommon = (
 
             const sourceVersion = slotInfos.sourceItem?.version ?? slotInfos.sourcePkm?.contextVersion;
             const sourceHeldItem = slotInfos.sourceItem?.item ?? slotInfos.sourcePkm?.heldItem;
-            const targetVersion = slotInfos.targetSave?.version ?? slotInfos.targetPkm?.contextVersion;
+            const targetVersion = slotInfos.targetSave?.displayedVersion ?? slotInfos.targetPkm?.contextVersion;
 
             if (sourceVersion && sourceHeldItem && targetVersion) {
-                if (!isItemCompatible(sourceHeldItem, sourceVersion, targetVersion))
+                if (!isItemCompatible(sourceHeldItem, sourceVersion, targetVersion)) {
+                    console.log({ sourceHeldItem, sourceVersion, targetVersion })
                     return {
                         canDrop: false,
                         reason: 'item-not-compatible',
                         slotInfos,
                     };
+                }
             }
             break;
         }

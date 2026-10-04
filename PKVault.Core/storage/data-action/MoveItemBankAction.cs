@@ -39,10 +39,10 @@ public class MoveItemBankAction(
         ArgumentNullException.ThrowIfNull(targetBoxId);
 
         if (input.sourceItemIds.Length > 0)
-            return await moveItemAction.InventoryToInventory(input.sourceSaveId, input.sourceItemIds, null, targetBoxId, flags);
+            return await moveItemAction.InventoryToInventory(input.sourceSaveId, input.sourceItemIds, null, (int)targetBoxId, flags);
 
         if (input.sourcePkmIds.Length > 0)
-            return await moveItemAction.PkmToInventory(input.sourceSaveId, input.sourcePkmIds, null, targetBoxId, flags);
+            return await moveItemAction.PkmToInventory(input.sourceSaveId, input.sourcePkmIds, null, (int)targetBoxId, flags);
 
         throw new ArgumentException($"Wrong arguments");
     }

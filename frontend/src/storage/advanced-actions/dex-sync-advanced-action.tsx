@@ -71,7 +71,7 @@ export const DexSyncAdvancedAction: React.FC<{
         },
         ...Object.values(saveInfos).map((save): ComboboxItem => ({
           value: save.id.toString(),
-          label: `${staticData.versions[ save.version ]?.name} - ${save.trainerName}`,
+          label: `${staticData.versions[ save.displayedVersion ]?.name} - ${save.trainerName}`,
           // selected: saveIds.includes(save.id),
           disabled: save.id === saveId,
         })),
@@ -82,12 +82,12 @@ export const DexSyncAdvancedAction: React.FC<{
 
         const saveId = +option.value;
         const save = saveInfosQuery.data.data[ saveId ];
-        const name = save && staticData.versions[ save.version ]?.name;
+        const name = save && staticData.versions[ save.displayedVersion ]?.name;
 
         return <Group wrap='nowrap'>
           {checked && <CheckIcon />}
           <UIGameImg
-            version={save?.version ?? null}
+            version={save?.displayedVersion ?? null}
             size='1lh'
           />
           {save
@@ -103,7 +103,7 @@ export const DexSyncAdvancedAction: React.FC<{
         const save = saveInfosQuery.data.data[ saveId ];
 
         return <UIGameImg
-          version={save?.version ?? null}
+          version={save?.displayedVersion ?? null}
           size='1lh'
         />;
       }}

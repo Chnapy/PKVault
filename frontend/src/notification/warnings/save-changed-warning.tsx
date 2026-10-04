@@ -21,7 +21,7 @@ export const SaveChangedWarning: React.FC<SaveChangedWarningModel> = ({ saveId }
     return <Table.Tr>
         <Table.Td>
             {t('notifications.warnings.save-changed', {
-                saveName: staticData.versions[ save.version ]?.name,
+                saveName: staticData.versions[ save.displayedVersion ]?.name,
                 path: save.path,
             })}
         </Table.Td>

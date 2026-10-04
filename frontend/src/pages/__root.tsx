@@ -22,7 +22,7 @@ export const RootPage: React.FC = () => {
 
   const isItemCompatible = React.useCallback<IsItemCompatibleFn>((sourceHeldItem, sourceVersion, targetVersion) => {
     const itemKey = staticData.getItemKey(sourceVersion, sourceHeldItem);
-    return !itemKey || staticData.isItemCompatible(targetVersion, itemKey);
+    return !itemKey || staticData.isItemCompatible(targetVersion, itemKey, false);
   }, [ staticData ]);
 
   const hasStorageActions = !!useStorageGetActions().data?.data.length;

@@ -13,8 +13,7 @@ public record StaticVersion(
     string[] Pokedexes,
     int MaxSpeciesId,
     int MaxIV,
-    int MaxEV,
-    HashSet<ushort> AllowedHeldItems
+    int MaxEV
 );
 
 public record StaticStat(
@@ -62,7 +61,8 @@ public record StaticItem(
 public record StaticVersionsItems(
     List<byte> Versions,
     // item value => item key
-    Dictionary<int, string> ComboItems
+    Dictionary<ushort, string> ComboInventoryItems,
+    HashSet<ushort> AllowedHeldItems
 );
 
 public record StaticItemsData(
@@ -141,7 +141,7 @@ public class StaticOthersLoader
         }
     }
 
-    public static Dictionary<byte, (SaveFile? Save, HashSet<ushort> AllowedItems)> GetAllSavesAllowedItems()
+    public static Dictionary<byte, (SaveFile? Save, HashSet<ushort> AllowedItems, HashSet<ushort> AllowedHeldItems)> GetAllSavesAllowedItems()
     {
         return Enum.GetValues<GameVersion>().Select(version =>
         {
@@ -149,11 +149,22 @@ public class StaticOthersLoader
             var blankSave = saveVersion == default
                 ? null
                 : BlankSaveFile.Get(saveVersion);
-            var allowedItems = blankSave?.HeldItems.ToArray().ToHashSet() ?? [];
-            return (version, blankSave, allowedItems);
+            HashSet<ushort> allowedInventoryItems;
+            HashSet<ushort> allowedHeldItems;
+            try
+            {
+                allowedInventoryItems = blankSave?.Inventory.Pouches.SelectMany(p => p.GetAllItems().ToArray()).ToHashSet() ?? [];
+                allowedHeldItems = blankSave?.HeldItems.ToArray().ToHashSet() ?? [];
+            }
+            catch
+            {
+                allowedInventoryItems = [];
+                allowedHeldItems = [];
+            }
+            return (version, blankSave, allowedInventoryItems, allowedHeldItems);
         }).ToDictionary(
             e => (byte)e.version,
-            e => (e.blankSave, e.allowedItems)
+            e => (e.blankSave, e.allowedInventoryItems, e.allowedHeldItems)
         );
     }
 }

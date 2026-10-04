@@ -18,7 +18,7 @@ export const useStaticData = () => {
 
     const getItemKey = (version: GameVersion, itemValue: number) => items.versionItems
         .find(entry => entry.versions.includes(version))
-        ?.comboItems[ itemValue ];
+        ?.comboInventoryItems[ itemValue ];
 
     const getItem = (version: GameVersion, itemValue: number | string) => {
         const key = typeof itemValue === 'string'
@@ -32,9 +32,15 @@ export const useStaticData = () => {
         return items.items[ key ];
     };
 
-    const isItemCompatible = (version: GameVersion, itemKey: string) => Object.values(items.versionItems
-        .find(entry => entry.versions.includes(version))
-        ?.comboItems ?? {}).includes(itemKey);
+    const isItemCompatible = (version: GameVersion, itemKey: string, held: boolean) => {
+        const versionItems = items.versionItems.find(entry => entry.versions.includes(version));
+        const entry = Object.entries(versionItems?.comboInventoryItems ?? {}).find(([ _, value ]) => value === itemKey);
+        if (!held)
+            return entry !== undefined;
+
+        const itemValue = Number(entry?.[ 0 ] ?? -1);
+        return versionItems?.allowedHeldItems.includes(itemValue) ?? false;
+    };
 
     return {
         ...rest,

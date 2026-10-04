@@ -7,7 +7,7 @@ export type ValidateRootSlot = {
     sourceBox?: Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
     sourcePkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem' | 'canEdit'>;
     sourceItem?: Pick<InventoryItemDTO, 'boxSlot' | 'id' | 'item' | 'version' | 'count'>;
-    targetSave?: Pick<SaveInfosDTO, 'version'>;
+    targetSave?: Pick<SaveInfosDTO, 'displayedVersion'>;
     targetBox?: Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
     targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem' | 'canEdit'>;
     targetSlot?: number;

@@ -90,7 +90,7 @@ public class StorageController(DataService dataService, StorageQueryService stor
         uint? sourceSaveId,
         string[] sourcePkmIds, string[] sourceItemIds,
         uint? targetSaveId,
-        string? sourceBoxId = null, string? targetBoxId = null,
+        string sourceBoxId, string targetBoxId,
         string? targetPkmId = null
     )
     {

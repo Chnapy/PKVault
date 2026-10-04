@@ -29,7 +29,7 @@ export const SortAdvancedAction: React.FC<{
 
     const versionsQuery = usePkmVariantIndex(data => {
         if (save)
-            return [ save.version ];
+            return [ save.displayedVersion ];
 
         return [ ...new Set(Object.values(data.data.byId)
             .map(pkm => pkm.contextVersion)

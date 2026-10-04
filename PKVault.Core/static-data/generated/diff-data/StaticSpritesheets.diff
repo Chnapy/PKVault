@@ -1,2 +1,381 @@
 --- This file displays changes of StaticSpritesheets compressed file from previous changes
 
+--- ..\PKVault.Core\static-data\generated\diff-data\StaticSpritesheets.diff
++++ ..\PKVault.Core\static-data\generated\diff-data\StaticSpritesheets.diff
+@@ -27035,172 +27035,347 @@
+       "width": 30,
+       "height": 30
+     },
+-    "sprites/items/bead-mail.png": {
++    "sprites/items/orange-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1408,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/dream-mail.png": {
++    "sprites/items/harbor-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1440,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/fab-mail.png": {
++    "sprites/items/glitter-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1472,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/glitter-mail.png": {
++    "sprites/items/mech-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1504,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/harbor-mail.png": {
++    "sprites/items/wood-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1536,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/mech-mail.png": {
++    "sprites/items/wave-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1568,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/orange-mail.png": {
++    "sprites/items/bead-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1600,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/retro-mail.png": {
++    "sprites/items/shadow-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1632,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/shadow-mail.png": {
++    "sprites/items/tropic-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1664,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/tropic-mail.png": {
++    "sprites/items/dream-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1696,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/wave-mail.png": {
++    "sprites/items/fab-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1728,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/wood-mail.png": {
++    "sprites/items/retro-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1760,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/air-mail.png": {
++    "sprites/items/ss-ticket.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1792,
+       "y": 352,
+-      "width": 24,
+-      "height": 24
++      "width": 30,
++      "height": 30
+     },
+-    "sprites/items/bloom-mail.png": {
++    "sprites/items/devon-goods.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1824,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/brick-mail.png": {
++    "sprites/items/basement-key.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1856,
+       "y": 352,
+-      "width": 24,
+-      "height": 24
++      "width": 30,
++      "height": 30
+     },
+-    "sprites/items/bubble-mail.png": {
++    "sprites/items/pokeblock-case.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1888,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/flame-mail.png": {
++    "sprites/items/rm-1-key.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1920,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/grass-mail.png": {
++    "sprites/items/rm-2-key.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1952,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/heart-mail.png": {
++    "sprites/items/rm-4-key.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 1984,
+       "y": 352,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/mosaic-mail.png": {
++    "sprites/items/rm-6-key.png": {
+       "sheetName": "spritesheet_items_0.webp",
+       "x": 2016,
+       "y": 352,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/storage-key.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "y": 384,
++      "width": 30,
++      "height": 30
++    },
++    "sprites/items/powder-jar.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 32,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/magma-emblem.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 64,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/old-sea-map.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 96,
++      "y": 384,
+       "width": 24,
+       "height": 24
+     },
++    "sprites/items/oaks-parcel.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 128,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/bike-voucher.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 160,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/lift-key.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 192,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/bicycle.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 224,
++      "y": 384,
++      "width": 30,
++      "height": 30
++    },
++    "sprites/items/fame-checker.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 256,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/berry-pouch.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 288,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/teachy-tv.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 320,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/tri-pass.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 352,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/rainbow-pass.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 384,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/ruby.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 416,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/sapphire.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 448,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/grass-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 480,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/flame-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 512,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/bubble-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 544,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/bloom-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 576,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/tunnel-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 608,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/steel-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 640,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/heart-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 672,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
+     "sprites/items/snow-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
++      "x": 704,
+       "y": 384,
+       "width": 24,
+       "height": 24
+     },
+     "sprites/items/space-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+-      "x": 32,
++      "x": 736,
++      "y": 384,
++      "width": 24,
++      "height": 24
++    },
++    "sprites/items/air-mail.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 768,
+       "y": 384,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/steel-mail.png": {
++    "sprites/items/mosaic-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+-      "x": 64,
++      "x": 800,
+       "y": 384,
+       "width": 24,
+       "height": 24
+     },
+-    "sprites/items/tunnel-mail.png": {
++    "sprites/items/brick-mail.png": {
+       "sheetName": "spritesheet_items_0.webp",
+-      "x": 96,
++      "x": 832,
+       "y": 384,
+       "width": 24,
+       "height": 24
++    },
++    "sprites/items/secret-potion.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 864,
++      "y": 384,
++      "width": 30,
++      "height": 30
++    },
++    "sprites/items/lost-item.png": {
++      "sheetName": "spritesheet_items_0.webp",
++      "x": 896,
++      "y": 384,
++      "width": 30,
++      "height": 30
+     }
+   }
+ }
