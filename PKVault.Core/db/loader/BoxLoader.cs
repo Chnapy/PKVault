@@ -95,9 +95,8 @@ public class BoxLoader : EntityLoader<BoxDTO, BoxEntity>, IBoxLoader
         {
             case BoxType.Inventory:
                 var inventoryLoader = sp.GetRequiredService<IInventoryLoader>();
-                var allItems = await inventoryLoader.GetAllEntities();
-                var itemsToRemove = allItems.Values.Where(item => item.BoxId == entity.IdInt);
-                foreach (var item in itemsToRemove)
+                var itemsToRemove = await inventoryLoader.GetEntitiesForBox(entity.IdInt);
+                foreach (var item in itemsToRemove.Values)
                     await inventoryLoader.DeleteEntity(item);
                 break;
             default:

@@ -3625,8 +3625,7 @@
             "type": "boolean"
           },
           "heldItem": {
-            "type": "integer",
-            "format": "int32"
+            "type": "integer"
           },
           "dynamicChecksum": {
             "type": "string"
@@ -3916,8 +3915,7 @@
             "type": "string"
           },
           "item": {
-            "type": "integer",
-            "format": "int32"
+            "type": "integer"
           },
           "name": {
             "type": "string"

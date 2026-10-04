@@ -163,7 +163,7 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
         return null;
     }
 
-    public static int GetInventoryBoxId(InventoryType type) => 100 + (byte)type;
+    public static int GetInventoryBoxId(InventoryType type) => 1000 + (byte)type;
 
     private static string GetWallpaperResourceName(GameVersion version, int index)
     {

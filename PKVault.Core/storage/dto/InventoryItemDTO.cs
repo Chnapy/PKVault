@@ -4,7 +4,7 @@ namespace PKVault.Core;
 
 public record InventoryItemDTO(
     string Id,
-    int Item,
+    ushort Item,
     string Name,
     InventoryType Type,
     GameVersion Version,

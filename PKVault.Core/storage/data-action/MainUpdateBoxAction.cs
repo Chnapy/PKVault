@@ -59,15 +59,14 @@ public class MainUpdateBoxAction(
 
         if (box.Type == BoxType.Inventory)
         {
-            var allItems = await inventoryLoader.GetAllEntities();
-            var boxItems = allItems.Values.Where(item => item.BoxId == box.IdInt);
+            var boxItems = await inventoryLoader.GetEntitiesForBox(box.IdInt);
 
-            if (box.Type != input.type && boxItems.Any())
+            if (box.Type != input.type && boxItems.Count > 0)
                 throw new ArgumentException($"Cannot change Box Inventory type with items inside");
 
             if (box.SlotCount != input.slotCount)
             {
-                if (boxItems.Any(item => item.BoxSlot >= input.slotCount - 1))
+                if (boxItems.Values.Any(item => item.BoxSlot >= input.slotCount - 1))
                     throw new ArgumentException($"Box slot count change is blocked by an item");
             }
         }

@@ -34,8 +34,8 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
                     currentSlot++;
 
                     return new InventoryItemDTO(
-                        Id: $"{save.Id}_{pouch.Type}_{item.Index}",
-                        Item: item.Index,
+                        Id: $"{save.Id}_{pouch.Type}_{item.Index}_{currentSlot}",
+                        Item: (ushort)item.Index,
                         Name: itemsStrings[item.Index],
                         Type: pouch.Type,
                         Version: save.Version,
@@ -53,7 +53,7 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         var dto = GetDto(id);
         ArgumentNullException.ThrowIfNull(dto);
 
-        WriteItem(dto.Item, count => count - 1);
+        WriteItem(dto.Type, dto.BoxSlot, count => count - 1);
 
         var dto2 = GetDto(id);
 
@@ -70,41 +70,91 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         return dto;
     }
 
-    private void WriteItem(int item, Func<int, int> countFn)
+    private void WriteItem(ushort item, Func<int, int> countFn)
+    {
+        foreach (var pouch in Inventory.Pouches)
+        {
+            for (var i = 0; i < pouch.Items.Length; i++)
+            {
+                var found = pouch.Items[i];
+                if (found.Index != item)
+                    continue;
+
+                // all extra checks are done here
+                WriteItem(pouch.Type, i, countFn);
+                return;
+            }
+        }
+        throw new ArgumentException($"Item not found in save inventory, item={item}");
+    }
+
+    private void WriteItem(InventoryType type, int slot, Func<int, int> countFn)
     {
         // var items = GameInfo.Sources.GetItemDataSource(save.Version, save.Context, save.GetSave().HeldItems)
         //     .Select(e => e.Value)
         //     .Where(value => value <= save.MaxItemID)
         //     .ToHashSet();
 
-        if (!AllowedItems.Contains((ushort)item))
-            throw new ArgumentException($"Item manipulation not allowed, item={item} version={save.Version}");
+        void SetItem(InventoryPouch pouch, ushort itemValue, InventoryItem item)
+        {
+            if (!AllowedItems.Contains(itemValue))
+                throw new ArgumentException($"Item manipulation not allowed, type={type} item={itemValue} version={save.Version}");
+
+            item.Index = itemValue;
+
+            var count = countFn(item.Count);
+
+            if (count < 0
+                || count > pouch.MaxCount
+                || !Inventory.IsQuantitySane(pouch.Type, item.Index, ref count, hasNew: true)
+                || !Inventory.IsLegal(pouch.Type, item.Index, count)
+            )
+                throw new Exception($"Count is invalid for item={pouch.Type}/{item.Index} count={count}");
+
+            item.SetNewDetails(count);
+
+            Inventory.CopyTo(save.GetSave());
+            Inventory = save.CreateInventory();
+        }
 
         foreach (var pouch in Inventory.Pouches)
         {
-            InventoryItem found;
+            if (pouch.Type != type)
+                continue;
+
+            ushort itemValue = 0;
+
             for (var i = 0; i < pouch.Items.Length; i++)
             {
-                found = pouch.Items[i];
-                if (found.Index == item)
+                var item = pouch.Items[i];
+
+                if (itemValue == 0)
                 {
-                    var count = countFn(found.Count);
+                    if (i != slot)
+                        continue;
 
-                    if (!Inventory.IsQuantitySane(pouch.Type, found.Index, ref count, hasNew: true)
-                        || !Inventory.IsLegal(pouch.Type, item, count)
+                    itemValue = (ushort)item.Index;
+                }
+
+                if (item.Index == itemValue)
+                {
+                    if (countFn(item.Count) > pouch.MaxCount
+                        || countFn(item.Count) < 0
                     )
-                        throw new Exception($"Count is invalid for item={pouch.Type}/{found.Index} count={count}");
+                        continue;
 
-                    found.SetNewDetails(count);
-
-                    Inventory.CopyTo(save.GetSave());
-                    Inventory = save.CreateInventory();
-
+                    SetItem(pouch, itemValue, item);
+                    return;
+                }
+                else if (item.Index == 0)
+                {
+                    SetItem(pouch, itemValue, item);
                     return;
                 }
             }
+
+            throw new ArgumentException($"Item not found in save inventory, type={type} slot={slot}");
         }
-        throw new ArgumentException();
     }
 
     public InventoryItemDTO? GetDto(string id)

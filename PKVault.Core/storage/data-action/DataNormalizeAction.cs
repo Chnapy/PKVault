@@ -132,7 +132,7 @@ public class DataNormalizeAction(
         // <= 2.3.4
         if (currentVersion != null && GetVersionValue(currentVersion.Value) <= GetVersionValue("2.3.4"))
         {
-            await MigrateIdsFrom234();
+            await MigrateFrom234();
         }
 
         // --- Update version
@@ -550,7 +550,7 @@ public class DataNormalizeAction(
     }
 
     // add inventory boxes
-    private async Task MigrateIdsFrom234()
+    private async Task MigrateFrom234()
     {
         var boxes = await boxLoader.GetAllEntities();
 

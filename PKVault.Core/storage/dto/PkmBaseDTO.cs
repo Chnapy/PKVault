@@ -74,7 +74,7 @@ public abstract record PkmBaseDTO(
     public byte? OriginMetLevel => Pkm.OriginMetLevel;
     public bool FatefulEncounter => Pkm.FatefulEncounter;
 
-    public int HeldItem => Pkm.HeldItem;
+    public ushort HeldItem => Pkm.HeldItem;
     public string DynamicChecksum => Pkm.DynamicChecksum;
     public int NicknameMaxLength => Pkm.MaxStringLengthNickname;
     public LanguageID LanguageID => Pkm.LanguageID;

@@ -205,7 +205,7 @@ public class MoveItemAction(
             parameters: [
                 item.Item, item.Version,
                 sourceSaveId == null ? null : item.Version, item.PkmName,
-                variantConvertedHeldItem.Version, pkm.Nickname
+                null, pkm.Nickname
             ]
         );
     }
@@ -226,7 +226,7 @@ public class MoveItemAction(
             parameters: [
                 firstItem.Item, firstItem.Version,
                 sourceSaveId == null ? null : firstItem.Version, null,
-                targetItems.First().Version, null,
+                targetSaveId == null ? null : targetItems.First().Version, null,
             ]
         );
     }
@@ -247,17 +247,17 @@ public class MoveItemAction(
             parameters: [
                 firstItem.Item, firstItem.Version,
                 sourceSaveId == null ? null : firstItem.Version, firstItem.PkmName,
-                targetItems.First().Version, null,
+                targetSaveId == null ? null : targetItems.First().Version, null,
             ]
         );
     }
 
-    private async Task<InventoryItemDTO> IncrementInventoryItemCount(uint? saveId, int? boxId, int srcItem, GameVersion srcVersion, DataUpdateFlags flags)
+    private async Task<InventoryItemDTO> IncrementInventoryItemCount(uint? saveId, int? boxId, ushort srcItem, GameVersion srcVersion, DataUpdateFlags flags)
     {
         return (await IncrementInventoryItemCount(saveId, boxId, [(srcItem, srcVersion)], flags)).First();
     }
 
-    private async Task<InventoryItemDTO[]> IncrementInventoryItemCount(uint? saveId, int? boxId, (int Item, GameVersion Version)[] srcItems, DataUpdateFlags flags)
+    private async Task<InventoryItemDTO[]> IncrementInventoryItemCount(uint? saveId, int? boxId, (ushort Item, GameVersion Version)[] srcItems, DataUpdateFlags flags)
     {
         if (saveId == null)
         {
@@ -342,18 +342,18 @@ public class MoveItemAction(
         await editPkmSaveAction.ShareChangesToAttached(dto);
     }
 
-    private async Task<(int Item, GameVersion Version, string PkmName)> PickPkmItem(uint? saveId, string pkmId, DataUpdateFlags flags)
+    private async Task<(ushort Item, GameVersion Version, string PkmName)> PickPkmItem(uint? saveId, string pkmId, DataUpdateFlags flags)
     {
         return (await PickPkmItem(saveId, [pkmId], flags)).First();
     }
 
-    private async Task<(int Item, GameVersion Version, string PkmName)[]> PickPkmItem(uint? saveId, string[] pkmIds, DataUpdateFlags flags)
+    private async Task<(ushort Item, GameVersion Version, string PkmName)[]> PickPkmItem(uint? saveId, string[] pkmIds, DataUpdateFlags flags)
     {
         if (saveId == null)
         {
             var variants = await pkmVariantLoader.GetEntitiesByIds(pkmIds);
 
-            List<(int Item, GameVersion Version, string PkmName)> variantResults = [];
+            List<(ushort Item, GameVersion Version, string PkmName)> variantResults = [];
             foreach (var variant in variants.Values)
             {
                 ArgumentNullException.ThrowIfNull(variant);
@@ -381,7 +381,7 @@ public class MoveItemAction(
 
         var saveLoader = savesLoadersService.GetLoadersRequired((uint)saveId);
 
-        List<(int Item, GameVersion Version, string PkmName)> saveResults = [];
+        List<(ushort Item, GameVersion Version, string PkmName)> saveResults = [];
         foreach (var pkmId in pkmIds)
         {
             var dto = saveLoader.Pkms.GetDto(pkmId);

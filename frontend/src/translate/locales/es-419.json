@@ -378,7 +378,7 @@
   "storage.save-actions.type.main-set-pkm-main": "Establecer la variante principal {{generation}} del Pokémon {{name}}",
   "storage.save-actions.type.main-update-bank": "Editar el banco \"{{name}}\"",
   "storage.save-actions.type.main-update-box": "Editar la caja \"{{oldName}}\" en \"{{name}}\"",
-  "storage.save-actions.type.move-item": "Mover objeto {{itemName}} de {{sourceSave}} {{sourcePkm}} a {{targetSave}} {{targetPkm}}",
+  "storage.save-actions.type.move-item": "Mover 1 {{itemName}} de {{sourceSave}} {{sourcePkm}} a {{targetSave}} {{targetPkm}}",
   "storage.save-actions.type.move-pkm": "Mover {{attached}} el Pokémon {{pkmName}} de {{sourceSave}} a {{targetSave}} caja \"{{targetBoxName}}\" hueco {{targetBoxSlot}}",
   "storage.save-actions.type.save-delete-pkm": "Eliminar el Pokémon {{name}} de la partida {{save}}",
   "storage.save-actions.type.save-edit-pkm": "Editar el Pokémon {{name}} de la partida {{save}}",

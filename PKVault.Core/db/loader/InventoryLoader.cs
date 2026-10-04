@@ -6,8 +6,9 @@ namespace PKVault.Core;
 public interface IInventoryLoader : IEntityLoader<InventoryItemDTO, InventoryItemEntity>
 {
     public InventoryItemDTO CreateDTO(InventoryItemEntity entity);
-    public Task<InventoryItemDTO> IncrementItemCount(int item, GameVersion version, int boxId);
+    public Task<InventoryItemDTO> IncrementItemCount(ushort item, GameVersion version, int boxId);
     public Task<InventoryItemDTO> DecrementItemCount(string itemId);
+    public Task<Dictionary<string, InventoryItemEntity>> GetEntitiesForBox(int boxId);
     public Task<int> GetMaxBoxSlot(int boxId);
     public Task NormalizeOrders();
 }
@@ -45,7 +46,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
 
         return new(
             Id: entity.Id,
-            Item: entity.Item,
+            Item: (ushort)entity.Item,
             Name: entity.Item < Names.Length ? Names[entity.Item] : "",
             Type: InventoryType.None,
             Version: entity.Version,
@@ -78,7 +79,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         return versionData;
     }
 
-    public async Task<InventoryItemDTO> IncrementItemCount(int item, GameVersion version, int boxId)
+    public async Task<InventoryItemDTO> IncrementItemCount(ushort item, GameVersion version, int boxId)
     {
         var entity = await GetEntity(item, version, boxId);
 
@@ -87,12 +88,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
             var itemKey = await GetItemKey(item, version);
             var id = (await GetMaxId()) + 1;
 
-            var dbSet = await GetDbSet();
-            var boxItems = dbSet
-                .Where(e => e.BoxId == boxId);
-            var boxSlot = (await boxItems.AnyAsync())
-                ? (await boxItems.MaxAsync(e => e.BoxSlot)) + 1
-                : 0;
+            var boxSlot = (await GetMaxBoxSlot(boxId)) + 1;
 
             var box = await boxLoader.GetEntityRequired(boxId.ToString());
             if (box.Type != BoxType.Inventory)
@@ -136,7 +132,16 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         return CreateDTO(entity);
     }
 
-    public async Task<InventoryItemEntity?> GetEntity(int item, GameVersion version, int boxId)
+    public async Task<Dictionary<string, InventoryItemEntity>> GetEntitiesForBox(int boxId)
+    {
+        var dbSet = await GetDbSet();
+
+        return await dbSet
+            .Where(p => p.BoxId == boxId)
+            .ToDictionaryAsync(p => p.Id);
+    }
+
+    public async Task<InventoryItemEntity?> GetEntity(ushort item, GameVersion version, int boxId)
     {
         var itemKey = await GetItemKey(item, version);
 
@@ -198,7 +203,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         await db.SaveChangesAsync();
     }
 
-    private async Task<string> GetItemKey(int item, GameVersion version)
+    private async Task<string> GetItemKey(ushort item, GameVersion version)
     {
         var staticItems = (await staticDataService.GetStaticOthers()).Items;
 

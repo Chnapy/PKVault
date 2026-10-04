@@ -2,7 +2,7 @@ import { SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
-import type { StorageSortPkmsParams } from '../../data/sdk/model';
+import { BoxType, type StorageSortPkmsParams } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
@@ -38,12 +38,18 @@ export const SortAdvancedAction: React.FC<{
 
     const versions = versionsQuery.data ?? [];
 
-    const bankId = boxes.find(box => box.idInt === boxId)?.bankId;
+    const currentBox = boxes.find(box => box.idInt === boxId);
+    const bankId = currentBox?.bankId;
 
     const filteredBoxes = boxes
         .filter(box => box.bankId === bankId)
+        .filter(box => box.type !== BoxType.Inventory)
         .filter(box => !saveId || box.canSaveReceivePkm)
         .sort((box1, box2) => (box1.order < box2.order ? -1 : 1)) ?? [];
+
+    const initialBox = currentBox?.type === BoxType.Inventory
+        ? filteredBoxes[ 0 ]
+        : currentBox;
 
     const staticData = useStaticData();
 
@@ -56,8 +62,8 @@ export const SortAdvancedAction: React.FC<{
 
     const { handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
         defaultValues: {
-            fromBoxId: boxId,
-            toBoxId: boxId,
+            fromBoxId: initialBox?.idInt,
+            toBoxId: initialBox?.idInt,
             pokedexName: pokedexKeys[ 0 ],
             leaveEmptySlot: false,
         },

@@ -127,7 +127,7 @@ public class SavesLoadersService(
 
         foreach (var loaders in Loaders.Values.ToList())
         {
-            if (loaders.Pkms.HasWritten || loaders.Boxes.HasWritten || loaders.Inventory.HasWritten)
+            if (loaders.HasWritten)
             {
                 tasks.Add(
                     WriteSave(loaders.Save)
@@ -376,4 +376,7 @@ public record SaveLoadersRecord(
     ISavePkmLoader Pkms,
     ISaveInventoryLoader Inventory,
     SaveInfosDTO[] Duplicates
-);
+)
+{
+    public bool HasWritten => Boxes.HasWritten || Pkms.HasWritten || Inventory.HasWritten;
+};

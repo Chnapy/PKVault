@@ -378,7 +378,7 @@
   "storage.save-actions.type.main-set-pkm-main": "Définir la variante {{generation}} comme principale du pokémon {{name}}",
   "storage.save-actions.type.main-update-bank": "Éditer la banque \"{{name}}\"",
   "storage.save-actions.type.main-update-box": "Éditer la boîte \"{{oldName}}\" en \"{{name}}\"",
-  "storage.save-actions.type.move-item": "Déplacer l'objet {{itemName}} de {{sourceSave}} {{sourcePkm}} vers {{targetSave}} {{targetPkm}}",
+  "storage.save-actions.type.move-item": "Déplacer 1 {{itemName}} de {{sourceSave}} {{sourcePkm}} vers {{targetSave}} {{targetPkm}}",
   "storage.save-actions.type.move-pkm": "Déplacer {{attached}} pokémon {{pkmName}} de {{sourceSave}} à {{targetSave}} boîte \"{{targetBoxName}}\" emplacement {{targetBoxSlot}}",
   "storage.save-actions.type.save-delete-pkm": "Supprimer le pokémon {{name}} depuis la sauvegarde {{save}}",
   "storage.save-actions.type.save-edit-pkm": "Éditer le pokémon {{name}} de la sauvegarde {{save}}",

@@ -53,7 +53,7 @@ public class WarningsService(
         }
 
         return [.. savesLoaders
-            .Where(saveLoaders => saveLoaders.Boxes.HasWritten || saveLoaders.Pkms.HasWritten || saveLoaders.Inventory.HasWritten)
+            .Where(saveLoaders => saveLoaders.HasWritten)
             .Where(saveLoaders =>
             {
                 var path = saveLoaders.Save.Metadata.FilePath;
