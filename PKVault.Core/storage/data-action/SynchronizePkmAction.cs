@@ -129,7 +129,7 @@ public class SynchronizePkmAction(
 
                 variantPkm = variantPkm.Update(pkm =>
                 {
-                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm, savePkm.Save.GetSave());
+                    pkmSharePropertiesService.SharePropertiesTo(savePkm.Pkm, pkm, null);
                 });
 
                 var variantEntity = await pkmVariantLoader.GetEntityRequired(variant.Id);

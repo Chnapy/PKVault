@@ -29,7 +29,6 @@ public class PKMConverterUtils
         FixHandlingTrainer(pkm, ctx);
         FixPersonalData(pkm, pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, pkm.Ability, true, ctx);
         FixBallLegality(pkm, ctx);
-        FixHeldItemLegality(pkm, ctx);
         FixRibbonLegality(pkm, ctx);
         FixContestLegality(pkm, ctx);
         FixPokerusLegality(pkm, ctx);
@@ -37,6 +36,7 @@ public class PKMConverterUtils
         FixRelearnMovesLegality(pkm, ctx);
         FixRegionLegality(pkm, ctx);
         FixMemories(pkm);
+        FixHeldItemLegality(pkm, ctx);
     }
 
     private void FixMemories(PKM pkm)
@@ -362,6 +362,10 @@ public class PKMConverterUtils
 
     public void FixHeldItemLegality(PKM pkm, ConvertContext ctx)
     {
+        // has false-positives
+        if (pkm.Context == EntityContext.Gen3)
+            return;
+
         var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
 
         if (!la.Valid && la.Results.Any(r =>
@@ -432,8 +436,6 @@ public class PKMConverterUtils
             : GameUtil.GameVersions.Where(v => v.Context == pkm.Context).ToArray();
 
         var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersions);
-
-        // Console.WriteLine($"CONVERT HELD-ITEM {srcContext}/{srcHeldItem} -> {heldItem.Version}/{heldItem.Item}");
 
         if (heldItem.Item != 0)
             pkm.HeldItem = heldItem.Item;

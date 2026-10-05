@@ -131,7 +131,9 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
             entry.Key,
             boxLoader.CreateDTO(
                 entry.Value,
-                GetWallpaperName(entry.Value.IdInt),
+                entry.Value.Type == BoxType.Inventory
+                    ? null
+                    : GetWallpaperName(entry.Value.IdInt),
                 Version: save.Version
             )
         )).ToDictionary();

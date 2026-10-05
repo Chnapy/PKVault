@@ -45,7 +45,8 @@ export const validateRoot = (slotInfosList: ValidateRootSlot[]): DropValidationR
                 return { canDrop: false, reason: 'multiple-items-to-pkm', slotInfos: undefined };
             }
 
-            if (slotInfosList.some(infos => infos.targetBox?.type !== BoxType.Inventory
+            if (slotInfosList.some(infos => infos.targetBox
+                && infos.targetBox.type !== BoxType.Inventory
                 && !infos.targetPkm
             )) {
                 return { canDrop: false, reason: 'items-to-pkm-empty-slot', slotInfos: undefined };

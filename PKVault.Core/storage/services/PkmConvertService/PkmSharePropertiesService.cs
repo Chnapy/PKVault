@@ -154,7 +154,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, PKM
             }
         }
 
-        if (source.CanHeldItem)
+        if (source.CanHeldItem && resultPkm.HeldItem > 0)
         {
             utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context.GetSingleGameVersion(), save?.Version);
         }
