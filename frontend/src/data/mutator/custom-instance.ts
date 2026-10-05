@@ -47,7 +47,10 @@ export const customInstance = async <T extends ResponseBack>(url: string, init?:
         const data = body ? JSON.parse(body) : {};
 
         return { data, status: res.status, headers: res.headers } satisfies ResponseBack as T;
-    } catch(err) {
+    } catch (err) {
+        if (err instanceof QueryError)
+            throw err;
+
         if (err instanceof DOMException && err.name === 'AbortError') {
             throw err;
         }
@@ -90,6 +93,9 @@ export class QueryError extends Error {
     public readonly errorStack: string | null;
 
     constructor(res: Pick<SerializableResponse, 'url' | 'status' | 'statusText' | 'headers'>, error?: Error) {
+        if (error && error instanceof QueryError)
+            console.error('Inner error cannot be a QueryError', { error });
+
         const errorMessage = error?.message ?? QueryError.getHeaderContent(res.headers.get('error-message'));
         const errorStack = error?.stack ?? QueryError.getHeaderContent(res.headers.get('error-stack'));
 

@@ -140,6 +140,8 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         []);
 
+    const pkmLoading = storageMode === 'default' && loading;
+
     return <>
         <WithControlsIcons
             placement='out' icons={controlIcons('open', 'drag', 'drag-attached', 'drop')}
@@ -151,7 +153,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     <UIDetailsLevel level={level} showBar />
                 </>}
                 selected={selected}
-                loading={loading}
+                loading={pkmLoading}
                 {...focusProps}
                 {...controlProps('open', 'drag', 'drag-attached', 'drop')}
                 {...buttonProps}

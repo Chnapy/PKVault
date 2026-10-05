@@ -419,7 +419,7 @@ public class PKMConverterUtils
         }
     }
 
-    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion? destVersion)
+    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, GameVersion srcVersion, GameVersion? destVersion)
     {
         if (srcHeldItem == 0)
         {
@@ -431,7 +431,7 @@ public class PKMConverterUtils
             ? [(GameVersion)destVersion]
             : GameUtil.GameVersions.Where(v => v.Context == pkm.Context).ToArray();
 
-        var heldItem = ConvertHeldItem(srcHeldItem, srcContext, targetVersions);
+        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersions);
 
         // Console.WriteLine($"CONVERT HELD-ITEM {srcContext}/{srcHeldItem} -> {heldItem.Version}/{heldItem.Item}");
 
@@ -439,26 +439,27 @@ public class PKMConverterUtils
             pkm.HeldItem = heldItem.Item;
     }
 
-    public (ushort Item, GameVersion Version) ConvertHeldItemRequired(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions, bool held = true)
+    public (ushort Item, GameVersion Version) ConvertHeldItemRequired(int srcHeldItem, GameVersion srcVersion, GameVersion[] targetVersions, bool held = true)
     {
         if (srcHeldItem == 0)
             return (0, targetVersions.First());
 
-        var heldItem = ConvertHeldItem(srcHeldItem, srcContext, targetVersions, held);
+        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersions, held);
         if (heldItem.Item == 0)
-            throw new ArgumentException($"Held item {srcContext}/{srcHeldItem} is not compatible with target versions {string.Join(',', targetVersions)}");
+            throw new ArgumentException($"Held item {srcVersion}/{srcHeldItem} is not compatible with target versions {string.Join(',', targetVersions)}");
         return heldItem;
     }
 
-    public (ushort Item, GameVersion Version) ConvertHeldItem(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions, bool held = true)
+    public (ushort Item, GameVersion Version) ConvertHeldItem(int srcHeldItem, GameVersion srcVersion, GameVersion[] targetVersions, bool held = true)
     {
         // only convert by string is reliable
-        return ConvertHeldItemByString(srcHeldItem, srcContext, targetVersions, held);
+        return ConvertHeldItemByString(srcHeldItem, srcVersion, targetVersions, held);
     }
 
-    public (ushort Item, GameVersion Version) ConvertHeldItemByString(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions, bool held = true)
+    public (ushort Item, GameVersion Version) ConvertHeldItemByString(int srcHeldItem, GameVersion srcVersion, GameVersion[] targetVersions, bool held = true)
     {
         // Required especially with COLO/XD
+        srcVersion = GameVersionUtil.GetSingleVersion(srcVersion);
         targetVersions = targetVersions
             .Select(GameVersionUtil.GetSingleVersion)
             .Where(v => v != default)
@@ -470,7 +471,10 @@ public class PKMConverterUtils
 
         var staticVersionsItems = GetStaticVersionsSavesAllowedItems().StaticVersionsItems;
 
-        var srcVersionItems = staticVersionsItems.First(vi => vi.Versions.Contains((byte)srcContext.GetSingleGameVersion()));
+        if (srcVersion == 0)
+            throw new Exception($"GameVersion cannot be 0");
+
+        var srcVersionItems = staticVersionsItems.First(vi => vi.Versions.Contains((byte)srcVersion));
         var itemKey = srcVersionItems.ComboInventoryItems[(ushort)srcHeldItem];
 
         foreach (var targetVersion in targetVersions)

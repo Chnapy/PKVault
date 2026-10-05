@@ -10,7 +10,7 @@ public interface ISaveInventoryLoader
     public Dictionary<string, InventoryItemDTO> GetAllDtos();
     public InventoryItemDTO? GetDto(string id);
     public InventoryItemDTO DecrementItemCount(string id);
-    public InventoryItemDTO IncrementItemCount(InventoryType type, int srcItem, EntityContext srcContext);
+    public InventoryItemDTO IncrementItemCount(InventoryType type, int srcItem, GameVersion srcVersion);
 }
 
 public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsService, PKMConverterUtils pkmConverterUtils) : ISaveInventoryLoader
@@ -43,7 +43,7 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
                     Item: (ushort)item.Index,
                     Name: itemsStrings[item.Index],
                     Type: pouch.Type,
-                    Version: save.Version,
+                    Version: GameVersionUtil.GetSingleVersion(save.Version),
                     Count: item.Count,
                     BoxId: SaveBoxLoader.GetInventoryBoxId(pouch.Type),
                     BoxSlot: currentSlot,
@@ -67,9 +67,9 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
         return dto2 ?? dto;
     }
 
-    public InventoryItemDTO IncrementItemCount(InventoryType type, int srcItem, EntityContext srcContext)
+    public InventoryItemDTO IncrementItemCount(InventoryType type, int srcItem, GameVersion srcVersion)
     {
-        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcContext, [save.Version], held: false);
+        var convertedItem = pkmConverterUtils.ConvertHeldItemRequired(srcItem, srcVersion, [save.Version], held: false);
 
         WriteItem(type, convertedItem.Item, count => count + 1);
 
@@ -98,8 +98,10 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
 
             // all extra checks are done here
             WriteItem(pouch.Type, i, countFn);
-            break;
+            return;
         }
+
+        throw new ArgumentException($"No enough space in save inventory, type={type} item={item} items.count={pouch.Items.Length}");
     }
 
     private void WriteItem(InventoryType type, int slot, Func<int, int> countFn)
