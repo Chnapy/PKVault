@@ -236,6 +236,8 @@
   "settings.external.3.description": "外部 PKM 檔案為唯讀，無法透過 PKVault 變更你的檔案。",
   "settings.external.3.label": "安全性",
   "settings.form.config": "設定檔路徑",
+  "settings.form.enable-gamepad": "遊戲手把/鍵盤導航",
+  "settings.form.enable-gamepad.description": "可以使用遊戲手把和鍵盤進行導航",
   "settings.form.globs.help": "檔案會直接在原位置讀取與修改，無須上傳、下載或管理副本。",
   "settings.form.globs.results": "所有結果",
   "settings.form.hide-cheats": "隱藏修改功能",

@@ -236,6 +236,8 @@
   "settings.external.3.description": "Defina o caminho das pastas de arquivos PKM avulsos.",
   "settings.external.3.label": "Pastas externas",
   "settings.form.config": "Caminho das configurações",
+  "settings.form.enable-gamepad": "Navegação por gamepad/teclado",
+  "settings.form.enable-gamepad.description": "Gamepad e teclado podem ser usados ​​para navegação",
   "settings.form.globs.help": "Padrões globais para ignorar arquivos específicos.",
   "settings.form.globs.results": "Todos os resultados",
   "settings.form.hide-cheats": "Ocultar cheats na edição de pokémon (EVs, moves)",

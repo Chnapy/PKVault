@@ -1,4 +1,4 @@
-import { Group, InputWrapper, Stack, Text, type InputWrapperProps } from '@mantine/core';
+import { Box, Group, InputWrapper, Stack, Text, type InputWrapperProps } from '@mantine/core';
 import type React from 'react';
 
 type UIInputLabelProps = {
@@ -15,7 +15,7 @@ export const UIInputLabel: React.FC<UIInputLabelProps> = ({ forInput, leftSectio
         label={<Group wrap='nowrap' py={3}>
             {leftSection}
             <Stack gap={0}>
-                {label}
+                <Box lh={1}>{label}</Box>
 
                 {description && <Text c='dimmed' fz='sm' lh={1}>
                     {description}
