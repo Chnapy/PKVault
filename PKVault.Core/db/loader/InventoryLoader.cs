@@ -53,6 +53,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
             Count: entity.Count,
             BoxId: entity.BoxId,
             BoxSlot: entity.BoxSlot,
+            InventorySlot: entity.BoxSlot,
             CanBeHeld: entity.Item <= ushort.MaxValue && Allowed.Contains((ushort)entity.Item)
         );
     }
@@ -71,7 +72,7 @@ public class InventoryLoader : EntityLoader<InventoryItemDTO, InventoryItemEntit
         {
             var itemsStrings = GameInfo.GetStrings(pkhexLang)
                 .GetItemStrings(version.Context, version);
-            var (_, allowedInventoryItems, _) = pkmConverterUtils.allSavesAllowedItems[(byte)version];
+            var (_, allowedInventoryItems, _) = pkmConverterUtils.GetStaticVersionsSavesAllowedItems().SavesAllowedItems[(byte)version];
 
             versionData = (itemsStrings, allowedInventoryItems);
             VersionDataDict.Add(version, versionData);

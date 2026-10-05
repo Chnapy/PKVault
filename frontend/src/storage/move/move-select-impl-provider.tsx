@@ -90,16 +90,19 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                         break;
                     }
                     default: {
+                        if (sourceContainer.type === 'bank')
+                            throw new Error();
+
                         const targetPkmId = target.targetContainer.type === 'inventory-item' ? undefined : target.targetId;
 
                         try {
                             const response = await storageMoveItem({
                                 sourceSaveId: sourceContainer.saveId ?? null,
-                                sourceBoxId: sourceContainer.boxId ?? null,
+                                sourceBoxId: sourceContainer.boxId,
                                 sourceItemIds,
                                 sourcePkmIds,
                                 targetSaveId: target.targetContainer.saveId ?? null,
-                                targetBoxId: target.targetContainer.boxId ?? null,
+                                targetBoxId: target.targetContainer.boxId,
                                 targetPkmId,
                             });
                             updateCacheMutationResponse(queryClient, response);

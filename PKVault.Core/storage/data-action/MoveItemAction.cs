@@ -353,6 +353,8 @@ public class MoveItemAction(
         {
             var variants = await pkmVariantLoader.GetEntitiesByIds(pkmIds);
 
+            var savesAllowedItems = pkmConverterUtils.GetStaticVersionsSavesAllowedItems().SavesAllowedItems;
+
             List<(ushort Item, GameVersion Version, string PkmName)> variantResults = [];
             foreach (var variant in variants.Values)
             {
@@ -371,7 +373,7 @@ public class MoveItemAction(
                 await editPkmVariantAction.ShareChangesToVariantsAndAttached(variant, pkm, flags);
 
                 var version = GetVariantGameVersions(variant).First(version =>
-                    pkmConverterUtils.allSavesAllowedItems[(byte)version].AllowedInventoryItems.Contains(variantItem)
+                    savesAllowedItems[(byte)version].AllowedInventoryItems.Contains(variantItem)
                 );
 
                 variantResults.Add((variantItem, version, pkm.Nickname));

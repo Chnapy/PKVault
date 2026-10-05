@@ -10,8 +10,9 @@ export const validateCommon = (
 ): DropValidationResult => {
     switch (slotInfos.mode) {
         case 'inventory': {
-            if (slotInfos.sourceBox?.id === slotInfos.targetBox?.id
-                && slotInfos.sourceBox?.type === BoxType.Inventory)
+            if (slotInfos.sourceBox?.type === BoxType.Inventory
+                && slotInfos.sourceSave?.id === slotInfos.targetSave?.id
+                && slotInfos.sourceBox.id === slotInfos.targetBox?.id)
                 return {
                     canDrop: false,
                     reason: 'item-same-inventory',
@@ -32,13 +33,19 @@ export const validateCommon = (
                     slotInfos,
                 };
 
+            if (slotInfos.sourceItem && slotInfos.targetPkm && !slotInfos.sourceItem.canBeHeld)
+                return {
+                    canDrop: false,
+                    reason: 'item-not-compatible',
+                    slotInfos,
+                };
+
             const sourceVersion = slotInfos.sourceItem?.version ?? slotInfos.sourcePkm?.contextVersion;
             const sourceHeldItem = slotInfos.sourceItem?.item ?? slotInfos.sourcePkm?.heldItem;
             const targetVersion = slotInfos.targetSave?.displayedVersion ?? slotInfos.targetPkm?.contextVersion;
 
             if (sourceVersion && sourceHeldItem && targetVersion) {
                 if (!isItemCompatible(sourceHeldItem, sourceVersion, targetVersion)) {
-                    console.log({ sourceHeldItem, sourceVersion, targetVersion })
                     return {
                         canDrop: false,
                         reason: 'item-not-compatible',

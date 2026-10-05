@@ -14,13 +14,15 @@ public class GenStaticOthers(
 {
     protected override async Task<StaticOthersData> GetData(string[] rootParts)
     {
-        var versions = GetStaticVersions();
+        var versionsSavesAllowedItems = StaticOthersLoader.ComputeStaticVersionsSavesAllowedItems();
+
+        var versions = GetStaticVersions(versionsSavesAllowedItems);
         var stats = GetStaticStats();
         var types = GetStaticTypes();
         var moves = GetStaticMoves();
         var natures = GetStaticNatures();
         var abilities = GetStaticAbilities();
-        var items = GetStaticItems();
+        var items = GetStaticItems(versionsSavesAllowedItems);
         var generations = GetStaticGenerations();
         var pokedexes = GetStaticPokedexes();
 
@@ -40,19 +42,17 @@ public class GenStaticOthers(
         );
     }
 
-    private async Task<Dictionary<byte, StaticVersion>> GetStaticVersions()
+    private async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(StaticOthersLoader.VersionsSavesAllowedItems versionsSavesAllowedItems)
     {
         using var _ = Log.Logger.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
         var staticVersions = new Dictionary<int, StaticVersion>();
 
-        var allSavesAllowedItems = StaticOthersLoader.GetAllSavesAllowedItems();
-
         foreach (var version in Enum.GetValues<GameVersion>())
         {
             tasks.Add(Task.Run(async () =>
             {
-                var (blankSave, _, _) = allSavesAllowedItems[(byte)version];
+                var (blankSave, _, _) = versionsSavesAllowedItems.SavesAllowedItems[(byte)version];
 
                 var versionName = GetVersionName(version);
                 var versionRegion = GetVersionRegionName(version);
@@ -327,13 +327,12 @@ public class GenStaticOthers(
         return dict;
     }
 
-    private async Task<StaticItemsData> GetStaticItems()
+    private async Task<StaticItemsData> GetStaticItems(StaticOthersLoader.VersionsSavesAllowedItems versionsSavesAllowedItems)
     {
         using var _ = Log.Logger.Time($"static-data {lang} process items");
 
-        var allSavesAllowedItems = StaticOthersLoader.GetAllSavesAllowedItems();
+        var (staticVersionsItems, savesAllowedItems, allVersionsItemStrings) = versionsSavesAllowedItems;
 
-        List<StaticVersionsItems> VersionItems = [];
         Dictionary<string, StaticItem> Items = [];
 
         // var notFound = new List<string>();
@@ -341,7 +340,7 @@ public class GenStaticOthers(
 
         ComboItem[] getInventoryItemStrings(GameVersion _version, GameStrings strings)
         {
-            var (save, allowedInventoryItems, allowedHeldItems) = allSavesAllowedItems[(byte)_version];
+            var (save, allowedInventoryItems, allowedHeldItems) = savesAllowedItems[(byte)_version];
 
             if (save == default)
             {
@@ -358,73 +357,15 @@ public class GenStaticOthers(
             return allowedInventoryItemsCombo.OrderBy(i => i.Value).ToArray();
         }
 
-        string GetKey(ComboItem[] allowedInventoryItems, ComboItem[] allowedHeldItemsCombo) =>
-            string.Join('.', allowedInventoryItems.Select(it => $"{it.Text},{it.Value}"))
-            + '_' + string.Join('.', allowedHeldItemsCombo.Select(it => $"{it.Text},{it.Value}"));
-
-        var allVersionsItemStrings = Enum.GetValues<GameVersion>()
-            .ToDictionary(
-                version => version,
-                version =>
-                {
-                    var inventoryItemsEn = getInventoryItemStrings(version, GameInfo.Strings);
-                    var heldItemsEn = inventoryItemsEn.Where(item =>
-                        allSavesAllowedItems[(byte)version].AllowedHeldItems.Contains((ushort)item.Value))
-                        .ToArray();
-                    var key = GetKey(inventoryItemsEn, heldItemsEn);
-
-                    var inventoryItems = GameInfo.CurrentLanguage == pkhexLang
-                        ? inventoryItemsEn
-                        : getInventoryItemStrings(version, GameInfo.GetStrings(pkhexLang));
-
-                    return (ItemsEn: inventoryItemsEn, Items: inventoryItems, Key: key);
-                });
-
-        foreach (var version in Enum.GetValues<GameVersion>())
-        {
-            var itemlist = allVersionsItemStrings[version].ItemsEn;
-
-            var versionItem = VersionItems.FirstOrDefault(st =>
-            {
-                var vers = (GameVersion)st.Versions.FirstOrDefault();
-                return allVersionsItemStrings[version].Key == allVersionsItemStrings[vers].Key;
-            });
-
-            if (versionItem == default)
-            {
-                Dictionary<ushort, string> comboInventoryItems = [];
-                foreach (var item in itemlist)
-                {
-                    var itemNamePokeapi = PokeApiFromPKHeX.GetPokeapiItemName(item.Text);
-                    if (comboInventoryItems.TryGetValue((ushort)item.Value, out var textPokeapi))
-                    {
-                        if (textPokeapi == itemNamePokeapi)
-                        {
-                            continue;
-                        }
-
-                        throw new Exception($"Key exists, key={item.Value} existingText={textPokeapi} tryText={itemNamePokeapi}");
-                    }
-                    comboInventoryItems.Add((ushort)item.Value, itemNamePokeapi);
-                }
-
-                versionItem = new(
-                        Versions: [],
-                        ComboInventoryItems: comboInventoryItems,
-                        AllowedHeldItems: allSavesAllowedItems[(byte)version].AllowedHeldItems
-                );
-                VersionItems.Add(versionItem);
-            }
-            versionItem.Versions.Add((byte)version);
-        }
-
-        foreach (var (Versions, _, _) in VersionItems)
+        foreach (var (Versions, _, _) in staticVersionsItems)
         {
             var version = (GameVersion)Versions.First();
             var itemsEn = allVersionsItemStrings[version].ItemsEn;
-            var items = allVersionsItemStrings[version].Items;
+            var items = GameInfo.CurrentLanguage == pkhexLang
+                ? itemsEn
+                : getInventoryItemStrings(version, GameInfo.GetStrings(pkhexLang));
 
-            for (var i = 0; i < items.Length; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
 
@@ -466,7 +407,7 @@ public class GenStaticOthers(
         }
 
         return new(
-            VersionItems,
+            VersionItems: staticVersionsItems,
             Items
         );
     }

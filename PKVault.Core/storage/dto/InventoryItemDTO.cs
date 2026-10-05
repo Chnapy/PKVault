@@ -11,5 +11,6 @@ public record InventoryItemDTO(
     int Count,
     int BoxId,
     int BoxSlot,
+    int InventorySlot,
     bool CanBeHeld
 ) : IWithId;

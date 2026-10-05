@@ -68,6 +68,14 @@ export const validateSaveToSave = (
           slotInfos,
         };
       }
+
+      if (slotInfos.sourceSave.context !== slotInfos.targetSave.context) {
+        return {
+          canDrop: false,
+          reason: 'save-to-save-not-same-context',
+          slotInfos,
+        };
+      }
       break;
   }
 
@@ -75,14 +83,6 @@ export const validateSaveToSave = (
     return {
       canDrop: false,
       reason: 'same-pkm-id',
-      slotInfos,
-    };
-  }
-
-  if (slotInfos.sourceSave.context !== slotInfos.targetSave.context) {
-    return {
-      canDrop: false,
-      reason: 'save-to-save-not-same-context',
       slotInfos,
     };
   }

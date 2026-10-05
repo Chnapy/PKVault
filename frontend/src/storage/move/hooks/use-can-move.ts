@@ -57,7 +57,7 @@ export const useCanMove = (container: MoveContainerValue, sourceIds: string[]) =
                 if (!item)
                     return false;
 
-                return item.canBeHeld;
+                return true;
             }), [ sourceIds ]),
             enabled: container.type === 'inventory-item',
         },

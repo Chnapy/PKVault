@@ -3908,6 +3908,7 @@
           "count",
           "boxId",
           "boxSlot",
+          "inventorySlot",
           "canBeHeld"
         ],
         "properties": {
@@ -3935,6 +3936,10 @@
             "format": "int32"
           },
           "boxSlot": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inventorySlot": {
             "type": "integer",
             "format": "int32"
           },

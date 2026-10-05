@@ -2,14 +2,19 @@ import { BoxType, type BoxDTO, type InventoryItemDTO, type PkmBaseDTO, type Save
 import type { StorageMode } from '../../../../ui/inventory/context/storage-mode-context';
 import type { DropValidationResult } from '../types';
 
+type Box = Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
+type Pkm = Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem' | 'canEdit'>;
+type Save = Pick<SaveInfosDTO, 'id' | 'displayedVersion'>;
+
 export type ValidateRootSlot = {
     mode: StorageMode;
-    sourceBox?: Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
-    sourcePkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem' | 'canEdit'>;
-    sourceItem?: Pick<InventoryItemDTO, 'boxSlot' | 'id' | 'item' | 'version' | 'count'>;
-    targetSave?: Pick<SaveInfosDTO, 'displayedVersion'>;
-    targetBox?: Pick<BoxDTO, 'id' | 'type' | 'name' | 'slotCount'>;
-    targetPkm?: Pick<PkmBaseDTO, 'boxSlot' | 'canMove' | 'nickname' | 'context' | 'contextVersion' | 'heldItem' | 'canHeldItem' | 'canEdit'>;
+    sourceSave?: Save;
+    sourceBox?: Box;
+    sourcePkm?: Pkm;
+    sourceItem?: Pick<InventoryItemDTO, 'boxSlot' | 'id' | 'item' | 'version' | 'count' | 'canBeHeld'>;
+    targetSave?: Save;
+    targetBox?: Box;
+    targetPkm?: Pkm;
     targetSlot?: number;
 };
 

@@ -14,8 +14,15 @@ public record ConvertContext(
 public class PKMConverterUtils
 {
     private readonly PKMPersonalFixer personalFixer = new();
-    public readonly Dictionary<byte, (SaveFile? Save, HashSet<ushort> AllowedInventoryItems, HashSet<ushort> AllowedHeldItems)> allSavesAllowedItems =
-        StaticOthersLoader.GetAllSavesAllowedItems();
+
+    private StaticOthersLoader.VersionsSavesAllowedItems? StaticVersionsSavesAllowedItems = null;
+
+    public StaticOthersLoader.VersionsSavesAllowedItems GetStaticVersionsSavesAllowedItems()
+    {
+        if (StaticVersionsSavesAllowedItems == null)
+            StaticVersionsSavesAllowedItems = StaticOthersLoader.ComputeStaticVersionsSavesAllowedItems();
+        return StaticVersionsSavesAllowedItems;
+    }
 
     public void FixCommonLegalityIssues(PKM pkm, ConvertContext ctx)
     {
@@ -445,56 +452,42 @@ public class PKMConverterUtils
 
     public (ushort Item, GameVersion Version) ConvertHeldItem(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions, bool held = true)
     {
-        var firstVersion = targetVersions.First();
-        if (srcHeldItem == 0)
-            return (0, firstVersion);
-
-        var heldItem = (
-            Item: (ushort)ItemConverter.GetItemForFormat(srcHeldItem, srcContext, firstVersion.Context),
-            Version: firstVersion
-        );
-        if (heldItem.Item == 0)
-            heldItem = ConvertHeldItemByString(srcHeldItem, srcContext, targetVersions, held);
-
-        if (heldItem.Item == 0)
-            return heldItem;
-
-        foreach (var targetVersion in targetVersions)
-        {
-            var allowedHeldItems = held
-                ? allSavesAllowedItems[(byte)targetVersion].AllowedHeldItems
-                : allSavesAllowedItems[(byte)targetVersion].AllowedInventoryItems;
-            if (!allowedHeldItems.Contains(heldItem.Item))
-                continue;
-            return (heldItem.Item, targetVersion);
-        }
-
-        return heldItem;
+        // only convert by string is reliable
+        return ConvertHeldItemByString(srcHeldItem, srcContext, targetVersions, held);
     }
 
     public (ushort Item, GameVersion Version) ConvertHeldItemByString(int srcHeldItem, EntityContext srcContext, GameVersion[] targetVersions, bool held = true)
     {
+        // Required especially with COLO/XD
+        targetVersions = targetVersions
+            .Select(GameVersionUtil.GetSingleVersion)
+            .Where(v => v != default)
+            .Distinct()
+            .ToArray();
+
         if (srcHeldItem == 0)
             return (0, targetVersions.First());
 
-        var stringsSrc = GameInfo.Strings.GetItemStrings(srcContext);
-        var strSrc = stringsSrc[srcHeldItem];
+        var staticVersionsItems = GetStaticVersionsSavesAllowedItems().StaticVersionsItems;
+
+        var srcVersionItems = staticVersionsItems.First(vi => vi.Versions.Contains((byte)srcContext.GetSingleGameVersion()));
+        var itemKey = srcVersionItems.ComboInventoryItems[(ushort)srcHeldItem];
 
         foreach (var targetVersion in targetVersions)
         {
-            var stringsDest = GameInfo.Strings.GetItemStrings(targetVersion.Context, targetVersion);
-
-            var strDestIndex = (ushort)stringsDest.ToList().FindIndex(str => str == strSrc);
-            if (strDestIndex <= 0)
+            var destVersionItems = staticVersionsItems.FirstOrDefault(vi => vi.Versions.Contains((byte)targetVersion));
+            if (destVersionItems == default)
                 continue;
 
-            var allowedHeldItems = held
-                ? allSavesAllowedItems[(byte)targetVersion].AllowedHeldItems
-                : allSavesAllowedItems[(byte)targetVersion].AllowedInventoryItems;
-            if (!allowedHeldItems.Contains(strDestIndex))
+            var destEntry = destVersionItems.ComboInventoryItems.FirstOrDefault(item => item.Value == itemKey);
+            if (destEntry.Key == default)
                 continue;
 
-            return (strDestIndex, targetVersion);
+            if (held
+                && !destVersionItems.AllowedHeldItems.Contains(destEntry.Key))
+                continue;
+
+            return (destEntry.Key, targetVersion);
         }
 
         return default;
