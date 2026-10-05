@@ -7,6 +7,7 @@ public record DataDTO(
     DataDTOState<Dictionary<string, BoxDTO?>>? MainBoxes,
     DataDTOState<Dictionary<string, PkmVariantDTO?>>? MainPkmVariants,
     DataDTOState<Dictionary<string, PkmLegalityDTO?>>? MainPkmLegalities,
+    Dictionary<string, InventoryItemDTO>? MainInventoryItems,
     DataDTOState<Dictionary<ushort, Dictionary<uint, DexItemDTO>>>? Dex,
     List<DataSaveDTO>? Saves,
     bool InvalidateAllSaves,
@@ -24,7 +25,8 @@ public record DataSaveDTO(
     uint SaveId,
     List<BoxDTO>? SaveBoxes,
     DataDTOState<Dictionary<string, PkmSaveDTO?>>? SavePkms,
-    DataDTOState<Dictionary<string, PkmLegalityDTO?>>? SavePkmLegality
+    DataDTOState<Dictionary<string, PkmLegalityDTO?>>? SavePkmLegality,
+    Dictionary<string, InventoryItemDTO>? SaveInventoryItems
 );
 
 public enum DataDTOType : uint

@@ -1,4 +1,4 @@
-import { DataActionType, EntityContext, type DataActionPayload } from '../../../data/sdk/model';
+import { DataActionType, EntityContext, GameVersion, type DataActionPayload } from '../../../data/sdk/model';
 import { getEntityContextGenerationName } from '../../../data/util/get-entity-context-generation-name';
 import { useStaticData } from '../../../hooks/use-static-data';
 import { useTranslate } from '../../../translate/i18n';
@@ -51,6 +51,14 @@ export const useActionDescription = () => {
                 t('storage.save-actions.type.save-edit-pkm', {
                     save: typeof parameters[ 0 ] === 'number' ? staticData.versions[ parameters[ 0 ] ?? -1 ]?.name : null,
                     name: parameters[ 1 ],
+                }),
+            [ DataActionType.MOVE_ITEM ]: () =>
+                t('storage.save-actions.type.move-item', {
+                    itemName: staticData.getItem(parameters[ 1 ] as GameVersion, Number(parameters[ 0 ]))?.name,
+                    sourceSave: typeof parameters[ 2 ] === 'number' ? staticData.versions[ parameters[ 2 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),
+                    sourcePkm: typeof parameters[ 3 ] === 'string' ? parameters[ 3 ] : '',
+                    targetSave: typeof parameters[ 4 ] === 'number' ? staticData.versions[ parameters[ 4 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),
+                    targetPkm: typeof parameters[ 5 ] === 'string' ? parameters[ 5 ] : '',
                 }),
             [ DataActionType.SET_PKM_VERSION_MAIN ]: () =>
                 t('storage.save-actions.type.main-set-pkm-main', {

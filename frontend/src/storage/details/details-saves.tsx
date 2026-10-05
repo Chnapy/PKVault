@@ -52,7 +52,7 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                     return;
 
                 const hasPkmForPageSaveContext = variants.some(variant => variant.context === otherStorageSave.context);
-                const isCompatibleWithPageSave = mainVariant.compatibleWithVersions.includes(otherStorageSave.version);
+                const isCompatibleWithPageSave = mainVariant.compatibleWithVersions.includes(otherStorageSave.displayedVersion);
 
                 if (isCompatibleWithPageSave && !hasPkmForPageSaveContext)
                     return otherStorageSave.context;

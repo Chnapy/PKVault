@@ -14,6 +14,7 @@ export const UIAction: React.FC<UIActionProps> = ({ type, label, description }) 
     return <Tooltip label={description}>
         <UISpriteSizeWrapper
             speciesSize='xs'
+            itemSize='1lh'
             component={Badge<'div'>}
             variant='dot' color={getActionColor(type)}
             size='lg' px='md'

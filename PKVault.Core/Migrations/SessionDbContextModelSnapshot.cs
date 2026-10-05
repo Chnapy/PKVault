@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using PKVault.Core;
 
 #nullable disable
 
@@ -13,7 +14,7 @@ namespace PKVault.Core.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
 
             modelBuilder.Entity("BankEntity", b =>
                 {
@@ -45,7 +46,21 @@ namespace PKVault.Core.Migrations
                     b.ToTable("Banks");
                 });
 
-            modelBuilder.Entity("BoxEntity", b =>
+            modelBuilder.Entity("MetaEntity", b =>
+                {
+                    b.Property<int>("Key")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("Metas");
+                });
+
+            modelBuilder.Entity("PKVault.Core.BoxEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -55,6 +70,9 @@ namespace PKVault.Core.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("IdInt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("InventoryType")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -77,7 +95,7 @@ namespace PKVault.Core.Migrations
                     b.ToTable("Boxes");
                 });
 
-            modelBuilder.Entity("DexFormEntity", b =>
+            modelBuilder.Entity("PKVault.Core.DexFormEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -121,21 +139,43 @@ namespace PKVault.Core.Migrations
                     b.ToTable("Pokedex");
                 });
 
-            modelBuilder.Entity("MetaEntity", b =>
+            modelBuilder.Entity("PKVault.Core.InventoryItemEntity", b =>
                 {
-                    b.Property<int>("Key")
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("BoxId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Value")
+                    b.Property<int>("BoxSlot")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("IdInt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Item")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ItemKey")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Key");
+                    b.Property<byte>("Version")
+                        .HasColumnType("INTEGER");
 
-                    b.ToTable("Metas");
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoxId");
+
+                    b.HasIndex("ItemKey");
+
+                    b.ToTable("InventoryItems");
                 });
 
-            modelBuilder.Entity("PkmFileEntity", b =>
+            modelBuilder.Entity("PKVault.Core.PkmFileEntity", b =>
                 {
                     b.Property<string>("Filepath")
                         .HasColumnType("TEXT");
@@ -158,7 +198,7 @@ namespace PKVault.Core.Migrations
                     b.ToTable("PkmFiles");
                 });
 
-            modelBuilder.Entity("PkmVariantEntity", b =>
+            modelBuilder.Entity("PKVault.Core.PkmVariantEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -233,7 +273,7 @@ namespace PKVault.Core.Migrations
                     b.ToTable("PkmVersions");
                 });
 
-            modelBuilder.Entity("BoxEntity", b =>
+            modelBuilder.Entity("PKVault.Core.BoxEntity", b =>
                 {
                     b.HasOne("BankEntity", null)
                         .WithMany()
@@ -242,17 +282,17 @@ namespace PKVault.Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PkmVariantEntity", b =>
+            modelBuilder.Entity("PKVault.Core.PkmVariantEntity", b =>
                 {
-                    b.HasOne("BoxEntity", null)
+                    b.HasOne("PKVault.Core.BoxEntity", null)
                         .WithMany()
                         .HasForeignKey("BoxId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("PkmFileEntity", "PkmFile")
+                    b.HasOne("PKVault.Core.PkmFileEntity", "PkmFile")
                         .WithOne()
-                        .HasForeignKey("PkmVariantEntity", "Filepath")
+                        .HasForeignKey("PKVault.Core.PkmVariantEntity", "Filepath")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

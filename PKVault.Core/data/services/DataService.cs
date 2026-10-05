@@ -27,18 +27,21 @@ public class DataService(
         var mainBoxesTask = GetPossibleMainBoxes(flags.MainBoxes);
         var mainPkmVariantsTask = GetPossibleMainPkmVariants(flags.MainPkmVariants);
         var mainPkmLegalitiesTask = GetPossibleMainPkmLegalities(mainPkmVariantsTask);
+        var mainInventoryItemsTask = GetPossibleMainInventoryItems(flags.MainInventoryItems);
 
         var savesTask = Task.WhenAll(flags.Saves.GetSaves().Select(async flag =>
         {
             var saveBoxesTask = GetPossibleSaveBoxes(flag.SaveId, flag.SaveBoxes);
             var savePkmsTask = GetPossibleSavePkms(flag.SaveId, flag.SavePkms);
             var savePkmLegalitiesTask = GetPossibleSaveLegalities(flag.SaveId, savePkmsTask);
+            var saveInventoryItemsTask = GetPossibleSaveInventoryItems(flag.SaveId, flag.SaveInventoryItems);
 
             return new DataSaveDTO(
                 SaveId: flag.SaveId,
                 SaveBoxes: await saveBoxesTask,
                 SavePkms: await savePkmsTask,
-                SavePkmLegality: await savePkmLegalitiesTask
+                SavePkmLegality: await savePkmLegalitiesTask,
+                SaveInventoryItems: await saveInventoryItemsTask
             );
         }));
 
@@ -102,6 +105,7 @@ public class DataService(
             MainBoxes: await mainBoxesTask,
             MainPkmVariants: await mainPkmVariantsTask,
             MainPkmLegalities: await mainPkmLegalitiesTask,
+            MainInventoryItems: await mainInventoryItemsTask,
             Saves: [.. await savesTask],
             InvalidateAllSaves: flags.Saves.All,
             SaveInfos: saveInfos,
@@ -244,6 +248,14 @@ public class DataService(
         return null;
     }
 
+    private async Task<Dictionary<string, InventoryItemDTO>?> GetPossibleMainInventoryItems(bool flag)
+    {
+        if (!flag)
+            return null;
+
+        return await storageQueryService.GetMainInventory();
+    }
+
     private async Task<List<BoxDTO>?> GetPossibleSaveBoxes(uint saveId, bool flag)
     {
         if (!flag)
@@ -293,6 +305,14 @@ public class DataService(
         }
 
         return null;
+    }
+
+    private async Task<Dictionary<string, InventoryItemDTO>?> GetPossibleSaveInventoryItems(uint saveId, bool flag)
+    {
+        if (!flag)
+            return null;
+
+        return await storageQueryService.GetSaveInventory(saveId);
     }
 
     private IDictionary<uint, SaveInfosDTO>? GetPossibleSaveInfos(bool flag)

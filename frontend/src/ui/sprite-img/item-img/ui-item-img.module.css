@@ -1,4 +1,12 @@
 .ui-item-img {
     --sprite-size-multiplier: var(--sprite-item-size-multiplier);
     --sprite-rendering: var(--sprite-item-rendering);
+
+    /* override sprite final size to ensure it follows 30px sizing, some sprites being +/- */
+    --sprite-size: calc(var(--sprite-size-multiplier, 1) * 30);
+}
+
+.ui-item-img-skeleton {
+    height: calc(var(--sprite-size) * 1px);
+    width: calc(var(--sprite-size) * 1px);
 }

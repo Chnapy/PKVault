@@ -3,9 +3,10 @@ import { useViewportSize } from '@mantine/hooks';
 import type React from 'react';
 import { WithControlsIcons } from '../../interaction/controls/icons/with-controls-icons';
 import { FocusScope } from '../../interaction/focus/scope/focus-scope';
+import { useStorageMode } from '../../inventory/context/storage-mode-context';
 import { usePanelControls } from '../../layout/hooks/use-panel-controls';
 import { useSpriteSizeLocalStorage } from '../../local-storage/use-storage-size-local-storage';
-import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
+import { UISpriteSizeWrapper, type UISpriteSizeWrapperProps } from '../../sprite-img/ui-sprite-size-wrapper';
 import { CurrentPanelProvider } from './context/ui-current-panel-provider';
 import { PanelProvider } from './context/ui-panel-context';
 
@@ -19,6 +20,8 @@ type UIStorageContentProps = {
 export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, right, middle }) => {
 
     const { panelProps, nodeId, childScopeId, controlIcons } = usePanelControls('storage-content');
+
+    const storageMode = useStorageMode().state;
 
     const [ speciesSizeRaw ] = useSpriteSizeLocalStorage('storage-sprite-size');
 
@@ -43,6 +46,10 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
         // md: 0.75,
         lg: speciesSizeRaw,
     });
+
+    const itemSize: UISpriteSizeWrapperProps[ 'itemSize' ] = storageMode === 'inventory'
+        ? 'lg'
+        : undefined;
 
     const getResponsiveContent = useMatches({
         base: () => <Splitter orientation='vertical' w='100%' lineSize={'var(--mantine-spacing-sm)'} styles={{ thumb: { width: 200 } }}>
@@ -86,6 +93,7 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
             <FocusScope id={childScopeId} parentNodeId={nodeId}>
                 <UISpriteSizeWrapper
                     speciesSize={speciesSize}
+                    itemSize={itemSize}
                     component={Grid}
                     id={id}
                     w='100%'

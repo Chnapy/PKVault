@@ -1,6 +1,7 @@
 import type { PkmSaveIndexes } from '../../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../../data/hooks/use-pkm-variant-index';
-import type { BankDTO, BoxDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BankDTO, BoxDTO, SaveInfosDTO, StorageGetInventoryItems200 } from '../../../../data/sdk/model';
+import type { StorageMode } from '../../../../ui/inventory/context/storage-mode-context';
 import type { ValidateMainToMainBank } from '../rules/validate-main-to-main';
 import type { ValidateSaveToMainBank } from '../rules/validate-save-to-main';
 
@@ -11,11 +12,13 @@ export type SlotInfosBank =
 type MoveDirectionBank = SlotInfosBank[ 'direction' ];
 
 export const buildSlotInfosBank = (
+    mode: StorageMode,
     dropBankId: string,
     sourceId: string,
     sourceSaveId: number | undefined | null,
     pkmVariantIndexes: PkmVariantIndexes | undefined,
     sourcePkmSaveIndexes: PkmSaveIndexes | undefined,
+    sourceInventory: StorageGetInventoryItems200 | undefined,
     savesById: Record<number, SaveInfosDTO>,
     sourceBoxes: Record<number, BoxDTO>,
     targetBanks: Record<string, BankDTO>,
@@ -25,10 +28,13 @@ export const buildSlotInfosBank = (
     switch (direction) {
         case 'main-to-bank': {
             const sourcePkm = pkmVariantIndexes?.byId[ sourceId ];
-            if (!sourcePkm) {
+            const sourceItem = sourceInventory?.[ sourceId ];
+            const source = sourcePkm ?? sourceItem;
+            if (!source) {
                 return [];
             }
-            const sourceBox = sourceBoxes[ sourcePkm.boxId ];
+
+            const sourceBox = sourceBoxes[ source.boxId ];
 
             const targetBank = targetBanks[ dropBankId ];
 
@@ -37,6 +43,7 @@ export const buildSlotInfosBank = (
             }
 
             return [ {
+                mode,
                 direction: 'main-to-bank',
                 sourcePkm,
                 sourceBox,
@@ -45,10 +52,13 @@ export const buildSlotInfosBank = (
         };
         case 'save-to-bank': {
             const sourcePkm = sourcePkmSaveIndexes?.byId[ sourceId ];
-            if (!sourcePkm || !sourceSaveId) {
+            const sourceItem = sourceInventory?.[ sourceId ];
+            const source = sourcePkm ?? sourceItem;
+            if (!source || !sourceSaveId) {
                 return [];
             }
-            const sourceBox = sourceBoxes[ sourcePkm.boxId ];
+
+            const sourceBox = sourceBoxes[ source.boxId ];
             const sourceSave = savesById[ sourceSaveId ];
 
             const targetBank = targetBanks[ dropBankId ];
@@ -58,6 +68,7 @@ export const buildSlotInfosBank = (
             }
 
             return [ {
+                mode,
                 direction: 'save-to-bank',
                 sourceSave,
                 sourcePkm,

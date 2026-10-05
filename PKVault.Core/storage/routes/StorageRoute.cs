@@ -39,6 +39,14 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return savePkms;
     }
 
+    [HttpGet("inventory")]
+    public async Task<Dictionary<string, InventoryItemDTO>> GetInventoryItems(uint? saveId = null)
+    {
+        return saveId == null
+            ? await storageQueryService.GetMainInventory()
+            : await storageQueryService.GetSaveInventory((uint)saveId);
+    }
+
     [HttpGet("pkm/legality")]
     public async Task<Dictionary<string, PkmLegalityDTO>> GetPkmsLegality(string[] pkmIds, uint? saveId)
     {
@@ -73,6 +81,32 @@ public class StorageController(DataService dataService, StorageQueryService stor
     )
     {
         var flags = await actionService.MovePkmBank(pkmIds, sourceSaveId, bankId, attached);
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
+    }
+
+    [HttpPut("move/item")]
+    public async Task<DataDTO> MoveItem(
+        uint? sourceSaveId,
+        string[] sourcePkmIds, string[] sourceItemIds,
+        uint? targetSaveId,
+        string sourceBoxId, string targetBoxId,
+        string? targetPkmId = null
+    )
+    {
+        var flags = await actionService.MoveItem(sourceSaveId, sourceBoxId, sourcePkmIds, sourceItemIds, targetSaveId, targetBoxId, targetPkmId);
+
+        return await dataService.CreateDataFromUpdateFlags(flags);
+    }
+
+    [HttpPut("move/item/bank")]
+    public async Task<DataDTO> MoveItemBank(
+        uint? sourceSaveId,
+        string[] sourcePkmIds, string[] sourceItemIds,
+        string bankId
+    )
+    {
+        var flags = await actionService.MoveItemBank(sourceSaveId, sourcePkmIds, sourceItemIds, bankId);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

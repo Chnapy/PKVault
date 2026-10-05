@@ -40,7 +40,7 @@ export const BankEdit: React.FC<{ bankId: string; }> = ({ bankId }) => {
         if (!save)
             return '-';
 
-        return `${staticData.versions[ save.version ]?.name} (${save.trainerName})`;
+        return `${staticData.versions[ save.displayedVersion ]?.name} (${save.trainerName})`;
     };
 
     const bankViewNames = (bankViewStorages ?? []).map(getViewName);

@@ -20,11 +20,12 @@ type UIBoxEditProps = {
     boxList: Pick<BoxDTO, 'id' | 'order'>[];
     bankList: Pick<BankDTO, 'id' | 'name'>[];
     minSlotCount: number;
+    hasItems: boolean;
     onOrderChange: (order: number) => void;
     onSubmit: (data: DataInput) => Promise<void>;
 };
 
-export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultValues, boxList, bankList, minSlotCount, onOrderChange, onSubmit: onSubmitRaw }) => {
+export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultValues, boxList, bankList, minSlotCount, hasItems, onOrderChange, onSubmit: onSubmitRaw }) => {
     const { t } = useTranslate();
 
     const popover = usePopover();
@@ -70,6 +71,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             data={Object.entries(BoxType).map(([ key, value ]) => ({
                 value,
                 label: switchUtil(key as keyof typeof BoxType, {
+                    Inventory: t('storage.box.edit.type.inventory'),
                     Box: t('storage.box.edit.type.box'),
                     SurpriseTrade: t('storage.box.edit.type.surprisetrade'),
                     PGL: t('storage.box.edit.type.pgl'),
@@ -86,9 +88,11 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
                     BattleBox: t('storage.box.edit.type.battlebox'),
                     Party: t('storage.box.edit.type.party'),
                 }),
-            })) ?? []}
+                disabled: hasItems && value === BoxType.Inventory,
+            }))}
             value={watchType}
             onChange={(value) => value !== null && setValue('type', value)}
+            disabled={hasItems && watchType === BoxType.Inventory}
             comboboxProps={{ withinPortal: false }}
         />
 

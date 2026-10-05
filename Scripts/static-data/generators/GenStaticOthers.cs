@@ -14,13 +14,15 @@ public class GenStaticOthers(
 {
     protected override async Task<StaticOthersData> GetData(string[] rootParts)
     {
-        var versions = GetStaticVersions();
+        var versionsSavesAllowedItems = StaticOthersLoader.ComputeStaticVersionsSavesAllowedItems();
+
+        var versions = GetStaticVersions(versionsSavesAllowedItems);
         var stats = GetStaticStats();
         var types = GetStaticTypes();
         var moves = GetStaticMoves();
         var natures = GetStaticNatures();
         var abilities = GetStaticAbilities();
-        var items = GetStaticItems();
+        var items = GetStaticItems(versionsSavesAllowedItems);
         var generations = GetStaticGenerations();
         var pokedexes = GetStaticPokedexes();
 
@@ -40,7 +42,7 @@ public class GenStaticOthers(
         );
     }
 
-    private async Task<Dictionary<byte, StaticVersion>> GetStaticVersions()
+    private async Task<Dictionary<byte, StaticVersion>> GetStaticVersions(StaticOthersLoader.VersionsSavesAllowedItems versionsSavesAllowedItems)
     {
         using var _ = Log.Logger.Time("static-data process versions");
         List<Task<StaticVersion>> tasks = [];
@@ -50,10 +52,7 @@ public class GenStaticOthers(
         {
             tasks.Add(Task.Run(async () =>
             {
-                var saveVersion = GameVersionUtil.GetSingleVersion(version);
-                var blankSave = saveVersion == default
-                    ? null
-                    : BlankSaveFile.Get(saveVersion);
+                var (blankSave, _, _) = versionsSavesAllowedItems.SavesAllowedItems[(byte)version];
 
                 var versionName = GetVersionName(version);
                 var versionRegion = GetVersionRegionName(version);
@@ -328,78 +327,43 @@ public class GenStaticOthers(
         return dict;
     }
 
-    private async Task<StaticItemsData> GetStaticItems()
+    private async Task<StaticItemsData> GetStaticItems(StaticOthersLoader.VersionsSavesAllowedItems versionsSavesAllowedItems)
     {
         using var _ = Log.Logger.Time($"static-data {lang} process items");
 
-        List<StaticVersionsItems> VersionItems = [];
+        var (staticVersionsItems, savesAllowedItems, allVersionsItemStrings) = versionsSavesAllowedItems;
+
         Dictionary<string, StaticItem> Items = [];
 
         // var notFound = new List<string>();
         // log.LogInformation(string.Join('\n', GameInfo.Strings.itemlist.ToList().FindAll(item => item.ToLower().Contains("ball"))));
 
-        List<ComboItem> getItemStrings(GameVersion _version, GameStrings strings)
+        ComboItem[] getInventoryItemStrings(GameVersion _version, GameStrings strings)
         {
-            var version = GameVersionUtil.GetSingleVersion(_version);
-            if (version == default)
+            var (save, allowedInventoryItems, allowedHeldItems) = savesAllowedItems[(byte)_version];
+
+            if (save == default)
             {
-                return _version == GameVersion.Any
-                    ? Util.GetCBList(strings.itemlist)
-                    : [];
-            }
-
-            var save = BlankSaveFile.Get(version);
-            var items = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version), save.HeldItems);
-            items.RemoveAll(i => i.Value > save.MaxItemID);
-            return items;
-        }
-
-        foreach (var version in Enum.GetValues<GameVersion>())
-        {
-            var itemlist = getItemStrings(version, GameInfo.Strings);
-            var itemlistStr = string.Join('.', itemlist.Select(it => $"{it.Text},{it.Value}"));
-
-            var versionItem = VersionItems.FirstOrDefault(st =>
-            {
-                var vers = (GameVersion)st.Versions.FirstOrDefault();
-
-                var itemlist2 = getItemStrings(vers, GameInfo.Strings);
-                return itemlist.Count == itemlist2.Count
-                    && itemlistStr == string.Join('.', itemlist2.Select(it => $"{it.Text},{it.Value}"));
-            });
-
-            if (versionItem == default)
-            {
-                Dictionary<int, string> comboItems = [];
-                foreach (var item in itemlist)
+                if (_version == GameVersion.Any)
                 {
-                    var itemNamePokeapi = PokeApiFromPKHeX.GetPokeapiItemName(item.Text);
-                    if (comboItems.TryGetValue(item.Value, out var textPokeapi))
-                    {
-                        if (textPokeapi == itemNamePokeapi)
-                        {
-                            continue;
-                        }
-
-                        throw new Exception($"Key exists, key={item.Value} existingText={textPokeapi} tryText={itemNamePokeapi}");
-                    }
-                    comboItems.Add(item.Value, itemNamePokeapi);
+                    return Util.GetCBList(strings.itemlist).ToArray();
                 }
-
-                versionItem = new(
-                    Versions: [],
-                    ComboItems: comboItems
-                );
-                VersionItems.Add(versionItem);
+                return [];
             }
-            versionItem.Versions.Add((byte)version);
+
+            var allowedInventoryItemsCombo = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version), allowedInventoryItems.ToArray());
+            allowedInventoryItemsCombo.RemoveAll(i => i.Value > save.MaxItemID);
+
+            return allowedInventoryItemsCombo.OrderBy(i => i.Value).ToArray();
         }
 
-        foreach (var (Versions, _) in VersionItems)
+        foreach (var (Versions, _, _) in staticVersionsItems)
         {
             var version = (GameVersion)Versions.First();
-            var itemsEn = getItemStrings(version, GameInfo.Strings);
-            var items = getItemStrings(version, GameInfo.GetStrings(pkhexLang));
+            var itemsEn = allVersionsItemStrings[version].ItemsEn;
+            var items = GameInfo.CurrentLanguage == pkhexLang
+                ? itemsEn
+                : getInventoryItemStrings(version, GameInfo.GetStrings(pkhexLang));
 
             for (var i = 0; i < items.Count; i++)
             {
@@ -408,7 +372,7 @@ public class GenStaticOthers(
                 var itemEn = itemsEn.FirstOrDefault(it => it.Value == item.Value);
                 if (itemEn == default)
                 {
-                    Serilog.Log.Error($"Item value not found in default items list, lang={lang} version={version} item={item.Value}/{item.Text}");
+                    Log.Error($"Item value not found in default items list, lang={lang} version={version} item={item.Value}/{item.Text}");
                     continue;
                 }
 
@@ -443,7 +407,7 @@ public class GenStaticOthers(
         }
 
         return new(
-            VersionItems,
+            VersionItems: staticVersionsItems,
             Items
         );
     }

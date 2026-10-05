@@ -19,9 +19,11 @@ public class PkmSharePropertiesServiceTests
             )
         ));
 
-        var pkmConvertService = new PkmConvertService(mockSettingsService.Object);
+        PKMConverterUtils pkmConverterUtils = new();
 
-        return new(pkmConvertService);
+        var pkmConvertService = new PkmConvertService(mockSettingsService.Object, pkmConverterUtils);
+
+        return new(pkmConvertService, pkmConverterUtils);
     }
 
     [Fact]

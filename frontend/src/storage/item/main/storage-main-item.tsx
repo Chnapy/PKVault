@@ -6,12 +6,12 @@ import { Gender } from '../../../data/sdk/model';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
 import { Route } from '../../../routes/storage';
 import { UIStorageItemIcons } from '../../../ui/storage/storage-item/ui-storage-item-icons';
-import { ItemImg } from '../../../img/item-img';
-import { StorageItem, type StorageItemProps } from '../storage-item';
 import { pick } from '../../../util/pick';
 import { useSelectCallback } from '../../../util/use-select-callback';
 import type { MoveContainerValue } from '../../move/move-container-fns';
 import { useCurrentStorage } from '../../panel/storage-panel-context';
+import { StorageItem, type StorageItemProps } from '../storage-item';
+import { StorageItemHeldItem } from '../storage-item-held-item';
 
 type StorageMainItemProps = Pick<StorageItemProps, 'nodeId' | 'selectFromPreviousSelected'> & {
     pkmId: string;
@@ -95,6 +95,11 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, isShiny, nSparkle, isShadow, isExternal, heldItem } = mainVariant;
 
+        const heldItemNode = <StorageItemHeldItem
+            heldItem={heldItem} contextVersion={contextVersion}
+            container={container} slot={boxSlot} id={id}
+        />;
+
         return <StorageItem
             id={id}
             selected={selected}
@@ -119,13 +124,11 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                 nbrVariants={variants.length}
                 hasDisabledVariant={hasDisabledVariant}
                 attached={!!attachedVariant}
-                heldItem={heldItem > 0 && <ItemImg
-                    version={contextVersion}
-                    item={heldItem}
-                />}
+                heldItem={heldItemNode}
                 canEvolve={canEvolve}
                 needSynchronize={canSynchronize}
             />}
+            heldItem={heldItemNode}
             onClick={() => navigate({
                 search: search => {
                     const alreadySelected = search.selected

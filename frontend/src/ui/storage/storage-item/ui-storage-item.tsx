@@ -12,6 +12,7 @@ import { useDragSubmitting } from '../../interaction/move/hooks/use-drag-submitt
 import { useDragging } from '../../interaction/move/hooks/use-dragging';
 import { useDroppable } from '../../interaction/move/hooks/use-droppable';
 import { useSelectContextActions, useSelectHasValue } from '../../interaction/select/context/use-select-context';
+import { useStorageMode } from '../../inventory/context/storage-mode-context';
 import { useCurrentPanel } from '../storage-content/context/ui-panel-context';
 import { UIDetailsLevel } from '../storage-details/ui-details-level';
 import { UIStorageItemBase } from './base/ui-storage-item-base';
@@ -27,10 +28,11 @@ export type UIStorageItemProps<C = unknown> =
         level: number;
         selectFromPreviousSelected: (id: string) => void;
         icons?: React.ReactNode;
+        heldItem?: React.ReactNode;
     };
 
 export const UIStorageItem: React.FC<UIStorageItemProps> = ({
-    ref: refRoot, id, nodeId, slot, globalOrder, icons,
+    ref: refRoot, id, nodeId, slot, globalOrder, icons, heldItem,
     container, selected, selectFromPreviousSelected,
     name, level, label,
     loading, disabled, onClick,
@@ -39,6 +41,8 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
     const { t } = useTranslate();
 
     const panel = useCurrentPanel();
+
+    const storageMode = useStorageMode().state;
 
     const checked = useSelectHasValue(container, [ id ]);
     const { addId, removeId } = useSelectContextActions();
@@ -57,9 +61,9 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
 
     const submitting = useDragSubmitting(container, slot, id);
 
-    disabled ||= droppable.canDrop === false;
+    disabled ||= droppable.canDrop === false || (!isDraggingState && storageMode === 'inventory' && !draggingMove.enabled);
     loading ||= submitting;
-
+    // console.log(id, dragging, draggingMove, draggingMoveAttached)
     const dragControls = useDragControls({
         dragging,
         draggingMove,
@@ -136,6 +140,8 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         []);
 
+    const pkmLoading = storageMode === 'default' && loading;
+
     return <>
         <WithControlsIcons
             placement='out' icons={controlIcons('open', 'drag', 'drag-attached', 'drop')}
@@ -147,7 +153,7 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
                     <UIDetailsLevel level={level} showBar />
                 </>}
                 selected={selected}
-                loading={loading}
+                loading={pkmLoading}
                 {...focusProps}
                 {...controlProps('open', 'drag', 'drag-attached', 'drop')}
                 {...buttonProps}
@@ -170,7 +176,9 @@ export const UIStorageItem: React.FC<UIStorageItemProps> = ({
             <UIStorageItemBase
                 opacity={0.75}
             >
-                {children}
+                {storageMode === 'inventory'
+                    ? heldItem
+                    : children}
             </UIStorageItemBase>
         </DragRender>}
     </>;

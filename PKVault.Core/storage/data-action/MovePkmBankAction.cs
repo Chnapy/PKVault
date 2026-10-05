@@ -20,8 +20,7 @@ public class MovePkmBankAction(
             throw new ArgumentException($"Pkm ids cannot be empty");
         }
 
-        var bank = (await bankLoader.GetEntity(input.bankId))
-            ?? throw new ArgumentException($"Bank not found");
+        var bank = await bankLoader.GetEntityRequired(input.bankId);
 
         if (bank.IsExternal)
         {
@@ -29,6 +28,7 @@ public class MovePkmBankAction(
         }
 
         var mainBoxes = (await boxLoader.GetEntitiesByBank(input.bankId)).Values
+            .Where(box => box.Type != BoxType.Inventory)
             .OrderBy(box => box.Order).ToList();
 
         var boxDict = new Dictionary<int, int[]>();
@@ -82,6 +82,7 @@ public class MovePkmBankAction(
         }
 
         var boxesDict = (await boxLoader.GetAllDtos())
+            .Where(p => p.Type != BoxType.Inventory)
             .ToDictionary(p => p.Id);
 
         async Task<DataActionPayload> act(string pkmId)

@@ -11,7 +11,7 @@ public class PK5Converter(PKMConverterUtils utils)
 
         utils.FixMetLocation(pk6, ctx);
 
-        utils.CopyHeldItemFrom(pk6, pk5.HeldItem, pk5.Context, pk5.Version);
+        utils.CopyHeldItemFrom(pk6, pk5.HeldItem, pk5.Context.GetSingleGameVersion(), ctx.TargetSave?.Version);
 
         utils.FixPersonalData(pk6, pk5.IsShiny, pk5.Form, pk5.Gender, pk5.Nature, pk5.Ability, false, ctx);
 
@@ -52,7 +52,7 @@ public class PK5Converter(PKMConverterUtils utils)
         pk5.CopyRibbonSetCommon4(pk4);
         pk5.CopyRibbonSetEvent4(pk4);
 
-        utils.CopyHeldItemFrom(pk4, pk5.HeldItem, pk5.Context, pk5.Version);
+        utils.CopyHeldItemFrom(pk4, pk5.HeldItem, pk5.Context.GetSingleGameVersion(), ctx.TargetSave?.Version);
 
         utils.FixAbility(pk4, ctx);
 

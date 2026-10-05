@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Primitives;
+using PKHeX.Core;
 
 namespace PKVault.Core;
 
@@ -12,6 +13,7 @@ namespace PKVault.Core;
 [JsonSerializable(typeof(List<BoxDTO>))]
 [JsonSerializable(typeof(List<PkmVariantDTO>))]
 [JsonSerializable(typeof(List<PkmSaveDTO>))]
+[JsonSerializable(typeof(Dictionary<string, InventoryItemDTO>))]
 [JsonSerializable(typeof(List<MoveItem>))]
 [JsonSerializable(typeof(List<BackupDTO>))]
 [JsonSerializable(typeof(DexMoveDTO))]

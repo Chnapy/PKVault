@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using PKHeX.Core;
@@ -16,12 +15,20 @@ public class PKMConverterUtils
 {
     private readonly PKMPersonalFixer personalFixer = new();
 
+    private StaticOthersLoader.VersionsSavesAllowedItems? StaticVersionsSavesAllowedItems = null;
+
+    public StaticOthersLoader.VersionsSavesAllowedItems GetStaticVersionsSavesAllowedItems()
+    {
+        if (StaticVersionsSavesAllowedItems == null)
+            StaticVersionsSavesAllowedItems = StaticOthersLoader.ComputeStaticVersionsSavesAllowedItems();
+        return StaticVersionsSavesAllowedItems;
+    }
+
     public void FixCommonLegalityIssues(PKM pkm, ConvertContext ctx)
     {
         FixHandlingTrainer(pkm, ctx);
         FixPersonalData(pkm, pkm.IsShiny, pkm.Form, pkm.Gender, pkm.Nature, pkm.Ability, true, ctx);
         FixBallLegality(pkm, ctx);
-        FixHeldItemLegality(pkm, ctx);
         FixRibbonLegality(pkm, ctx);
         FixContestLegality(pkm, ctx);
         FixPokerusLegality(pkm, ctx);
@@ -29,6 +36,7 @@ public class PKMConverterUtils
         FixRelearnMovesLegality(pkm, ctx);
         FixRegionLegality(pkm, ctx);
         FixMemories(pkm);
+        FixHeldItemLegality(pkm, ctx);
     }
 
     private void FixMemories(PKM pkm)
@@ -354,6 +362,10 @@ public class PKMConverterUtils
 
     public void FixHeldItemLegality(PKM pkm, ConvertContext ctx)
     {
+        // has false-positives
+        if (pkm.Context == EntityContext.Gen3)
+            return;
+
         var la = LegalityAnalysisService.GetLegalitySafeRaw(new(pkm), ctx.TargetSave);
 
         if (!la.Valid && la.Results.Any(r =>
@@ -411,27 +423,80 @@ public class PKMConverterUtils
         }
     }
 
-    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public void CopyHeldItemFrom(PKM pkm, int srcHeldItem, GameVersion srcVersion, GameVersion? destVersion)
     {
-        pkm.HeldItem = ItemConverter.GetItemForFormat(srcHeldItem, srcContext, pkm.Context);
+        if (srcHeldItem == 0)
+        {
+            pkm.HeldItem = 0;
+            return;
+        }
 
-        CopyHeldItemByStringFrom(pkm, srcHeldItem, srcContext, srcVersion);
+        GameVersion[] targetVersions = destVersion != null
+            ? [(GameVersion)destVersion]
+            : GameUtil.GameVersions.Where(v => v.Context == pkm.Context).ToArray();
+
+        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersions);
+
+        if (heldItem.Item != 0)
+            pkm.HeldItem = heldItem.Item;
     }
 
-    public void CopyHeldItemByStringFrom(PKM pkm, int srcHeldItem, EntityContext srcContext, GameVersion srcVersion)
+    public (ushort Item, GameVersion Version) ConvertHeldItemRequired(int srcHeldItem, GameVersion srcVersion, GameVersion[] targetVersions, bool held = true)
     {
-        if (srcHeldItem > 0 && pkm.HeldItem == 0)
-        {
-            var stringsSrc = GameInfo.Strings.GetItemStrings(srcContext, srcVersion);
-            var stringsDest = GameInfo.Strings.GetItemStrings(pkm.Context, pkm.Version);
+        if (srcHeldItem == 0)
+            return (0, targetVersions.First());
 
-            var strSrc = stringsSrc[srcHeldItem];
-            var strDestIndex = stringsDest.ToList().FindIndex(str => str == strSrc);
-            if (strDestIndex > 0)
-            {
-                pkm.HeldItem = strDestIndex;
-            }
+        var heldItem = ConvertHeldItem(srcHeldItem, srcVersion, targetVersions, held);
+        if (heldItem.Item == 0)
+            throw new ArgumentException($"Held item {srcVersion}/{srcHeldItem} is not compatible with target versions {string.Join(',', targetVersions)}");
+        return heldItem;
+    }
+
+    public (ushort Item, GameVersion Version) ConvertHeldItem(int srcHeldItem, GameVersion srcVersion, GameVersion[] targetVersions, bool held = true)
+    {
+        // only convert by string is reliable
+        return ConvertHeldItemByString(srcHeldItem, srcVersion, targetVersions, held);
+    }
+
+    public (ushort Item, GameVersion Version) ConvertHeldItemByString(int srcHeldItem, GameVersion srcVersion, GameVersion[] targetVersions, bool held = true)
+    {
+        // Required especially with COLO/XD
+        srcVersion = GameVersionUtil.GetSingleVersion(srcVersion);
+        targetVersions = targetVersions
+            .Select(GameVersionUtil.GetSingleVersion)
+            .Where(v => v != default)
+            .Distinct()
+            .ToArray();
+
+        if (srcHeldItem == 0)
+            return (0, targetVersions.First());
+
+        var staticVersionsItems = GetStaticVersionsSavesAllowedItems().StaticVersionsItems;
+
+        if (srcVersion == 0)
+            throw new Exception($"GameVersion cannot be 0");
+
+        var srcVersionItems = staticVersionsItems.First(vi => vi.Versions.Contains((byte)srcVersion));
+        var itemKey = srcVersionItems.ComboInventoryItems[(ushort)srcHeldItem];
+
+        foreach (var targetVersion in targetVersions)
+        {
+            var destVersionItems = staticVersionsItems.FirstOrDefault(vi => vi.Versions.Contains((byte)targetVersion));
+            if (destVersionItems == default)
+                continue;
+
+            var destEntry = destVersionItems.ComboInventoryItems.FirstOrDefault(item => item.Value == itemKey);
+            if (destEntry.Key == default)
+                continue;
+
+            if (held
+                && !destVersionItems.AllowedHeldItems.Contains(destEntry.Key))
+                continue;
+
+            return (destEntry.Key, targetVersion);
         }
+
+        return default;
     }
 
     public void CopyMovesFrom(PKM pkm, PKM pkmSrc)

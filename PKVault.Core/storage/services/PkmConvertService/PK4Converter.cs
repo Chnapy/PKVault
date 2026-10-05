@@ -80,7 +80,7 @@ public class PK4Converter(PKMConverterUtils utils)
         pk4.CopyRibbonSetCommon3(pk3);
         pk4.CopyRibbonSetEvent3(pk3);
 
-        utils.CopyHeldItemFrom(pk3, pk4.HeldItem, pk4.Context, pk4.Version);
+        utils.CopyHeldItemFrom(pk3, pk4.HeldItem, pk4.Context.GetSingleGameVersion(), ctx.TargetSave?.Version);
 
         utils.FixAbility(pk3, ctx);
 

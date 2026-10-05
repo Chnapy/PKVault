@@ -8,6 +8,7 @@ import { useMoveContext } from '../../../../ui/interaction/move/context/use-move
 import type { MoveState } from '../../../../ui/interaction/move/state/move-state';
 import type { SelectContext } from '../../../../ui/interaction/select/context/select-context';
 import { useSelectContextNullable } from '../../../../ui/interaction/select/context/use-select-context';
+import { StorageModeProvider } from '../../../../ui/inventory/context/storage-mode-provider';
 import type { MoveContainerValue, MoveParams } from '../../move-container-fns';
 import { MoveSelectImplProvider, type MoveSelectImplProviderProps } from '../../move-select-impl-provider';
 
@@ -59,12 +60,15 @@ export const renderHookWithWrapper = <Result, Props>(
             return <QueryClientProvider client={queryClient}>
                 <RouterContextProvider router={router}>
                     <ControlsProvider>
-                        <MoveSelectImplProvider
-                            selectCtx={selectDefaultValue}
-                            moveCtx={moveDefaultValue}
-                        >
-                            {children}
-                        </MoveSelectImplProvider>
+                        <StorageModeProvider>
+                            <MoveSelectImplProvider
+                                isItemCompatible={() => true}
+                                selectCtx={selectDefaultValue}
+                                moveCtx={moveDefaultValue}
+                            >
+                                {children}
+                            </MoveSelectImplProvider>
+                        </StorageModeProvider>
                     </ControlsProvider>
                 </RouterContextProvider>
             </QueryClientProvider>;

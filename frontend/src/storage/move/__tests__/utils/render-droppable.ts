@@ -50,7 +50,7 @@ export const renderDroppable = async ({ source, target, initialState }: RenderDr
             const dragMove = draggable.useDrag();
             const dragMoveAttached = draggable.useDrag<MoveParams>({ attached: true });
 
-            const { prefetchQueries } = useDroppableValidation();
+            const { prefetchQueries } = useDroppableValidation(() => true);
 
             return {
                 prefetchQueries: () => prefetchQueries(sourceObj),

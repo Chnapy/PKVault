@@ -63,7 +63,7 @@ export const SavesPage: React.FC = withErrorCatcher('default', () => {
           return null;
         }
 
-        const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.version ]?.maxSpeciesId ?? 0));
+        const maxSpecies = Math.max(...saves.map(save => staticData.versions[ save.displayedVersion ]?.maxSpeciesId ?? 0));
 
         const regions = staticData.generations[ generation ]?.regions ?? [];
 

@@ -134,7 +134,7 @@ public class EvolvePkmAction(
 
         if (attachedEntity != null)
         {
-            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedEntity.Id, attachedEntity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedEntity.Id, attachedEntity.AttachedSavePkmIdBase!)]), flags);
         }
 
         await new DexMainService(sp).EnablePKM(entityPkm);

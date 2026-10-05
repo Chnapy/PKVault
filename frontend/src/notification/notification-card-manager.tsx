@@ -1,4 +1,4 @@
-import { ActionIcon, Code, Group, ScrollArea, Table } from '@mantine/core';
+import { ActionIcon, Box, Code, ScrollArea, Table } from '@mantine/core';
 import { InfoIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import { BackendErrorsContext } from '../data/backend-errors-context';
@@ -25,15 +25,16 @@ export const NotificationCardManager: React.FC = () => {
             return <Table.Tr key={i}>
                 <Table.Td>
                     <details>
-                        <summary style={{
-                            whiteSpace: 'break-spaces',
-                            cursor: 'pointer'
-                        }}>
-                            <Group display='inline-flex' gap='sm' c='red' style={{ verticalAlign: 'top' }}>
-                                <InfoIcon />
-                                {error.message}
-                            </Group>
-                        </summary>
+                        <Box
+                            component='summary'
+                            c='red'
+                            style={{
+                                whiteSpace: 'break-spaces',
+                                cursor: 'pointer'
+                            }}>
+                            <InfoIcon style={{ verticalAlign: 'text-top', marginRight: 4 }} />
+                            {error.message}
+                        </Box>
 
                         <ScrollArea maw={500}>
                             <Code block p='md'>

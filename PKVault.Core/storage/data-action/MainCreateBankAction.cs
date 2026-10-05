@@ -43,6 +43,7 @@ public class MainCreateBankAction(
         await bankLoader.NormalizeOrders();
 
         await mainCreateBoxAction.CreateBox(new(id.ToString(), null));
+        await mainCreateBoxAction.CreateBox(new(id.ToString(), null, BoxType.Inventory, "Items"));
 
         return new(
             type: DataActionType.MAIN_CREATE_BANK,

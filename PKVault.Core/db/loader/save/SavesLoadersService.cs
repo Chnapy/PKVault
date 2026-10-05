@@ -29,7 +29,8 @@ public class SavesLoadersService(
     IFileIOService fileIOService,
     ISettingsService settingsService,
     IPkmConvertService pkmConvertService,
-    StaticDataService staticDataService
+    StaticDataService staticDataService,
+    PKMConverterUtils pkmConverterUtils
 ) : ISavesLoadersService
 {
     private IDictionary<uint, SaveLoadersRecord> Loaders = new Dictionary<uint, SaveLoadersRecord>();
@@ -126,7 +127,7 @@ public class SavesLoadersService(
 
         foreach (var loaders in Loaders.Values.ToList())
         {
-            if (loaders.Pkms.HasWritten || loaders.Boxes.HasWritten)
+            if (loaders.HasWritten)
             {
                 tasks.Add(
                     WriteSave(loaders.Save)
@@ -314,12 +315,13 @@ public class SavesLoadersService(
 
         var boxLoader = new SaveBoxLoader(save, sp);
         var pkmLoader = new SavePkmLoader(pkmConvertService, language, evolves, save);
+        var inventoryLoader = new SaveInventoryLoader(save, settingsService, pkmConverterUtils);
 
         duplicates ??= loaders.TryGetValue(save.Id, out var existingSave)
             ? existingSave.Duplicates
             : [];
 
-        loaders[save.Id] = new(save, boxLoader, pkmLoader, duplicates);
+        loaders[save.Id] = new(save, boxLoader, pkmLoader, inventoryLoader, duplicates);
     }
 
     public async Task<SaveWrapper> CheckSaveData(byte[] fileBytes, string filename, bool overwrite)
@@ -372,5 +374,9 @@ public record SaveLoadersRecord(
     SaveWrapper Save,
     ISaveBoxLoader Boxes,
     ISavePkmLoader Pkms,
+    ISaveInventoryLoader Inventory,
     SaveInfosDTO[] Duplicates
-);
+)
+{
+    public bool HasWritten => Boxes.HasWritten || Pkms.HasWritten || Inventory.HasWritten;
+};

@@ -4,7 +4,7 @@ import { switchUtil } from '../../util/switch-util';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReactTag = keyof React.JSX.IntrinsicElements | React.JSXElementConstructor<{ style: any }>;
 
-type UISpriteSizeWrapperProps<T extends ReactTag = ReactTag> = {
+export type UISpriteSizeWrapperProps<T extends ReactTag = ReactTag> = {
     component: T;
     speciesSize?: 'xs' | 'sm' | 'md' | 'lg' | number;
     itemSize?: '1lh' | 'md' | 'lg' | number;

@@ -1,5 +1,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
+using PKHeX.Core;
 
 namespace PKVault.Core;
 
@@ -94,6 +95,25 @@ public class StorageQueryService(
             var pkmSave = saveLoaders.Pkms.GetDto(id);
             return (id, pkmSave);
         }).ToDictionary();
+    }
+
+    public async Task<Dictionary<string, InventoryItemDTO>> GetSaveInventory(uint saveId)
+    {
+        var saveLoaders = savesLoadersService.GetLoaders(saveId);
+        if (saveLoaders == null)
+            return [];
+
+        return saveLoaders.Inventory.GetAllDtos();
+    }
+
+    public async Task<Dictionary<string, InventoryItemDTO>> GetMainInventory()
+    {
+        using var scope = sp.CreateScope();
+        var inventoryLoader = scope.ServiceProvider.GetRequiredService<IInventoryLoader>();
+
+        var dtos = await inventoryLoader.GetAllDtos();
+
+        return dtos.ToDictionary(dto => dto.Id);
     }
 
     public async Task<Dictionary<string, PkmLegalityDTO?>> GetPkmsLegality(string[] pkmIds, uint? saveId)

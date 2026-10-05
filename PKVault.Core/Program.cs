@@ -88,6 +88,7 @@ public class Program
         services.AddSingleton<BackupService>();
         services.AddSingleton<ILegalityAnalysisService, LegalityAnalysisService>();
         services.AddSingleton<DataService>();
+        services.AddSingleton<PKMConverterUtils>();
         services.AddSingleton<IPkmConvertService, PkmConvertService>();
         services.AddSingleton<IPkmSharePropertiesService, PkmSharePropertiesService>();
         services.AddSingleton<PkmUpdateService>();
@@ -105,6 +106,8 @@ public class Program
         services.AddScoped<MainDeleteBankAction>();
         services.AddScoped<MovePkmAction>();
         services.AddScoped<MovePkmBankAction>();
+        services.AddScoped<MoveItemAction>();
+        services.AddScoped<MoveItemBankAction>();
         services.AddScoped<MainCreatePkmVariantAction>();
         services.AddScoped<EditPkmVariantAction>();
         services.AddScoped<EditPkmSaveAction>();
@@ -122,6 +125,7 @@ public class Program
         services.AddScoped<IBoxLoader, BoxLoader>();
         services.AddScoped<IPkmVariantLoader, PkmVariantLoader>();
         services.AddScoped<IPkmFileLoader, PkmFileLoader>();
+        services.AddScoped<IInventoryLoader, InventoryLoader>();
         services.AddScoped<IDexLoader, DexLoader>();
         services.AddSingleton<ISavesLoadersService, SavesLoadersService>();   // singleton for perf reasons
 

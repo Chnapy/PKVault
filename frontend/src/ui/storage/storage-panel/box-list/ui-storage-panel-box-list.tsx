@@ -1,10 +1,12 @@
 import { ActionIcon, Divider, Group, Menu, Text, Tooltip } from '@mantine/core';
-import { BoxIcon, CalendarSyncIcon, CirclePlusIcon, EllipsisVerticalIcon, SortDescIcon } from 'lucide-react';
+import { BackpackIcon, BoxIcon, CalendarSyncIcon, CirclePlusIcon, EllipsisVerticalIcon, SortDescIcon } from 'lucide-react';
 import React from 'react';
 import type { BoxType } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsData, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
+import { useSelectContextActions } from '../../../interaction/select/context/use-select-context';
+import { useStorageMode, useStorageModeContext } from '../../../inventory/context/storage-mode-context';
 import { UIMenu } from '../../../popover/ui-menu';
 import { UIPopover } from '../../../popover/ui-popover';
 import { useCurrentPanel } from '../../storage-content/context/ui-panel-context';
@@ -19,14 +21,20 @@ export type UIStoragePanelBoxListProps = Pick<UIExpandableTabsProps<UIBoxData>, 
     onCreate?: () => unknown;
     advancedActionSort: React.ReactNode;
     advancedDexSync: React.ReactNode;
+    openModeTooltip?: boolean;
 };
 
 export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
-    value, data, renderTab, renderExpanded, onSelect, onCreate, advancedActionSort, advancedDexSync
+    value, data, renderTab, renderExpanded, onSelect, onCreate, advancedActionSort, advancedDexSync, openModeTooltip
 }) => {
     const { t } = useTranslate();
 
     const { isInCurrentPanel } = useCurrentPanel();
+
+    const { clear } = useSelectContextActions();
+
+    const { useMoveStore } = useStorageModeContext();
+    const storageMode = useStorageMode().state;
 
     return <Group align='flex-start' wrap='nowrap'>
         <UIExpandableTabs<UIBoxData>
@@ -40,7 +48,23 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             value={value}
             data={data}
             onChange={onSelect}
-            left={<BoxIcon style={{ flexShrink: 0 }} />}
+            left={<Tooltip label={t('storage.mode.switch')} position='bottom-start' opened={openModeTooltip} withArrow arrowSize={6}>
+                <UIActionIcon
+                    name='storage-mode'
+                    controlLabel={t('action.select')}
+                    onClick={() => {
+                        clear();
+                        useMoveStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default');
+                    }}
+                    variant={storageMode === 'inventory' ? 'filled' : 'default'}
+                    color={storageMode === 'inventory' ? 'violet.9' : undefined}
+                    size={24}
+                >
+                    {storageMode === 'inventory'
+                        ? <BackpackIcon style={{ flexShrink: 0 }} />
+                        : <BoxIcon style={{ flexShrink: 0 }} />}
+                </UIActionIcon>
+            </Tooltip>}
             renderTab={renderTab}
             renderExpanded={(data, opt) => <Group py='md' px='xs'>
                 {renderExpanded?.(data, opt)}

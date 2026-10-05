@@ -17,6 +17,12 @@ export type MoveContainerValue =
         saveId?: undefined;
         boxId?: undefined;
         bankId: string;
+    }
+    | {
+        type: 'inventory-item';
+        saveId?: number;
+        boxId: string;
+        bankId?: undefined;
     };
 
 export type MoveParams = {
@@ -46,6 +52,12 @@ const getContainerValue = (hash: string): MoveContainerValue => {
             return {
                 type: 'bank',
                 bankId,
+            };
+        case 'inventory-item':
+            return {
+                type: 'inventory-item',
+                saveId: saveId ? Number(saveId) : undefined,
+                boxId,
             };
     }
 };

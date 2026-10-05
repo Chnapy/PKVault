@@ -1,5 +1,6 @@
 import type { PkmVariantIndexes } from '../../../data/hooks/use-pkm-variant-index';
 import type { MoveParams } from '../move-container-fns';
+import type { IsItemCompatibleFn } from './rules/validate-common';
 import { validateRoot } from './rules/validate-root';
 import { swapSlotInfos } from './slot-infos/swap-slot-infos';
 import type { DropValidationResult, SlotInfos } from './types';
@@ -9,6 +10,7 @@ export const validateDrop = (
     params: MoveParams | undefined,
     slotInfosList: SlotInfos[],
     pkmVariantIndexes: PkmVariantIndexes,
+    isItemCompatible: IsItemCompatibleFn,
 ): DropValidationResult => {
 
     const rootResult = validateRoot(slotInfosList);
@@ -19,6 +21,7 @@ export const validateDrop = (
             info,
             params?.attached ?? false,
             pkmVariantIndexes,
+            isItemCompatible,
         );
         if (!result.canDrop) return result;
 
@@ -30,6 +33,7 @@ export const validateDrop = (
                 swapInfo,
                 params?.attached ?? false,
                 pkmVariantIndexes,
+                isItemCompatible,
             );
             if (!swapResult.canDrop) return swapResult;
         }

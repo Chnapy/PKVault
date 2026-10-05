@@ -263,7 +263,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     public string GetOriginMetLocation(string language) => GameInfo.GetStrings(language)
         .GetLocationName(Pkm.WasEgg, Pkm.MetLocation, Pkm.Format, Pkm.Generation, Pkm.Version);
 
-    public int HeldItem => Pkm.HeldItem;
+    public ushort HeldItem => (ushort)Pkm.HeldItem;
 
     public int GetConvertedHeldItem() => ItemConverter.GetItemForFormat(HeldItem, Context, StaticDataService.LAST_ENTITY_CONTEXT);
 
@@ -288,6 +288,12 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
         // https://github.com/Chnapy/PKVault/issues/205
         return pkm.Nickname.Replace('’', '\'').Replace(' ', '\'');
     }
+
+    public bool CanHeldItem => Pkm.Format >= 2
+        && Pkm is not PB7
+        && Pkm is not PA8
+        && IsEnabled
+        && !Pkm.IsEgg;
 
     public bool IsSpeciesValid => Species > 0 && Species < GameInfo.Strings.Species.Count;
 

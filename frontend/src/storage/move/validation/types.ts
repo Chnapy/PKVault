@@ -28,6 +28,11 @@ export type DropRefusalReason =
     | 'save-shadow-to-main'
     | 'save-cannot-move-main-to-main'
     | 'pkm-cannot-move'
+    | 'pkm-to-inventory'
     | 'main-to-same-bank'
     | 'same-pkm-id'
-    | 'bank-external';
+    | 'bank-external'
+    | 'multiple-items-to-pkm'
+    | 'items-to-pkm-empty-slot'
+    | 'item-same-inventory'
+    | 'item-not-compatible';

@@ -12,10 +12,8 @@ public interface IPkmSharePropertiesService
  * Share properties from a PKM source to a PKM target,
  * handling all convert requirements and contexts differences.
  */
-public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : IPkmSharePropertiesService
+public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, PKMConverterUtils utils) : IPkmSharePropertiesService
 {
-    private readonly PKMConverterUtils utils = new();
-
     public void SharePropertiesTo(ImmutablePKM source, PKM targetPkm, SaveFile? save)
     {
         var sourcePkm = source.GetMutablePkm();
@@ -156,12 +154,9 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService) : I
             }
         }
 
-        if (source.Format >= 2
-            && sourcePkm is not PB7
-            && sourcePkm is not PA8
-        )
+        if (source.CanHeldItem && resultPkm.HeldItem > 0)
         {
-            utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context, resultPkm.Version);
+            utils.CopyHeldItemFrom(targetPkm, resultPkm.HeldItem, resultPkm.Context.GetSingleGameVersion(), save?.Version);
         }
 
         if (sourcePkm is IAppliedMarkings)

@@ -1,6 +1,7 @@
 import { Card, CloseButton, Group, Text } from '@mantine/core';
 import { SquareCheckIcon } from 'lucide-react';
 import type React from 'react';
+import { BoxType } from '../../data/sdk/model';
 import { useTranslate } from '../../translate/i18n';
 import { WithControlsIcons } from '../../ui/interaction/controls/icons/with-controls-icons';
 import { useControls } from '../../ui/interaction/controls/use-controls';
@@ -8,6 +9,7 @@ import { getBackControl } from '../../ui/interaction/focus-controls/common-contr
 import { Focus } from '../../ui/interaction/focus/provider/use-focus-context';
 import { useFocusScopeContext } from '../../ui/interaction/focus/scope/use-focus-scope-context';
 import { useSelectContext, useSelectContextActions } from '../../ui/interaction/select/context/use-select-context';
+import { useStorageMode } from '../../ui/inventory/context/storage-mode-context';
 import { UICardSectionControl } from '../../ui/storage/storage-panel/card-section-control/ui-card-section-control';
 import type { MoveContainerValue } from '../move/move-container-fns';
 import { useCurrentStorageWithFallback } from '../panel/hooks/use-current-storage-with-fallback';
@@ -17,6 +19,9 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
     const { t } = useTranslate();
 
     const { saveId, box } = useCurrentStorageWithFallback().data ?? {};
+
+    const storageMode = useStorageMode().state;
+    const isInventory = box?.type === BoxType.Inventory;
 
     const parentScope = useFocusScopeContext();
     const order = parentScope.parentsIds.length;
@@ -30,16 +35,22 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
         if (!box)
             return;
 
-        const currentContainer = selectCtx.getContainerHash(saveId
+        const currentContainer = selectCtx.getContainerHash(isInventory
             ? {
-                type: 'save-item',
-                saveId,
+                type: 'inventory-item',
+                saveId: saveId ?? undefined,
                 boxId: box.id,
             }
-            : {
-                type: 'main-item',
-                boxId: box.id,
-            });
+            : saveId
+                ? {
+                    type: 'save-item',
+                    saveId,
+                    boxId: box.id,
+                }
+                : {
+                    type: 'main-item',
+                    boxId: box.id,
+                });
 
         return s.container === currentContainer
             ? s.ids
@@ -102,16 +113,19 @@ export const MultiSelectActions: React.FC<{ enabled: boolean }> = ({ enabled }) 
                 <Group gap='sm'>
                     <SquareCheckIcon />
                     <Text>
-                        {t('storage.actions.select-title', { count: multiSelectIds.size })}
+                        {storageMode === 'inventory'
+                            ? t('storage.actions.select-inventory-title', { count: multiSelectIds.size })
+                            : t('storage.actions.select-title', { count: multiSelectIds.size })}
                     </Text>
                     <CloseButton onClick={selectCtxActions.clear} size='sm' ml='auto' />
                 </Group>
             </Card.Section>
             {enabled && <Card.Section component={UICardSectionControl} inheritPadding py='inherit' withBorder>
                 <DetailsActions
-                    pkmIds={[ ...multiSelectIds ]}
+                    ids={[ ...multiSelectIds ]}
                     saveId={saveId ?? null}
                     deleteAllRelatedVariants
+                    isInventory={isInventory}
                 />
             </Card.Section>}
         </Card>

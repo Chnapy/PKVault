@@ -4,6 +4,7 @@ public class DataUpdateFlags
     public DataUpdateFlagsState MainBanks = new();
     public DataUpdateFlagsState MainBoxes = new();
     public DataUpdateFlagsState MainPkmVariants = new();
+    public bool MainInventoryItems = new();
     public DataUpdateFlagsState Dex = new();
     public DataUpdateSaveListFlags Saves = new();
     public bool Warnings;
@@ -17,6 +18,7 @@ public class DataUpdateSaveFlags(uint saveId)
     public uint SaveId => saveId;
     public bool SaveBoxes;
     public DataUpdateFlagsState SavePkms = new();
+    public bool SaveInventoryItems;
 }
 
 public class DataUpdateSaveListFlags

@@ -6,12 +6,12 @@ import { Gender } from '../../../data/sdk/model';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
 import { Route } from '../../../routes/storage';
 import { UIStorageItemIcons } from '../../../ui/storage/storage-item/ui-storage-item-icons';
-import { ItemImg } from '../../../img/item-img';
-import { StorageItem, type StorageItemProps } from '../storage-item';
 import { pick } from '../../../util/pick';
 import { useSelectCallback } from '../../../util/use-select-callback';
 import type { MoveContainerValue } from '../../move/move-container-fns';
 import { useCurrentStorage } from '../../panel/storage-panel-context';
+import { StorageItem, type StorageItemProps } from '../storage-item';
+import { StorageItemHeldItem } from '../storage-item-held-item';
 
 type StorageSaveItemProps = Pick<StorageItemProps, 'nodeId' | 'selectFromPreviousSelected'> & {
     saveId: number;
@@ -81,6 +81,11 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
 
         const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, isShiny, nSparkle, isEgg, isShadow, canEvolve } = savePkm;
 
+        const heldItemNode = <StorageItemHeldItem
+            heldItem={savePkm.heldItem} contextVersion={contextVersion}
+            container={container} slot={boxSlot} id={id}
+        />;
+
         return <StorageItem
             id={id}
             selected={selected}
@@ -120,10 +125,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 isN={nSparkle}
                 isStarter={savePkm.isStarter}
                 isDuplicate={savePkm.isDuplicate}
-                heldItem={savePkm.heldItem > 0 && <ItemImg
-                    version={contextVersion}
-                    item={savePkm.heldItem}
-                />}
+                heldItem={heldItemNode}
                 warning={!!pkmLegality && !pkmLegality.isValid}
                 level={savePkm.level}
                 party={savePkm.party >= 0 ? savePkm.party : undefined}
@@ -131,6 +133,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 attached={isAttached}
                 needSynchronize={canSynchronize}
             />}
+            heldItem={heldItemNode}
         />;
     }),
 );

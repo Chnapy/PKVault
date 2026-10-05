@@ -139,6 +139,37 @@ public class ActionService(
         );
     }
 
+    public async Task<DataUpdateFlags> MoveItem(
+        uint? sourceSaveId, string sourceBoxId,
+        string[] sourcePkmIds, string[] sourceItemIds,
+        uint? targetSaveId, string targetBoxId,
+        string? targetPkmId
+    )
+    {
+        using var scope = sp.CreateScope();
+
+        return await AddAction(
+            scope,
+            (scope) => scope.ServiceProvider.GetRequiredService<MoveItemAction>(),
+            new(sourceSaveId, sourceBoxId, sourcePkmIds, sourceItemIds, targetSaveId, targetBoxId, targetPkmId)
+        );
+    }
+
+    public async Task<DataUpdateFlags> MoveItemBank(
+        uint? sourceSaveId,
+        string[] sourcePkmIds, string[] sourceItemIds,
+        string bankId
+    )
+    {
+        using var scope = sp.CreateScope();
+
+        return await AddAction(
+            scope,
+            (scope) => scope.ServiceProvider.GetRequiredService<MoveItemBankAction>(),
+            new(sourceSaveId, sourcePkmIds, sourceItemIds, bankId)
+        );
+    }
+
     public async Task<DataUpdateFlags> MainCreatePkmVariant(string pkmVariantId, EntityContext context)
     {
         using var scope = sp.CreateScope();
@@ -385,6 +416,7 @@ public class ActionService(
                 ..db.PkmVariantsFlags.Ids,
             ]
         };
+        flags.MainInventoryItems = flags.MainInventoryItems || db.InventoryItemsFlags.All || db.InventoryItemsFlags.Ids.Count > 0;
         flags.Dex = new()
         {
             All = flags.Dex.All || db.DexFlags.All,

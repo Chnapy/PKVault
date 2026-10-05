@@ -9,6 +9,16 @@ public class MainDeleteBoxAction(IBoxLoader boxLoader, IBankLoader bankLoader) :
     {
         var box = await boxLoader.GetEntityRequired(input.boxId);
 
+        var boxes = (await boxLoader.GetEntitiesByBank(box.BankId)).Values;
+
+        if (box.Type == BoxType.Inventory
+            && boxes.Count(box => box.Type == BoxType.Inventory) < 2)
+            throw new ArgumentException($"Cannot delete last Inventory box, id={input.boxId}");
+
+        if (box.Type != BoxType.Inventory
+            && boxes.Count(box => box.Type != BoxType.Inventory) < 2)
+            throw new ArgumentException($"Cannot delete last Pkm box, id={input.boxId}");
+
         await boxLoader.DeleteEntity(box);
         await boxLoader.NormalizeOrders();
 
