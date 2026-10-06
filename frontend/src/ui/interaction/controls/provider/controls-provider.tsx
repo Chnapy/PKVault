@@ -39,11 +39,13 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         window.addEventListener('mousedown', mouseListener);
         window.addEventListener('mousemove', mouseListener);
 
-        if (!enableGamepad)
+        if (!enableGamepad) {
+            updateState('mouse');
             return () => {
                 window.removeEventListener('mousemove', mouseListener);
                 window.removeEventListener('mousedown', mouseListener);
             };
+        }
 
         // sort & filter based on order + spread
         const getSortedFilteredControls = () => {
