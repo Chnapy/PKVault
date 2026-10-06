@@ -1239,55 +1239,18 @@
           "Storage"
         ],
         "operationId": "Storage_MoveItemBank",
-        "parameters": [
-          {
-            "name": "sourceSaveId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "nullable": true
-            },
-            "x-position": 1
-          },
-          {
-            "name": "sourcePkmIds",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
+        "requestBody": {
+          "x-name": "input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoveItemBankActionInput"
               }
-            },
-            "x-position": 2
+            }
           },
-          {
-            "name": "sourceItemIds",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "x-position": 3
-          },
-          {
-            "name": "bankId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 4
-          }
-        ],
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "",
@@ -1308,75 +1271,18 @@
           "Storage"
         ],
         "operationId": "Storage_MovePkm",
-        "parameters": [
-          {
-            "name": "pkmIds",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
+        "requestBody": {
+          "x-name": "input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovePkmActionInput"
               }
-            },
-            "x-position": 1
+            }
           },
-          {
-            "name": "sourceSaveId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "targetSaveId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "nullable": true
-            },
-            "x-position": 3
-          },
-          {
-            "name": "targetBoxId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 4
-          },
-          {
-            "name": "targetBoxSlots",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
-            "x-position": 5
-          },
-          {
-            "name": "attached",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            },
-            "x-position": 6
-          }
-        ],
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "",
@@ -1397,50 +1303,18 @@
           "Storage"
         ],
         "operationId": "Storage_MovePkmBank",
-        "parameters": [
-          {
-            "name": "pkmIds",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
+        "requestBody": {
+          "x-name": "input",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MovePkmBankActionInput"
               }
-            },
-            "x-position": 1
+            }
           },
-          {
-            "name": "sourceSaveId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "nullable": true
-            },
-            "x-position": 2
-          },
-          {
-            "name": "bankId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "attached",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "boolean"
-            },
-            "x-position": 4
-          }
-        ],
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "",
@@ -5001,6 +4875,98 @@
           },
           "targetPkmId": {
             "type": "string"
+          }
+        }
+      },
+      "MoveItemBankActionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sourcePkmIds",
+          "sourceItemIds",
+          "bankId"
+        ],
+        "properties": {
+          "sourceSaveId": {
+            "type": "integer"
+          },
+          "sourcePkmIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sourceItemIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bankId": {
+            "type": "string"
+          }
+        }
+      },
+      "MovePkmActionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pkmIds",
+          "targetBoxId",
+          "targetBoxSlots",
+          "attached"
+        ],
+        "properties": {
+          "pkmIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sourceSaveId": {
+            "type": "integer"
+          },
+          "targetSaveId": {
+            "type": "integer"
+          },
+          "targetBoxId": {
+            "type": "string"
+          },
+          "targetBoxSlots": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "attached": {
+            "type": "boolean"
+          }
+        }
+      },
+      "MovePkmBankActionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pkmIds",
+          "bankId",
+          "attached"
+        ],
+        "properties": {
+          "pkmIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sourceSaveId": {
+            "type": "integer"
+          },
+          "bankId": {
+            "type": "string"
+          },
+          "attached": {
+            "type": "boolean"
           }
         }
       },

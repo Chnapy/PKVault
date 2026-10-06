@@ -62,25 +62,17 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("move/pkm")]
-    public async Task<DataDTO> MovePkm(
-        string[] pkmIds, uint? sourceSaveId,
-        uint? targetSaveId, string targetBoxId, int[] targetBoxSlots,
-        bool attached
-    )
+    public async Task<DataDTO> MovePkm(MovePkmActionInput input)
     {
-        var flags = await actionService.MovePkm(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached);
+        var flags = await actionService.MovePkm(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("move/pkm/bank")]
-    public async Task<DataDTO> MovePkmBank(
-        string[] pkmIds, uint? sourceSaveId,
-        string bankId,
-        bool attached
-    )
+    public async Task<DataDTO> MovePkmBank(MovePkmBankActionInput input)
     {
-        var flags = await actionService.MovePkmBank(pkmIds, sourceSaveId, bankId, attached);
+        var flags = await actionService.MovePkmBank(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -94,13 +86,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("move/item/bank")]
-    public async Task<DataDTO> MoveItemBank(
-        uint? sourceSaveId,
-        string[] sourcePkmIds, string[] sourceItemIds,
-        string bankId
-    )
+    public async Task<DataDTO> MoveItemBank(MoveItemBankActionInput input)
     {
-        var flags = await actionService.MoveItemBank(sourceSaveId, sourcePkmIds, sourceItemIds, bankId);
+        var flags = await actionService.MoveItemBank(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

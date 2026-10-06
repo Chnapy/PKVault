@@ -78,7 +78,7 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                     case 'bank': {
                         try {
                             const response = await storageMoveItemBank({
-                                sourceSaveId: sourceContainer.saveId ?? null,
+                                sourceSaveId: sourceContainer.saveId,
                                 sourceItemIds,
                                 sourcePkmIds,
                                 bankId: target.targetContainer.bankId,
@@ -125,7 +125,7 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                             const response = await storageMovePkmBank({
                                 pkmIds: sourceIds,
                                 bankId: target.targetContainer.bankId,
-                                sourceSaveId: sourceContainer.saveId ?? null,
+                                sourceSaveId: sourceContainer.saveId,
                                 attached: source.params?.attached ?? false,
                             });
                             updateCacheMutationResponse(queryClient, response);
@@ -147,8 +147,8 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                         try {
                             const response = await storageMovePkm({
                                 pkmIds: sourceIds,
-                                sourceSaveId: sourceContainer.saveId ?? null,
-                                targetSaveId: target.targetContainer.saveId ?? null,
+                                sourceSaveId: sourceContainer.saveId,
+                                targetSaveId: target.targetContainer.saveId,
                                 targetBoxId: target.targetContainer.boxId,
                                 targetBoxSlots,
                                 attached: source.params?.attached ?? false,

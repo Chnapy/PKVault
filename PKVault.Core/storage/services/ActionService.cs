@@ -109,33 +109,25 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MovePkm(
-        string[] pkmIds, uint? sourceSaveId,
-        uint? targetSaveId, string targetBoxId, int[] targetBoxSlots,
-        bool attached
-    )
+    public async Task<DataUpdateFlags> MovePkm(MovePkmActionInput input)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<MovePkmAction>(),
-            new(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached)
+            input
         );
     }
 
-    public async Task<DataUpdateFlags> MovePkmBank(
-        string[] pkmIds, uint? sourceSaveId,
-        string bankId,
-        bool attached
-    )
+    public async Task<DataUpdateFlags> MovePkmBank(MovePkmBankActionInput input)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<MovePkmBankAction>(),
-            new(pkmIds, sourceSaveId, bankId, attached)
+            input
         );
     }
 
@@ -150,18 +142,14 @@ public class ActionService(
         );
     }
 
-    public async Task<DataUpdateFlags> MoveItemBank(
-        uint? sourceSaveId,
-        string[] sourcePkmIds, string[] sourceItemIds,
-        string bankId
-    )
+    public async Task<DataUpdateFlags> MoveItemBank(MoveItemBankActionInput input)
     {
         using var scope = sp.CreateScope();
 
         return await AddAction(
             scope,
             (scope) => scope.ServiceProvider.GetRequiredService<MoveItemBankAction>(),
-            new(sourceSaveId, sourcePkmIds, sourceItemIds, bankId)
+            input
         );
     }
 
