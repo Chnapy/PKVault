@@ -1,11 +1,11 @@
-import { EmptyState, Group } from '@mantine/core';
+import { EmptyState, Group, useMatches } from '@mantine/core';
 import { PackageOpenIcon } from 'lucide-react';
 import React from 'react';
 import { useStorageGetInventoryItems } from '../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../translate/i18n';
 import { useSelectContext, useSelectContextActions } from '../../../ui/interaction/select/context/use-select-context';
+import { useSpriteSizeLocalStorage } from '../../../ui/local-storage/use-storage-size-local-storage';
 import { UISpriteSizeWrapper } from '../../../ui/sprite-img/ui-sprite-size-wrapper';
-import { getBoxColumns } from '../../../ui/storage/storage-panel/get-box-columns';
 import { useSelectCallback } from '../../../util/use-select-callback';
 import { StorageMainInventoryItem } from '../../item/main/storage-main-inventory-item';
 import { StorageSaveInventoryItem } from '../../item/save/storage-save-inventory-item';
@@ -126,21 +126,20 @@ export const StoragePanelInventoryItems: React.FC = () => {
 
     const emptyBox = inventory.every(id => !id);
 
-    const cols = getBoxColumns(items.length);
+    const [ speciesSizeRaw ] = useSpriteSizeLocalStorage('storage-sprite-size');
 
-    return <UISpriteSizeWrapper itemSize='lg'
+    const itemSize = useMatches({
+        base: 1.5,
+        lg: speciesSizeRaw * 2,
+    });
+
+    return <UISpriteSizeWrapper itemSize={itemSize}
         component={Group}
         gap='sm'
         wrap='wrap'
         mx='auto'
         pos='relative'
         w='fit-content'
-        style={cols
-            ? {
-                display: 'grid',
-                gridTemplateColumns: `repeat(${cols}, 1fr)`,
-            }
-            : undefined}
     >
         {items}
 

@@ -48,7 +48,7 @@ export const UIStorageContent: React.FC<UIStorageContentProps> = ({ id, left, ri
     });
 
     const itemSize: UISpriteSizeWrapperProps[ 'itemSize' ] = storageMode === 'inventory'
-        ? 'lg'
+        ? speciesSize * 2
         : undefined;
 
     const getResponsiveContent = useMatches({
