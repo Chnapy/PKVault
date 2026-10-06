@@ -77,7 +77,7 @@ export const MoveAttachedButton: React.FC<
                 controlLabel={saveId ? t('storage.actions.detach-save') : t('storage.actions.detach-main')}
                 onClick={() =>
                     mainPkmDetachSaveMutation.mutateAsync({
-                        params: {
+                        data: {
                             pkmVariantIds: attachedVariantIds,
                         },
                     })

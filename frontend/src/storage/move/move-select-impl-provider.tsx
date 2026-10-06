@@ -97,13 +97,13 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
 
                         try {
                             const response = await storageMoveItem({
-                                sourceSaveId: sourceContainer.saveId ?? null,
+                                sourceSaveId: sourceContainer.saveId,
                                 sourceBoxId: sourceContainer.boxId,
                                 sourceItemIds,
                                 sourcePkmIds,
-                                targetSaveId: target.targetContainer.saveId ?? null,
+                                targetSaveId: target.targetContainer.saveId,
                                 targetBoxId: target.targetContainer.boxId,
-                                targetPkmId,
+                                targetPkmId: targetPkmId,
                             });
                             updateCacheMutationResponse(queryClient, response);
                         } catch (err) {

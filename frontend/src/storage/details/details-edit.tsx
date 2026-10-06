@@ -99,17 +99,21 @@ export const DetailsEdit: React.FC<{ pkmId: string; saveId: number | null }> = (
                 isAlpha={pkm.alphaMove === move}
             />
         </UIDetailsContentMoveTable>}
-        onSubmit={async data => {
+        onSubmit={async editPayload => {
             if (saveId) {
                 await editPkmSaveMutation.mutateAsync({
-                    saveId: saveId ?? undefined,
-                    pkmId: pkm.id,
-                    data,
+                    data: {
+                        saveId: saveId ?? undefined,
+                        pkmSaveId: pkm.id,
+                        editPayload
+                    },
                 });
             } else {
                 await editPkmVariantMutation.mutateAsync({
-                    pkmVariantId: pkm.id,
-                    data,
+                    data: {
+                        pkmVariantId: pkm.id,
+                        editPayload,
+                    }
                 });
             }
         }}

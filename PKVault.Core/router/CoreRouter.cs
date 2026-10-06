@@ -251,7 +251,9 @@ public partial class CoreRouter
             {
                 if (p.HasDefaultValue)
                     return p.DefaultValue;
-                if (Nullable.GetUnderlyingType(p.ParameterType) != null)
+                NullabilityInfoContext nullCtx = new();
+                NullabilityInfo info = nullCtx.Create(p);
+                if (info.ReadState == NullabilityState.Nullable)
                     return null;
                 if (p.ParameterType.IsArray)
                     return Array.CreateInstanceFromArrayType(p.ParameterType, 0);

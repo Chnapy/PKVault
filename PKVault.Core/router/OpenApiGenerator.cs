@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text.Json;
 using Namotion.Reflection;
 using NJsonSchema;
@@ -60,6 +61,8 @@ public class OpenApiGenerator
         var schemaResolver = new OpenApiSchemaResolver(document, settings);
         var generator = new JsonSchemaGenerator(settings);
 
+        NullabilityInfoContext nullCtx = new();
+
         JsonSchema Resolve(Type type) =>
             generator.GenerateWithReference<JsonSchema>(type.ToContextualType(), schemaResolver, (_, schema) =>
             {
@@ -74,8 +77,9 @@ public class OpenApiGenerator
                         if (!schema.Properties.TryGetValue(Param.Name!, out var param))
                             continue;
 
-                        var nullable = Nullable.GetUnderlyingType(Param.ParameterType) != null;
-                        var required = !Param.HasDefaultValue;
+                        NullabilityInfo nullInfo = nullCtx.Create(Param);
+                        var nullable = nullInfo.ReadState == NullabilityState.Nullable;
+                        var required = !nullable && !Param.HasDefaultValue;
 
                         if (Param.HasDefaultValue && Param.DefaultValue != null)
                         {
@@ -139,7 +143,8 @@ public class OpenApiGenerator
                         Position = position
                     };
 
-                    var nullable = Param.IsOptional || Nullable.GetUnderlyingType(Param.ParameterType) != null;
+                    NullabilityInfo nullInfo = nullCtx.Create(Param);
+                    var nullable = Param.IsOptional || nullInfo.ReadState == NullabilityState.Nullable;
                     var required = !Param.HasDefaultValue;
 
                     if (Param.HasDefaultValue && Param.DefaultValue != null)
