@@ -138,7 +138,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             }))}
             value={watchBankId}
             onChange={value => value && setValue('bankId', value)}
-            disabled={boxes.length <= 1}
+            disabled={boxes.length <= 1 || watchType === BoxType.Inventory}
             comboboxProps={{ withinPortal: false }}
         />
     </UIFormCard>;

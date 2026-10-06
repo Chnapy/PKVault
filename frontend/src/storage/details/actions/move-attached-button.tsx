@@ -8,15 +8,17 @@ import { useStorageMainPkmDetachSave } from '../../../data/sdk/storage/storage.g
 import { useTranslate } from '../../../translate/i18n';
 import { UIButton, type UIButtonProps } from '../../../ui/form/button/ui-button';
 import { useControlsCurrentType } from '../../../ui/interaction/controls/use-controls-current-type';
-import { useDragging } from '../../../ui/interaction/move/hooks/use-dragging';
+import type { UseDraggingReturn } from '../../../ui/interaction/move/hooks/use-dragging';
 import { UIPokedexIcons } from '../../../ui/pokedex/icons/ui-pokedex-icons';
 import { filterIsDefined } from '../../../util/filter-is-defined';
 import { pick } from '../../../util/pick';
 import { useSelectCallback } from '../../../util/use-select-callback';
-import type { MoveContainerValue, MoveParams } from '../../move/move-container-fns';
+import type { MoveParams } from '../../move/move-container-fns';
 import type { ActionButtonDefaultProps } from './edit-pkm-button';
 
-export const MoveAttachedButton: React.FC<ActionButtonDefaultProps> = ({ pkmIds, saveId }) => {
+export const MoveAttachedButton: React.FC<
+    ActionButtonDefaultProps & Pick<UseDraggingReturn, 'useDrag'>
+> = ({ pkmIds, saveId, useDrag }) => {
     const { t } = useTranslate();
 
     const pkmIndexQuery = usePkmIndex(saveId ?? null,
@@ -47,22 +49,8 @@ export const MoveAttachedButton: React.FC<ActionButtonDefaultProps> = ({ pkmIds,
 
     const pkms = pkmIndexQuery.data ?? [];
     const attachedVariantIds = attachedVariantIdsQuery.data ?? [];
-    const boxId = pkms[ 0 ]?.boxId;
-    const pkmToMove = pkms[ 0 ];
 
-    const container = React.useMemo((): MoveContainerValue => saveId
-        ? {
-            type: 'save-item',
-            saveId,
-            boxId: boxId?.toString() ?? '',
-        }
-        : {
-            type: 'main-item',
-            boxId: boxId?.toString() ?? '',
-        }, [ boxId, saveId ]);
-
-    const dragging = useDragging(pkmToMove?.id ?? '', container, false);
-    const draggingMoveAttached = dragging.useDrag<MoveParams>({ attached: true });
+    const draggingMoveAttached = useDrag<MoveParams>({ attached: true });
 
     const hasDuplicate = pkms.some(pkm => pkm.isDuplicate);
 

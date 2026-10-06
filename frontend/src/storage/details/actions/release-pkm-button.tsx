@@ -13,35 +13,23 @@ import type { MoveContainerValue } from '../../move/move-container-fns';
 import type { ActionButtonDefaultProps } from './edit-pkm-button';
 
 export type ReleasePkmButtonProps = ActionButtonDefaultProps & {
+    container: MoveContainerValue;
     deleteAllRelatedVariants: boolean;
 };
 
-export const ReleasePkmButton: React.FC<ReleasePkmButtonProps> = ({ pkmIds, saveId, deleteAllRelatedVariants }) => {
+export const ReleasePkmButton: React.FC<ReleasePkmButtonProps> = ({ pkmIds, saveId, container, deleteAllRelatedVariants }) => {
     const { t } = useTranslate();
 
     const pkmIndexQuery = usePkmIndex(saveId ?? null,
         useSelectCallback(data => {
             return pkmIds.map(id => data.data.byId[ id ]).filter(filterIsDefined)
-                .map(pkm => pick(pkm, [ 'id', 'boxId', 'canDelete' ]));
+                .map(pkm => pick(pkm, [ 'id', 'canDelete' ]));
         }, [ pkmIds ]));
 
     const pkms = pkmIndexQuery.data ?? [];
 
-    const boxId = pkms[ 0 ]?.boxId;
-
     const mainPkmVariantDeleteMutation = useStorageMainDeletePkmVariant();
     const savePkmDeleteMutation = useStorageSaveDeletePkms();
-
-    const container = React.useMemo((): MoveContainerValue => saveId
-        ? {
-            type: 'save-item',
-            saveId,
-            boxId: boxId?.toString() ?? '',
-        }
-        : {
-            type: 'main-item',
-            boxId: boxId?.toString() ?? '',
-        }, [ boxId, saveId ]);
 
     const selectCtx = useSelectContextNullable();
 

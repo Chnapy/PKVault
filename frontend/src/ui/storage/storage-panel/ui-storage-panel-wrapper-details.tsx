@@ -28,16 +28,8 @@ export const UIStoragePanelWrapperDetails: React.FC<UIStoragePanelWrapperDetails
         opened={opened}
         setOpened={setOpened}
         target={children}
-        dropdown={details}
+        dropdown={!seeThrough && details}
         width={expanded ? 'target' : detailsWidth}
-        dropdownProps={{
-            style: seeThrough
-                ? {
-                    opacity: 0.1,
-                    pointerEvents: 'none',
-                }
-                : undefined,
-        }}
         focusOnMount={false}
         position={position}
         closeOnClickOutside={false}

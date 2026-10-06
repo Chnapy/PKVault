@@ -1,13 +1,21 @@
+import { useLocalStorage } from '@mantine/hooks';
 import React from 'react';
 import { addGamepadEventListener } from '../gamepad/gamepad-event';
 import { gamepadLoop, getGamepads } from '../gamepad/gamepad-loop';
 import { controlsContext, createControlsStore, type ControlsContext, type ControlTriggerType } from './controls-context';
 
 export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [ methods ] = React.useState((): ControlsContext => ({
+
+    const [ enableGamepad, setEnableGamepad ] = useLocalStorage<boolean>({
+        key: 'enable-gamepad',
+        defaultValue: true,
+    });
+
+    const [ methods ] = React.useState((): Pick<ControlsContext, 'useControlsStore' | 'toggleGamepad'> => ({
         useControlsStore: createControlsStore(
-            getGamepads().some(v => v) ? 'gamepad' : undefined,
+            enableGamepad && getGamepads().some(v => v) ? 'gamepad' : undefined,
         ),
+        toggleGamepad: () => setEnableGamepad(v => !v),
     }));
 
     React.useEffect(() => {
@@ -24,6 +32,20 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 currentType: state,
             };
         });
+
+        const mouseListener = () => {
+            updateState('mouse');
+        };
+        window.addEventListener('mousedown', mouseListener);
+        window.addEventListener('mousemove', mouseListener);
+
+        if (!enableGamepad) {
+            updateState('mouse');
+            return () => {
+                window.removeEventListener('mousemove', mouseListener);
+                window.removeEventListener('mousedown', mouseListener);
+            };
+        }
 
         // sort & filter based on order + spread
         const getSortedFilteredControls = () => {
@@ -47,6 +69,10 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
 
         const keydownListener = (e: KeyboardEvent) => {
+            // avoid gamepad/keyboard conflicts
+            if (getGamepads().some(Boolean))
+                return;
+
             if (
                 (!document.activeElement || document.activeElement.nodeName !== 'INPUT')
                 && !e.shiftKey
@@ -77,14 +103,7 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 }
             }
         };
-
-        const mouseListener = () => {
-            updateState('mouse');
-        };
-
         window.addEventListener('keydown', keydownListener);
-        window.addEventListener('mousedown', mouseListener);
-        window.addEventListener('mousemove', mouseListener);
 
         const removeGamepadListener = addGamepadEventListener(e => {
             updateState('gamepad');
@@ -152,9 +171,14 @@ export const ControlsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             window.removeEventListener('mousedown', mouseListener);
             window.removeEventListener('keydown', keydownListener);
         };
-    }, [ methods.useControlsStore ]);
+    }, [ enableGamepad, methods.useControlsStore ]);
 
-    return <controlsContext.Provider value={methods}>
+    const finalMethods = React.useMemo((): ControlsContext => ({
+        ...methods,
+        enableGamepad,
+    }), [ enableGamepad, methods ]);
+
+    return <controlsContext.Provider value={finalMethods}>
         {children}
     </controlsContext.Provider>
 };

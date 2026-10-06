@@ -53,12 +53,12 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
     const queryClient = useQueryClient();
     const errorsOnMutationResponse = BackendErrorsContext.useOnMutationResponse();
 
-    const { useMoveStore } = useStorageModeContext();
+    const { useStorageModeStore } = useStorageModeContext();
 
     return React.useCallback(async (source, target) => {
         const sourceContainer = containerFns.getContainerValue(source.containerId);
 
-        const storageMode = useMoveStore.getState().state;
+        const storageMode = useStorageModeStore.getState().state;
 
         console.log('drop', sourceContainer, source, target)
 
@@ -163,7 +163,7 @@ const useOnDrop = (): MoveProviderProps<MoveContainerValue, MoveParams>[ 'onDrop
                 break;
             }
         }
-    }, [ errorsOnMutationResponse, queryClient, useMoveStore ]);
+    }, [ errorsOnMutationResponse, queryClient, useStorageModeStore ]);
 };
 
 export type MoveSelectImplProviderProps = {

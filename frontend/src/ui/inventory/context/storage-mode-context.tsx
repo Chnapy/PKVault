@@ -4,7 +4,7 @@ import { create } from 'zustand';
 export type StorageMode = 'default' | 'inventory';
 
 export const storageModeContext = React.createContext<{
-    useMoveStore: ReturnType<typeof createStorageModeStore>;
+    useStorageModeStore: ReturnType<typeof createStorageModeStore>;
 } | null>(null);
 
 export type StorageModeStore = {
@@ -24,4 +24,4 @@ export const useStorageModeContext = () => {
     return ctx;
 };
 
-export const useStorageMode = () => useStorageModeContext().useMoveStore();
+export const useStorageMode = () => useStorageModeContext().useStorageModeStore();

@@ -42,7 +42,7 @@ export const useDroppableValidation = (isItemCompatible: IsItemCompatibleFn) => 
 
     const { t } = useTranslate();
 
-    const { useMoveStore } = useStorageModeContext();
+    const { useStorageModeStore } = useStorageModeContext();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     type QuerySelectData<O> = O extends UseQueryOptions<any, any, infer D>
@@ -176,7 +176,7 @@ export const useDroppableValidation = (isItemCompatible: IsItemCompatibleFn) => 
             getItemsContainers,
         } = getCommonData(source);
 
-        const mode = useMoveStore.getState().state;
+        const mode = useStorageModeStore.getState().state;
 
         const attached = source?.params?.attached ?? false;
 
@@ -352,7 +352,7 @@ export const useDroppableValidation = (isItemCompatible: IsItemCompatibleFn) => 
             rootItems: bankSlotStates,
             items: itemSlotStates,
         };
-    }, [ getCommonData, isItemCompatible, queryClient, t, useMoveStore ]);
+    }, [ getCommonData, isItemCompatible, queryClient, t, useStorageModeStore ]);
 
     return {
         validate,

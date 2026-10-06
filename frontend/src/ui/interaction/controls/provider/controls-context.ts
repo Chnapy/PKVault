@@ -49,6 +49,8 @@ export type ControlId = string;
 
 export type ControlsContext = {
     useControlsStore: ReturnType<typeof createControlsStore>;
+    enableGamepad: boolean;
+    toggleGamepad: () => void;
 };
 
 export const controlsContext = React.createContext<ControlsContext | null>(null);

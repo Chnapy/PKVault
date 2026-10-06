@@ -1,5 +1,5 @@
 import { Card, SimpleGrid } from '@mantine/core';
-import { FileIcon, FolderIcon, GlobeIcon, PenOffIcon, ShieldOff } from 'lucide-react';
+import { FileIcon, FolderIcon, Gamepad2Icon, GlobeIcon, PenOffIcon, ShieldOffIcon } from 'lucide-react';
 import type React from "react";
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RuntimeSystem } from '../../data/sdk/model';
@@ -10,6 +10,7 @@ import { UISelect } from '../../ui/form/select/ui-select';
 import { UISwitch } from '../../ui/form/switch/ui-switch';
 import { UIInputLabel } from '../../ui/form/ui-input-label';
 import { UIBallIcon } from '../../ui/icon/ui-ball-icon';
+import { useControlsContext } from '../../ui/interaction/controls/provider/use-controls-context';
 import { UIPathLine } from '../../ui/path/ui-path-line';
 import { switchUtil } from '../../util/switch-util';
 
@@ -22,6 +23,8 @@ export const SettingsMainLeft: React.FC = () => {
     const form = useFormContext<SettingsFormData>();
 
     const [ language ] = useWatch({ control: form.control, name: [ 'language' ] });
+
+    const { enableGamepad, toggleGamepad } = useControlsContext();
 
     return <>
         <Card>
@@ -61,7 +64,7 @@ export const SettingsMainLeft: React.FC = () => {
         </Card>
 
         <Card>
-            <SimpleGrid cols={2}>
+            <SimpleGrid cols={2} spacing={0} verticalSpacing='md'>
                 <UIInputLabel leftSection={<PenOffIcon />} forInput='hidE_CHEATS'
                     label={t('settings.form.hide-cheats')}
                     description={t('settings.form.hide-cheats.description')}
@@ -74,7 +77,7 @@ export const SettingsMainLeft: React.FC = () => {
                     my='sm'
                 />
 
-                <UIInputLabel leftSection={<ShieldOff />} forInput='skiP_LEGALITY_CHECKS'
+                <UIInputLabel leftSection={<ShieldOffIcon />} forInput='skiP_LEGALITY_CHECKS'
                     label={t('settings.form.skip-legality')}
                     description={t('settings.form.skip-legality.description')}
                 />
@@ -82,6 +85,19 @@ export const SettingsMainLeft: React.FC = () => {
                     {...form.register('skiP_LEGALITY_CHECKS')}
                     defaultChecked={form.getValues('skiP_LEGALITY_CHECKS')}
                     controlLabel={t('settings.form.skip-legality')}
+                    ml='auto'
+                    mt='sm'
+                />
+
+                <UIInputLabel leftSection={<Gamepad2Icon />} forInput='enable-gamepad'
+                    label={t('settings.form.enable-gamepad')}
+                    description={t('settings.form.enable-gamepad.description')}
+                />
+                <UISwitch
+                    name='enable-gamepad'
+                    checked={enableGamepad}
+                    onChange={toggleGamepad}
+                    controlLabel={t('settings.form.enable-gamepad')}
                     ml='auto'
                     mt='sm'
                 />

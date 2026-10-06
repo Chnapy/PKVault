@@ -5,6 +5,7 @@ import type { BoxType } from '../../../../data/sdk/model';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIExpandableTabs, type UIExpandableTabsData, type UIExpandableTabsProps } from '../../../expandable-tabs/ui-expandable-tabs';
 import { UIActionIcon } from '../../../form/button/ui-action-icon';
+import { useMoveContext } from '../../../interaction/move/context/use-move-context';
 import { useSelectContextActions } from '../../../interaction/select/context/use-select-context';
 import { useStorageMode, useStorageModeContext } from '../../../inventory/context/storage-mode-context';
 import { UIMenu } from '../../../popover/ui-menu';
@@ -33,8 +34,14 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
 
     const { clear } = useSelectContextActions();
 
-    const { useMoveStore } = useStorageModeContext();
+    const { useStorageModeStore } = useStorageModeContext();
     const storageMode = useStorageMode().state;
+
+    const enableStorageMode = useMoveContext().useMoveStore(s => s.state.status === 'idle');
+
+    const storageModeIcon = storageMode === 'inventory'
+        ? <BackpackIcon style={{ flexShrink: 0 }} />
+        : <BoxIcon style={{ flexShrink: 0 }} />;
 
     return <Group align='flex-start' wrap='nowrap'>
         <UIExpandableTabs<UIBoxData>
@@ -48,23 +55,23 @@ export const UIStoragePanelBoxList: React.FC<UIStoragePanelBoxListProps> = ({
             value={value}
             data={data}
             onChange={onSelect}
-            left={<Tooltip label={t('storage.mode.switch')} position='bottom-start' opened={openModeTooltip} withArrow arrowSize={6}>
-                <UIActionIcon
-                    name='storage-mode'
-                    controlLabel={t('action.select')}
-                    onClick={() => {
-                        clear();
-                        useMoveStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default');
-                    }}
-                    variant={storageMode === 'inventory' ? 'filled' : 'default'}
-                    color={storageMode === 'inventory' ? 'violet.9' : undefined}
-                    size={24}
-                >
-                    {storageMode === 'inventory'
-                        ? <BackpackIcon style={{ flexShrink: 0 }} />
-                        : <BoxIcon style={{ flexShrink: 0 }} />}
-                </UIActionIcon>
-            </Tooltip>}
+            left={enableStorageMode
+                ? <Tooltip label={t('storage.mode.switch')} position='bottom-start' opened={openModeTooltip} withArrow arrowSize={6}>
+                    <UIActionIcon
+                        name='storage-mode'
+                        controlLabel={t('action.select')}
+                        onClick={() => {
+                            clear();
+                            useStorageModeStore.getState().dispatch(storageMode === 'default' ? 'inventory' : 'default');
+                        }}
+                        variant={storageMode === 'inventory' ? 'filled' : 'default'}
+                        color={storageMode === 'inventory' ? 'violet.9' : undefined}
+                        size={24}
+                    >
+                        {storageModeIcon}
+                    </UIActionIcon>
+                </Tooltip>
+                : storageModeIcon}
             renderTab={renderTab}
             renderExpanded={(data, opt) => <Group py='md' px='xs'>
                 {renderExpanded?.(data, opt)}

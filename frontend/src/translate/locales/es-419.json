@@ -236,6 +236,8 @@
   "settings.external.3.description": "Los archivos PKM externos son de solo lectura; tus archivos no se pueden modificar desde PKVault.",
   "settings.external.3.label": "Seguridad",
   "settings.form.config": "Ruta de configuración",
+  "settings.form.enable-gamepad": "Navegación con mando/teclado",
+  "settings.form.enable-gamepad.description": "Se pueden utilizar el mando y el teclado para la navegación",
   "settings.form.globs.help": "Los archivos se leen y se modifican in situ: no hace falta subirlos ni descargarlos, ni gestionar copias.",
   "settings.form.globs.results": "Todos los resultados",
   "settings.form.hide-cheats": "Ocultar trucos",

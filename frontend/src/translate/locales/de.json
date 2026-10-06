@@ -236,6 +236,8 @@
   "settings.external.3.description": "Externe PKM-Dateien sind schreibgeschützt; Ihre Dateien können nicht über PKVault verändert werden.",
   "settings.external.3.label": "Sicherheit",
   "settings.form.config": "Konfigurationspfad",
+  "settings.form.enable-gamepad": "Gamepad-/Tastaturnavigation",
+  "settings.form.enable-gamepad.description": "Gamepad und Tastatur können zur Navigation verwendet werden",
   "settings.form.globs.help": "Dateien werden direkt an ihrem Speicherort gelesen und bearbeitet – es sind weder Uploads noch Downloads erforderlich, und es müssen keine Kopien verwaltet werden.",
   "settings.form.globs.results": "Alle Ergebnisse",
   "settings.form.hide-cheats": "Cheats ausblenden",
