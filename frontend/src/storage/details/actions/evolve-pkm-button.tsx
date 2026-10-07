@@ -39,8 +39,8 @@ export const EvolvePkmButton: React.FC<ActionButtonDefaultProps> = ({ pkmIds, sa
                 return;
 
             await evolvePkmsMutation.mutateAsync({
-                params: {
-                    saveId,
+                data: {
+                    saveId: saveId ?? undefined,
                     ids: canEvolveList.map(pkm => pkm.id),
                 },
             });

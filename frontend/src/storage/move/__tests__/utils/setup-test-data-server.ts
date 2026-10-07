@@ -659,22 +659,10 @@ export const setupTestDataServer = () => {
                 }),
             ]);
         }),
-        http.put(getStorageMovePkmUrl({
-            targetBoxId: '',
-            attached: false,
-            pkmIds: [],
-            sourceSaveId: null,
-            targetBoxSlots: [],
-            targetSaveId: null,
-        }), () => {
+        http.put(getStorageMovePkmUrl(), () => {
             return HttpResponse.json({});
         }),
-        http.put(getStorageMovePkmBankUrl({
-            bankId: '',
-            attached: false,
-            pkmIds: [],
-            sourceSaveId: null,
-        }), () => {
+        http.put(getStorageMovePkmBankUrl(), () => {
             return HttpResponse.json({});
         }),
     );

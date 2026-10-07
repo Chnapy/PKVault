@@ -11,10 +11,8 @@ import { usePopover } from '../../../interaction/focus-controls/components/popov
 import { UIFormCard } from '../../../popover/popover-card/ui-form-card';
 import type { UIDetailsStatName } from '../content/stats/ui-details-stats-row';
 
-type DataInput = EditPkmVariantPayload;
-
 type UIDetailsEditProps = {
-    defaultValues: DataInput;
+    defaultValues: EditPkmVariantPayload;
     hideCheats: boolean;
     nicknameMaxLength: number;
     minEv: number;
@@ -22,7 +20,7 @@ type UIDetailsEditProps = {
     availableMoves: number[];
     renderMoveItemPill: (move: number, onRemove?: () => void) => React.ReactNode;
     renderMoveItemOption: (move: number, selected: boolean, full: boolean) => React.ReactNode;
-    onSubmit: (data: DataInput) => Promise<void>;
+    onSubmit: (editPayload: EditPkmVariantPayload) => Promise<void>;
 };
 
 export const UIDetailsEdit: React.FC<UIDetailsEditProps> = ({

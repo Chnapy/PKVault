@@ -74,6 +74,7 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
         boxId={boxId}
         selected={selected}
         defaultValues={{
+            boxId,
             bankId: box.bankId!,
             boxName: box.name,
             type: box.type,
@@ -106,8 +107,8 @@ export const StorageBoxEdit: React.FC<{ boxId: string }> = ({ boxId }) => {
         }}
         onSubmit={async ({ bankId, type, boxName, slotCount, order }) => {
             await boxUpdateMutation.mutateAsync({
-                boxId,
-                params: {
+                data: {
+                    boxId,
                     type,
                     boxName,
                     slotCount,

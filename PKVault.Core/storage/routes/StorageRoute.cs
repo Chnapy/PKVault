@@ -62,51 +62,33 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("move/pkm")]
-    public async Task<DataDTO> MovePkm(
-        string[] pkmIds, uint? sourceSaveId,
-        uint? targetSaveId, string targetBoxId, int[] targetBoxSlots,
-        bool attached
-    )
+    public async Task<DataDTO> MovePkm(MovePkmActionInput input)
     {
-        var flags = await actionService.MovePkm(pkmIds, sourceSaveId, targetSaveId, targetBoxId, targetBoxSlots, attached);
+        var flags = await actionService.MovePkm(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("move/pkm/bank")]
-    public async Task<DataDTO> MovePkmBank(
-        string[] pkmIds, uint? sourceSaveId,
-        string bankId,
-        bool attached
-    )
+    public async Task<DataDTO> MovePkmBank(MovePkmBankActionInput input)
     {
-        var flags = await actionService.MovePkmBank(pkmIds, sourceSaveId, bankId, attached);
+        var flags = await actionService.MovePkmBank(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("move/item")]
-    public async Task<DataDTO> MoveItem(
-        uint? sourceSaveId,
-        string[] sourcePkmIds, string[] sourceItemIds,
-        uint? targetSaveId,
-        string sourceBoxId, string targetBoxId,
-        string? targetPkmId = null
-    )
+    public async Task<DataDTO> MoveItem(MoveItemActionInput input)
     {
-        var flags = await actionService.MoveItem(sourceSaveId, sourceBoxId, sourcePkmIds, sourceItemIds, targetSaveId, targetBoxId, targetPkmId);
+        var flags = await actionService.MoveItem(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("move/item/bank")]
-    public async Task<DataDTO> MoveItemBank(
-        uint? sourceSaveId,
-        string[] sourcePkmIds, string[] sourceItemIds,
-        string bankId
-    )
+    public async Task<DataDTO> MoveItemBank(MoveItemBankActionInput input)
     {
-        var flags = await actionService.MoveItemBank(sourceSaveId, sourcePkmIds, sourceItemIds, bankId);
+        var flags = await actionService.MoveItemBank(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -114,18 +96,15 @@ public class StorageController(DataService dataService, StorageQueryService stor
     [HttpPost("main/box")]
     public async Task<DataDTO> CreateMainBox(string bankId)
     {
-        var flags = await actionService.MainCreateBox(bankId);
+        var flags = await actionService.MainCreateBox(new(bankId, null));
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
-    [HttpPut("main/box/{boxId}")]
-    public async Task<DataDTO> UpdateMainBox(
-        string boxId, string boxName, int order, string bankId,
-        int slotCount, BoxType type
-    )
+    [HttpPut("main/box")]
+    public async Task<DataDTO> UpdateMainBox(MainUpdateBoxActionInput input)
     {
-        var flags = await actionService.MainUpdateBox(boxId, boxName, order, bankId, slotCount, type);
+        var flags = await actionService.MainUpdateBox(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -146,12 +125,10 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
-    [HttpPut("main/bank/{bankId}")]
-    public async Task<DataDTO> UpdateMainBank(string bankId,
-        string bankName, bool isDefault, int order,
-        BankEntity.BankView view)
+    [HttpPut("main/bank")]
+    public async Task<DataDTO> UpdateMainBank(MainUpdateBankActionInput input)
     {
-        var flags = await actionService.MainUpdateBank(bankId, bankName, isDefault, order, view);
+        var flags = await actionService.MainUpdateBank(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -165,9 +142,9 @@ public class StorageController(DataService dataService, StorageQueryService stor
     }
 
     [HttpPut("main/pkm/detach-save")]
-    public async Task<DataDTO> MainPkmDetachSave(string[] pkmVariantIds)
+    public async Task<DataDTO> MainPkmDetachSave(DetachPkmSaveActionInput input)
     {
-        var flags = await actionService.MainPkmDetachSaves(pkmVariantIds);
+        var flags = await actionService.MainPkmDetachSaves(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -175,23 +152,23 @@ public class StorageController(DataService dataService, StorageQueryService stor
     [HttpPost("main/pkm-version")]
     public async Task<DataDTO> MainCreatePkmVariant(string pkmVariantId, EntityContext context)
     {
-        var flags = await actionService.MainCreatePkmVariant(pkmVariantId, context);
+        var flags = await actionService.MainCreatePkmVariant(new(pkmVariantId, context));
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
-    [HttpPut("main/pkm-version/{pkmVariantId}")]
-    public async Task<DataDTO> MainEditPkmVariant(string pkmVariantId, EditPkmVariantPayload payload)
+    [HttpPut("main/pkm-version")]
+    public async Task<DataDTO> MainEditPkmVariant(EditPkmVariantActionInput input)
     {
-        var flags = await actionService.MainEditPkmVariant(pkmVariantId, payload);
+        var flags = await actionService.MainEditPkmVariant(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpDelete("main/pkm-version")]
-    public async Task<DataDTO> MainDeletePkmVariant(string[] pkmVariantIds, bool deleteAllRelatedVariants)
+    public async Task<DataDTO> MainDeletePkmVariant(DeletePkmVariantActionInput input)
     {
-        var flags = await actionService.MainPkmVariantsDelete(pkmVariantIds, deleteAllRelatedVariants);
+        var flags = await actionService.MainPkmVariantsDelete(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
@@ -204,42 +181,42 @@ public class StorageController(DataService dataService, StorageQueryService stor
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
-    [HttpDelete("save/{saveId}/pkm")]
-    public async Task<DataDTO> SaveDeletePkms(uint saveId, string[] pkmIds)
+    [HttpDelete("save/pkm")]
+    public async Task<DataDTO> SaveDeletePkms(SaveDeletePkmActionInput input)
     {
-        var flags = await actionService.SaveDeletePkms(saveId, pkmIds);
+        var flags = await actionService.SaveDeletePkms(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
-    [HttpPut("save/{saveId}/pkm/{pkmId}")]
-    public async Task<DataDTO> SaveEditPkm(uint saveId, string pkmId, EditPkmVariantPayload payload)
+    [HttpPut("save/pkm")]
+    public async Task<DataDTO> SaveEditPkm(EditPkmSaveActionInput input)
     {
-        var flags = await actionService.SaveEditPkm(saveId, pkmId, payload);
+        var flags = await actionService.SaveEditPkm(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("pkm/evolve")]
-    public async Task<DataDTO> EvolvePkms(string[] ids, uint? saveId)
+    public async Task<DataDTO> EvolvePkms(EvolvePkmActionInput input)
     {
-        var flags = await actionService.EvolvePkms(saveId, ids);
+        var flags = await actionService.EvolvePkms(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("pkm/sort")]
-    public async Task<DataDTO> SortPkms(uint? saveId, int fromBoxId, int toBoxId, string pokedexName, bool leaveEmptySlot)
+    public async Task<DataDTO> SortPkms(SortPkmActionInput input)
     {
-        var flags = await actionService.SortPkms(saveId, fromBoxId, toBoxId, pokedexName, leaveEmptySlot);
+        var flags = await actionService.SortPkms(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }
 
     [HttpPut("dex/sync")]
-    public async Task<DataDTO> DexSync(uint[] saveIds)
+    public async Task<DataDTO> DexSync(DexSyncActionInput input)
     {
-        var flags = await actionService.DexSync(saveIds);
+        var flags = await actionService.DexSync(input);
 
         return await dataService.CreateDataFromUpdateFlags(flags);
     }

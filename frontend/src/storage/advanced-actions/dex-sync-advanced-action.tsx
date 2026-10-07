@@ -2,7 +2,7 @@ import { Alert, Group, type ComboboxItem } from '@mantine/core';
 import { AlertTriangleIcon, CalendarSyncIcon, CheckIcon } from 'lucide-react';
 import type React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import type { StorageDexSyncParams } from "../../data/sdk/model";
+import type { DexSyncActionInput } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from "../../data/sdk/save-infos/save-infos.gen";
 import { useStorageDexSync } from "../../data/sdk/storage/storage.gen";
 import { useStaticData } from "../../hooks/use-static-data";
@@ -27,7 +27,7 @@ export const DexSyncAdvancedAction: React.FC<{
   const dexSyncMutation = useStorageDexSync();
 
   const { handleSubmit, setValue, control } =
-    useForm<StorageDexSyncParams>({
+    useForm<DexSyncActionInput>({
       defaultValues: {
         saveIds: [ saveId ],
       },
@@ -37,7 +37,7 @@ export const DexSyncAdvancedAction: React.FC<{
 
   const onSubmit = handleSubmit(async ({ saveIds }) => {
     const result = await dexSyncMutation.mutateAsync({
-      params: {
+      data: {
         saveIds,
       },
     });

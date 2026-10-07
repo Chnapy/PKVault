@@ -2,7 +2,8 @@ import { Group, NumberInput } from '@mantine/core';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import React from 'react';
 import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
-import { BoxType, type BankDTO, type BoxDTO, type StorageUpdateMainBoxParams } from '../../../../data/sdk/model';
+import { BoxType, type BankDTO, type BoxDTO } from '../../../../data/sdk/model';
+import type { StorageUpdateMainBoxMutationBody } from '../../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../../translate/i18n';
 import { switchUtil } from '../../../../util/switch-util';
 import { UIButton } from '../../../form/button/ui-button';
@@ -11,18 +12,16 @@ import { UITextInput } from '../../../form/text-input/ui-text-input';
 import { usePopover } from '../../../interaction/focus-controls/components/popover/hooks/use-popover';
 import { UIFormCard } from '../../../popover/popover-card/ui-form-card';
 
-type DataInput = StorageUpdateMainBoxParams;
-
 type UIBoxEditProps = {
     boxId: string;
     selected?: boolean;
-    defaultValues: DataInput;
+    defaultValues: StorageUpdateMainBoxMutationBody;
     boxList: Pick<BoxDTO, 'id' | 'order'>[];
     bankList: Pick<BankDTO, 'id' | 'name'>[];
     minSlotCount: number;
     hasItems: boolean;
     onOrderChange: (order: number) => void;
-    onSubmit: (data: DataInput) => Promise<void>;
+    onSubmit: (data: StorageUpdateMainBoxMutationBody) => Promise<void>;
 };
 
 export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultValues, boxList, bankList, minSlotCount, hasItems, onOrderChange, onSubmit: onSubmitRaw }) => {

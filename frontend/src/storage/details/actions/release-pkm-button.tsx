@@ -50,14 +50,14 @@ export const ReleasePkmButton: React.FC<ReleasePkmButtonProps> = ({ pkmIds, save
 
             if (saveId) {
                 await savePkmDeleteMutation.mutateAsync({
-                    saveId: saveId,
-                    params: {
+                    data: {
+                        saveId,
                         pkmIds: canReleaseList.map(pkm => pkm.id),
                     },
                 });
             } else {
                 await mainPkmVariantDeleteMutation.mutateAsync({
-                    params: {
+                    data: {
                         pkmVariantIds: canReleaseList.map(pkm => pkm.id),
                         deleteAllRelatedVariants,
                     },

@@ -2,7 +2,7 @@ import { SortDescIcon } from 'lucide-react';
 import type React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { usePkmVariantIndex } from '../../data/hooks/use-pkm-variant-index';
-import { BoxType, type StorageSortPkmsParams } from '../../data/sdk/model';
+import { BoxType, type SortPkmActionInput } from '../../data/sdk/model';
 import { useSaveInfosGetAll } from '../../data/sdk/save-infos/save-infos.gen';
 import { useStorageSortPkms } from '../../data/sdk/storage/storage.gen';
 import { useStaticData } from '../../hooks/use-static-data';
@@ -60,7 +60,7 @@ export const SortAdvancedAction: React.FC<{
 
     const sortPkmsMutation = useStorageSortPkms();
 
-    const { handleSubmit, formState, setValue, control } = useForm<Omit<StorageSortPkmsParams, 'saveId'>>({
+    const { handleSubmit, formState, setValue, control } = useForm<Omit<SortPkmActionInput, 'saveId'>>({
         defaultValues: {
             fromBoxId: initialBox?.idInt,
             toBoxId: initialBox?.idInt,
@@ -77,8 +77,8 @@ export const SortAdvancedAction: React.FC<{
 
     const onSubmit = handleSubmit(async ({ fromBoxId, toBoxId, pokedexName, leaveEmptySlot }) => {
         const result = await sortPkmsMutation.mutateAsync({
-            params: {
-                saveId,
+            data: {
+                saveId: saveId ?? undefined,
                 fromBoxId,
                 toBoxId,
                 pokedexName,
