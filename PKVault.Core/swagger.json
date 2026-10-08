@@ -5104,11 +5104,13 @@
         "description": "",
         "x-enumNames": [
           "FILE_EXPLORE",
-          "OPEN_FOLDER"
+          "OPEN_FOLDER",
+          "ANDROID_PKVAULT_DIRECTORY"
         ],
         "enum": [
           0,
-          1
+          1,
+          2
         ]
       },
       "DesktopMessageResponse": {

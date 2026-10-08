@@ -83,7 +83,7 @@ public class AndroidFileIOService : IFileIOService
         return result.Files.Select(f => Path.Combine(rootDir, f.Path)).ToArray();
     }
 
-    bool TryResolveSaf(string path, out Uri documentUri)
+    bool TryResolveSafRead(string path, out Uri documentUri)
     {
         documentUri = default!;
         if (!mapper.TryResolve(path, out var uri, out var isTree, out var relative))
@@ -103,9 +103,25 @@ public class AndroidFileIOService : IFileIOService
         return true;
     }
 
+    bool TryResolveSafWrite(string path, out Uri documentUri)
+    {
+        documentUri = default!;
+        if (!mapper.TryResolve(path, out var uri, out var isTree, out var relative))
+            return false;
+
+        if (!isTree)
+        {
+            documentUri = uri;
+            return true;
+        }
+
+        documentUri = SafDocument.ResolveOrCreateFile(resolver, uri, relative);
+        return true;
+    }
+
     public async Task<byte[]> ReadBytes(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return await inner.ReadBytes(path);
 
         using var stream = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
@@ -116,7 +132,7 @@ public class AndroidFileIOService : IFileIOService
 
     public byte[] ReadBytesSync(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return inner.ReadBytesSync(path);
 
         using var stream = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
@@ -127,7 +143,7 @@ public class AndroidFileIOService : IFileIOService
 
     public async Task<string> ReadText(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return await inner.ReadText(path);
 
         using var stream = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
@@ -140,7 +156,7 @@ public class AndroidFileIOService : IFileIOService
 
     public async Task<TValue?> ReadJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return await inner.ReadJSONFile(path, jsonTypeInfo);
 
         using var stream = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
@@ -149,7 +165,7 @@ public class AndroidFileIOService : IFileIOService
 
     public TValue ReadJSONFileSync<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue defaultValue)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return inner.ReadJSONFileSync(path, jsonTypeInfo, defaultValue);
 
         using var stream = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
@@ -158,20 +174,26 @@ public class AndroidFileIOService : IFileIOService
 
     public IArchive ReadZip(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
-            return inner.ReadZip(path);
+        MemoryStream ms;
 
-        using var input = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
-        var ms = new MemoryStream();
-        input.CopyTo(ms);
-        ms.Position = 0;
-        var zip = new ZipArchive(ms);
-        return new Archive(zip, new System.IO.Abstractions.FileSystem());
+        if (TryResolveSafRead(path, out var uri))
+        {
+            using var input = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
+            ms = new MemoryStream();
+            input.CopyTo(ms);
+            ms.Position = 0;
+        }
+        else
+        {
+            ms = new MemoryStream(inner.ReadBytesSync(path));
+        }
+
+        return new Archive(new ZipArchive(ms), OpenDestinationStream);
     }
 
     public (bool TooSmall, bool TooBig) CheckGameFile(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return inner.CheckGameFile(path);
 
         var size = SafDocument.GetSize(resolver, uri) ?? 0;
@@ -180,13 +202,13 @@ public class AndroidFileIOService : IFileIOService
 
     public (bool TooSmall, bool TooBig) CheckGameFile(long length) => inner.CheckGameFile(length);
 
-    public bool Exists(string path) => TryResolveSaf(path, out _) || inner.Exists(path);
+    public bool Exists(string path) => TryResolveSafRead(path, out _) || inner.Exists(path);
 
     public DateTime GetLastWriteTime(string path) => GetLastWriteTimeUtc(path).ToLocalTime();
 
     public DateTime GetLastWriteTimeUtc(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return inner.GetLastWriteTimeUtc(path);
 
         var meta = SafDocument.GetSingleDocumentMeta(resolver, uri);
@@ -195,7 +217,7 @@ public class AndroidFileIOService : IFileIOService
 
     public async Task WriteBytes(string path, byte[] value)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafWrite(path, out var uri))
         {
             await inner.WriteBytes(path, value);
             return;
@@ -207,7 +229,7 @@ public class AndroidFileIOService : IFileIOService
 
     public async Task WriteJSONFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafWrite(path, out var uri))
         {
             await inner.WriteJSONFile(path, jsonTypeInfo, value);
             return;
@@ -219,7 +241,7 @@ public class AndroidFileIOService : IFileIOService
 
     public async Task WriteJSONGZipFile<TValue>(string path, JsonTypeInfo<TValue> jsonTypeInfo, TValue value)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafWrite(path, out var uri))
         {
             await inner.WriteJSONGZipFile(path, jsonTypeInfo, value);
             return;
@@ -233,36 +255,104 @@ public class AndroidFileIOService : IFileIOService
 
     public bool Delete(string path)
     {
-        if (!TryResolveSaf(path, out var uri))
+        if (!TryResolveSafRead(path, out var uri))
             return inner.Delete(path);
         return DocumentsContract.DeleteDocument(resolver, uri);
     }
 
+    bool IsSafManaged(string path) => mapper.TryResolve(path, out _, out _, out _);
+
+    Stream OpenSourceStream(string path)
+    {
+        if (IsSafManaged(path))
+        {
+            if (!TryResolveSafRead(path, out var uri))
+                throw new FileNotFoundException(path);
+            return resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
+        }
+        return File.OpenRead(path);
+    }
+
+    Stream OpenDestinationStream(string path, bool overwrite = true)
+    {
+        path = FileIOService.NormalizePath(path);
+
+        if (!overwrite && Exists(path))
+            throw new IOException($"The file '{path}' already exists.");
+
+        if (TryResolveSafWrite(path, out var uri))
+            return resolver.OpenOutputStream(uri, "wt") ?? throw new IOException($"Cannot write {path}");
+
+        var dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(dir))
+            Directory.CreateDirectory(dir);
+        return new FileStream(path, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write);
+    }
+
     public void Copy(string sourceFileName, string destFileName, bool overwrite)
     {
-        if (TryResolveSaf(sourceFileName, out _) || TryResolveSaf(destFileName, out _))
-            throw new NotSupportedException($"Copy cannot be used with paths out-of-app (SAF), sourceFileName={sourceFileName}");
-        inner.Copy(sourceFileName, destFileName, overwrite);
+        if (!IsSafManaged(sourceFileName) && !IsSafManaged(destFileName))
+        {
+            inner.Copy(sourceFileName, destFileName, overwrite);
+            return;
+        }
+
+        if (Path.GetFullPath(sourceFileName) == Path.GetFullPath(destFileName))
+            throw new IOException($"Source and destination are the same file: {sourceFileName}");
+
+        if (!overwrite && Exists(destFileName))
+            throw new IOException($"The file '{destFileName}' already exists.");
+
+        using var input = OpenSourceStream(sourceFileName);
+        using var output = OpenDestinationStream(destFileName);
+        input.CopyTo(output);
     }
 
     public void Move(string sourceFileName, string destFileName, bool overwrite)
     {
-        if (TryResolveSaf(sourceFileName, out _) || TryResolveSaf(destFileName, out _))
-            throw new NotSupportedException($"Move cannot be used with paths out-of-app (SAF), sourceFileName={sourceFileName}");
-        inner.Move(sourceFileName, destFileName, overwrite);
+        if (!IsSafManaged(sourceFileName) && !IsSafManaged(destFileName))
+        {
+            inner.Move(sourceFileName, destFileName, overwrite);
+            return;
+        }
+
+        if (Path.GetFullPath(sourceFileName) == Path.GetFullPath(destFileName))
+            return;
+
+        if (!Exists(sourceFileName))
+            throw new FileNotFoundException(sourceFileName);
+
+        Copy(sourceFileName, destFileName, overwrite);
+
+        if (!Delete(sourceFileName))
+            throw new IOException($"Copied to '{destFileName}' but could not delete source '{sourceFileName}'");
     }
 
     public void CreateDirectory(string path)
     {
-        if (TryResolveSaf(path, out _))
-            throw new NotSupportedException($"CreateDirectory cannot be used with paths out-of-app (SAF), path={path}");
-        inner.CreateDirectory(path);
+        if (!mapper.TryResolve(path, out var treeUri, out var isTree, out var relative))
+        {
+            inner.CreateDirectory(path);
+            return;
+        }
+
+        if (!isTree)
+            throw new IOException($"Cannot create a directory on a single-document permission, path={path}");
+
+        SafDocument.ResolveOrCreateDirectory(resolver, treeUri, relative);
     }
 
     public void CreateDirectoryIfAny(string path)
     {
-        if (TryResolveSaf(path, out _))
+        if (IsSafManaged(path))
+        {
+            var directoryPath = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(directoryPath))
+            {
+                CreateDirectory(directoryPath);
+            }
             return;
+        }
         inner.CreateDirectoryIfAny(path);
     }
 }

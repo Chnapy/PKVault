@@ -208,6 +208,52 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                         }
                         break;
                     }
+                case DesktopMessageType.ANDROID_PKVAULT_DIRECTORY:
+                    var targetPath = request.basePath == "/data/data/io.github.chnapy.pkvault"
+                        ? FileSystem.Current.AppDataDirectory
+                        : MatcherUtil.NormalizePath(request.basePath ?? "");
+                    ArgumentException.ThrowIfNullOrWhiteSpace(targetPath);
+
+                    var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
+                    var sessionService = ServiceProvider.GetRequiredService<ISessionService>();
+                    var fileIOService = ServiceProvider.GetRequiredService<IFileIOService>();
+
+                    if (settingsService.GetSettings().RuntimeSystem != RuntimeSystem.ANDROID)
+                        throw new PlatformNotSupportedException($"OS not compatible");
+
+                    if (!sessionService.HasEmptyActionList())
+                        throw new InvalidOperationException($"Action list should be empty");
+
+                    var filesToMove = fileIOService.Matcher.SearchPaths(["./"]);
+
+                    foreach (var filePath in filesToMove)
+                    {
+                        if (filePath.StartsWith("./.__")
+                            || filePath.EndsWith(".db")
+                        )
+                            continue;
+
+                        var fileTargetPath = MatcherUtil.NormalizePath(Path.Combine(targetPath, filePath));
+                        Log.Debug($"COPY {filePath} -> {fileTargetPath}");
+
+                        var bytes = await fileIOService.ReadBytes(filePath);
+                        await fileIOService.WriteBytes(fileTargetPath, bytes);
+                    }
+
+                    Directory.SetCurrentDirectory(targetPath);
+
+                    if (targetPath == FileSystem.Current.AppDataDirectory)
+                        Preferences.Default.Remove("pkvault-directory");
+                    else
+                        Preferences.Default.Set("pkvault-directory", targetPath);
+                    Log.Debug($"Preferences[pkvault-directory] = {Preferences.Default.Get<string?>("pkvault-directory", null)}");
+
+                    return new(
+                        type: request.type,
+                        id: request.id ?? 0,
+                        directoryOnly: request.directoryOnly,
+                        values: []
+                    );
             }
 
             // var data = $"{{ \"detail\": {responseSerialized} }}";

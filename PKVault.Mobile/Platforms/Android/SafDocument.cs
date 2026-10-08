@@ -38,6 +38,7 @@ public class SafDocument
                     cursor.GetString(1) ?? "",
                     cursor.GetString(2) == DocumentsContract.Document.MimeTypeDir));
             }
+            cursor.Close();
         }
 
         foreach (var (id, name, isDirectory) in children)
@@ -78,8 +79,14 @@ public class SafDocument
     {
         using var cursor = resolver.Query(documentUri, [DocumentsContract.Document.ColumnSize], null, null, null);
         if (cursor is null || !cursor.MoveToFirst() || cursor.IsNull(0))
+        {
+            cursor?.Close();
             return null;
-        return cursor.GetLong(0);
+        }
+
+        var value = cursor.GetLong(0);
+        cursor.Close();
+        return value;
     }
 
     // public static IReadOnlyList<PickedDirectoryEntry> ListEntries(string treeUriString, bool recursive = true)
@@ -127,6 +134,8 @@ public class SafDocument
                 DateTimeOffset.FromUnixTimeMilliseconds(lastModified).DateTime)
             );
         }
+        cursor.Close();
+
         return results;
     }
 
@@ -156,46 +165,73 @@ public class SafDocument
         };
         using var cursor = resolver.Query(documentUri, projection, null, null, null);
         if (cursor is null || !cursor.MoveToFirst())
+        {
+            cursor?.Close();
             return null;
+        }
 
-        return (cursor.GetString(0) ?? "unknown",
+        var value = (cursor.GetString(0) ?? "unknown",
                  cursor.IsNull(1) ? 0L : cursor.GetLong(1));
+        cursor.Close();
+        return value;
     }
 
-    // public static Uri? ResolveOrCreateDocumentUri(
-    //     ContentResolver resolver, Uri treeUri, string relativePath, bool createIfMissing, bool asDirectory = false)
-    // {
-    //     var docId = DocumentsContract.GetTreeDocumentId(treeUri);
-    //     var segments = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-    //     Uri currentUri = DocumentsContract.BuildDocumentUriUsingTree(treeUri, docId)!;
+    public static Uri ResolveOrCreateFile(ContentResolver resolver, Uri treeUri, string relativePath)
+        => ResolveOrCreate(resolver, treeUri, relativePath, asDirectory: false);
 
-    //     for (int i = 0; i < segments.Length; i++)
-    //     {
-    //         var isLast = i == segments.Length - 1;
-    //         var children = ListChildren(resolver, treeUri, docId);
-    //         var match = children.FirstOrDefault(c => c.Name == segments[i]);
+    public static Uri ResolveOrCreateDirectory(ContentResolver resolver, Uri treeUri, string relativePath)
+        => ResolveOrCreate(resolver, treeUri, relativePath, asDirectory: true);
 
-    //         if (match is null)
-    //         {
-    //             if (!createIfMissing)
-    //                 return null;
+    private static Uri ResolveOrCreate(ContentResolver resolver, Uri treeUri, string relativePath, bool asDirectory)
+    {
+        var segments = relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-    //             var mime = isLast && !asDirectory
-    //                 ? "application/octet-stream"
-    //                 : DocumentsContract.Document.MimeTypeDir!;
-    //             var newUri = DocumentsContract.CreateDocument(resolver, currentUri, mime, segments[i]);
-    //             if (newUri is null)
-    //                 return null;
-    //             currentUri = newUri;
-    //             docId = DocumentsContract.GetDocumentId(newUri);
-    //         }
-    //         else
-    //         {
-    //             currentUri = Uri.Parse(match.Uri)!;
-    //             docId = DocumentsContract.GetDocumentId(currentUri);
-    //         }
-    //     }
+        var docId = DocumentsContract.GetTreeDocumentId(treeUri);
+        var currentUri = DocumentsContract.BuildDocumentUriUsingTree(treeUri, docId)!;
 
-    //     return currentUri;
-    // }
+        if (segments.Length == 0)
+        {
+            return asDirectory
+                ? currentUri
+                : throw new IOException("Cannot create a file at the tree root");
+        }
+
+        for (var i = 0; i < segments.Length; i++)
+        {
+            var isLast = i == segments.Length - 1;
+            var expectDirectory = !isLast || asDirectory;
+            var name = segments[i];
+
+            var match = ListChildren(resolver, treeUri, docId)
+                .FirstOrDefault(c => c.Name == name);
+
+            if (match is not null)
+            {
+                if (match.IsDirectory != expectDirectory)
+                    throw new IOException(expectDirectory
+                        ? $"'{name}' exists and is a file"
+                        : $"'{name}' exists and is a directory");
+
+                currentUri = Uri.Parse(match.Uri)!;
+            }
+            else
+            {
+                var mime = expectDirectory ? DocumentsContract.Document.MimeTypeDir! : GetMimeType(name);
+                currentUri = DocumentsContract.CreateDocument(resolver, currentUri, mime, name)
+                    ?? throw new IOException(
+                        $"CreateDocument returned null (name={name}, parent={currentUri}, mime={mime})");
+            }
+
+            docId = DocumentsContract.GetDocumentId(currentUri);
+        }
+
+        return currentUri;
+    }
+
+    private static string GetMimeType(string fileName)
+    {
+        var ext = Path.GetExtension(fileName).TrimStart('.').ToLowerInvariant();
+        return Android.Webkit.MimeTypeMap.Singleton?.GetMimeTypeFromExtension(ext)
+            ?? "application/octet-stream";
+    }
 }
