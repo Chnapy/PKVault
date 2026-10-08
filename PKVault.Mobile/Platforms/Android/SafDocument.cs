@@ -38,6 +38,7 @@ public class SafDocument
                     cursor.GetString(1) ?? "",
                     cursor.GetString(2) == DocumentsContract.Document.MimeTypeDir));
             }
+            cursor.Close();
         }
 
         foreach (var (id, name, isDirectory) in children)
@@ -78,8 +79,14 @@ public class SafDocument
     {
         using var cursor = resolver.Query(documentUri, [DocumentsContract.Document.ColumnSize], null, null, null);
         if (cursor is null || !cursor.MoveToFirst() || cursor.IsNull(0))
+        {
+            cursor?.Close();
             return null;
-        return cursor.GetLong(0);
+        }
+
+        var value = cursor.GetLong(0);
+        cursor.Close();
+        return value;
     }
 
     // public static IReadOnlyList<PickedDirectoryEntry> ListEntries(string treeUriString, bool recursive = true)
@@ -127,6 +134,8 @@ public class SafDocument
                 DateTimeOffset.FromUnixTimeMilliseconds(lastModified).DateTime)
             );
         }
+        cursor.Close();
+
         return results;
     }
 
@@ -156,10 +165,15 @@ public class SafDocument
         };
         using var cursor = resolver.Query(documentUri, projection, null, null, null);
         if (cursor is null || !cursor.MoveToFirst())
+        {
+            cursor?.Close();
             return null;
+        }
 
-        return (cursor.GetString(0) ?? "unknown",
+        var value = (cursor.GetString(0) ?? "unknown",
                  cursor.IsNull(1) ? 0L : cursor.GetLong(1));
+        cursor.Close();
+        return value;
     }
 
     public static Uri ResolveOrCreateFile(ContentResolver resolver, Uri treeUri, string relativePath)
@@ -177,7 +191,6 @@ public class SafDocument
 
         if (segments.Length == 0)
         {
-            // La racine du tree existe forcément
             return asDirectory
                 ? currentUri
                 : throw new IOException("Cannot create a file at the tree root");

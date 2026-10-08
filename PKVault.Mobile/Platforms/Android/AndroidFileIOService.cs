@@ -174,15 +174,21 @@ public class AndroidFileIOService : IFileIOService
 
     public IArchive ReadZip(string path)
     {
-        if (!TryResolveSafRead(path, out var uri))
-            return inner.ReadZip(path);
+        MemoryStream ms;
 
-        using var input = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
-        var ms = new MemoryStream();
-        input.CopyTo(ms);
-        ms.Position = 0;
-        var zip = new ZipArchive(ms);
-        return new Archive(zip, new System.IO.Abstractions.FileSystem());
+        if (TryResolveSafRead(path, out var uri))
+        {
+            using var input = resolver.OpenInputStream(uri) ?? throw new FileNotFoundException(path);
+            ms = new MemoryStream();
+            input.CopyTo(ms);
+            ms.Position = 0;
+        }
+        else
+        {
+            ms = new MemoryStream(inner.ReadBytesSync(path));
+        }
+
+        return new Archive(new ZipArchive(ms), OpenDestinationStream);
     }
 
     public (bool TooSmall, bool TooBig) CheckGameFile(string path)
@@ -267,15 +273,20 @@ public class AndroidFileIOService : IFileIOService
         return File.OpenRead(path);
     }
 
-    Stream OpenDestinationStream(string path)
+    Stream OpenDestinationStream(string path, bool overwrite = true)
     {
+        path = FileIOService.NormalizePath(path);
+
+        if (!overwrite && Exists(path))
+            throw new IOException($"The file '{path}' already exists.");
+
         if (TryResolveSafWrite(path, out var uri))
             return resolver.OpenOutputStream(uri, "wt") ?? throw new IOException($"Cannot write {path}");
 
         var dir = Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(dir))
             Directory.CreateDirectory(dir);
-        return new FileStream(path, FileMode.Create, FileAccess.Write);
+        return new FileStream(path, overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write);
     }
 
     public void Copy(string sourceFileName, string destFileName, bool overwrite)

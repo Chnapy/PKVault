@@ -38,28 +38,12 @@ public class SessionService(
         DataActionPayload Payload
     );
 
-    private string DbFolderPath
-    {
-        get
-        {
-            if (settingsService.GetSettings().RuntimeSystem == RuntimeSystem.ANDROID)
-                return MatcherUtil.NormalizePath(Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    settingsService.GetSettings().SettingsMutable.DB_PATH
-                ));
-            return settingsService.GetSettings().GetDbPath();
-        }
-    }
+    private string DbFolderPath => GetDbFolderPathIfAndroid()
+        ?? settingsService.GetSettings().GetDbPath();
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
-    public string MainDbRelativePath
-    {
-        get
-        {
-            if (settingsService.GetSettings().RuntimeSystem == RuntimeSystem.ANDROID)
-                return MainDbPath;
-            return Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkvault.db");
-        }
-    }
+    public string MainDbRelativePath => Path.Combine(
+        GetDbFolderPathIfAndroid() ?? settingsService.GetSettings().SettingsMutable.DB_PATH,
+        "pkvault.db");
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
 
     public DateTime? StartTime { get; private set; }
@@ -326,5 +310,17 @@ public class SessionService(
         await db.Database.CloseConnectionAsync();
 
         Log.Logger.Information($"DB session connection closed");
+    }
+
+    /// Android only: DB folder is always in BaseDirectory, no matter of CurrentDirectory
+    private string? GetDbFolderPathIfAndroid()
+    {
+        var settings = settingsService.GetSettings();
+        if (settings.RuntimeSystem == RuntimeSystem.ANDROID)
+            return MatcherUtil.NormalizePath(Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                settings.SettingsMutable.DB_PATH
+            ));
+        return null;
     }
 }

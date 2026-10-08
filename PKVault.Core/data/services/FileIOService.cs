@@ -5,6 +5,7 @@ using System.Text;
 using PKHeX.Core;
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
+using Serilog;
 
 namespace PKVault.Core;
 
@@ -251,6 +252,8 @@ public class FileIOService(IFileSystem fileSystem) : IFileIOService
     }
 }
 
+public delegate Stream OpenWriteStream(string path, bool overwrite);
+
 public interface IArchive : IDisposable
 {
     public ReadOnlyCollection<IArchiveEntry> Entries { get; }
@@ -265,10 +268,14 @@ public interface IArchiveEntry
     public void ExtractToFile(string destinationFileName, bool overwrite);
 }
 
-public class Archive(ZipArchive archive, IFileSystem fileSystem) : IArchive
+public class Archive(ZipArchive archive, OpenWriteStream openWrite) : IArchive
 {
     public ReadOnlyCollection<IArchiveEntry> Entries => [..archive.Entries
-        .Select(entry => new ArchiveEntry(entry, fileSystem))];
+        .Select(entry => new ArchiveEntry(entry, openWrite))];
+
+    public Archive(ZipArchive archive, IFileSystem fileSystem)
+        : this(archive, (path, overwrite) => ArchiveEntry.OpenOnFileSystem(fileSystem, path, overwrite))
+    { }
 
     public void Dispose()
     {
@@ -276,7 +283,7 @@ public class Archive(ZipArchive archive, IFileSystem fileSystem) : IArchive
     }
 }
 
-public class ArchiveEntry(ZipArchiveEntry entry, IFileSystem fileSystem) : IArchiveEntry
+public class ArchiveEntry(ZipArchiveEntry entry, OpenWriteStream openWrite) : IArchiveEntry
 {
     public string Name => entry.Name;
     public string FullName => entry.FullName;
@@ -292,20 +299,27 @@ public class ArchiveEntry(ZipArchiveEntry entry, IFileSystem fileSystem) : IArch
     {
         destinationFileName = FileIOService.NormalizePath(destinationFileName);
 
-        var directoryPath = Path.GetDirectoryName(destinationFileName);
+        Log.Debug($"Extract archive entry {FullName} -> {destinationFileName} (overwrite={overwrite})");
+
+        using var fs = openWrite(destinationFileName, overwrite);
+        using var entryStream = entry.Open();
+        entryStream.CopyTo(fs);
+    }
+
+    public static Stream OpenOnFileSystem(IFileSystem fileSystem, string path, bool overwrite)
+    {
+        var directoryPath = Path.GetDirectoryName(path);
         if (!string.IsNullOrWhiteSpace(directoryPath))
         {
             fileSystem.Directory.CreateDirectory(directoryPath);
         }
 
-        using var fs = fileSystem.FileStream.New(destinationFileName, new FileStreamOptions()
+        return fileSystem.FileStream.New(path, new FileStreamOptions()
         {
             Access = FileAccess.Write,
             Mode = overwrite ? FileMode.Create : FileMode.CreateNew,
             Share = FileShare.None,
             BufferSize = 0x4000 // 16K
         });
-        using var entryStream = entry.Open();
-        entryStream.CopyTo(fs);
     }
 }

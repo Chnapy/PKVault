@@ -45,7 +45,6 @@ public class SafTreeMapper(Context appContext)
         return map;
     }
 
-    // Conversion générique docId -> chemin réel, utilisable pour un tree OU un document unique
     public bool TryGetLocalPath(Uri uri, out string localPath)
     {
         localPath = "";
@@ -58,7 +57,7 @@ public class SafTreeMapper(Context appContext)
         }
         catch
         {
-            return false; // provider qui ne suit pas le schéma docId standard (ex. cloud)
+            return false;
         }
 
         var parts = docId?.Split(':', 2);
@@ -110,11 +109,10 @@ public class SafTreeMapper(Context appContext)
         relativePath = "";
 
         if (path.Contains("/Android/data/") || path.Contains("/Android/obb/"))
-            return false; // toujours géré par System.IO classique
+            return false;
 
         var entries = GetMappedEntries();
 
-        // 1. Correspondance exacte prioritaire (document unique)
         var exact = entries.FirstOrDefault(e => !e.IsTree && e.LocalPath == path);
         if (exact is not null)
         {
@@ -123,7 +121,6 @@ public class SafTreeMapper(Context appContext)
             return true;
         }
 
-        // 2. Sinon, tree englobant le plus spécifique
         var treeMatch = entries
             .Where(e => e.IsTree && (
                 path == e.LocalPath ||
