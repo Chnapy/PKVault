@@ -29,6 +29,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
     // public static string[] ProgramArgs = [];
     public static string AppDirectory = GetAppDirectory();
+    public static readonly RuntimeSystem RuntimeSystem = GetRuntimeSystem();
     public static bool FlatpakMigrated = false;
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();
@@ -260,25 +261,24 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         var (BuildID, Version) = GetBuildInfo();
 
-        var runtimeSystem = GetRuntimeSystem();
         var sourceProvider = GetSourceProvider();
 
-        var isDesktop = runtimeSystem != RuntimeSystem.DOCKER;
+        var isDesktop = RuntimeSystem != RuntimeSystem.DOCKER;
 
         var updateUrl = sourceProvider == SourceProvider.GithubRelease
-            ? runtimeSystem == RuntimeSystem.WINDOWS
+            ? RuntimeSystem == RuntimeSystem.WINDOWS
                 ? "https://projectpokemon.org/home/files/file/5766-pkvault"
                 : "https://github.com/Chnapy/PKVault/releases/latest"
             : null;
 
         var canUploadSaves = !isDesktop;
         var canDeleteSaves = !isDesktop;
-        var canOpenFolder = isDesktop && runtimeSystem != RuntimeSystem.ANDROID;
+        var canOpenFolder = isDesktop && RuntimeSystem != RuntimeSystem.ANDROID;
         var canUseDesktopFileExplorer = isDesktop;// && runtimeSystem != RuntimeSystem.ANDROID;
 
         return new(
             BuildID,
-            RuntimeSystem: runtimeSystem,
+            RuntimeSystem,
             SourceProvider: sourceProvider,
             FlatpakMigrated: FlatpakMigrated,
             Version,

@@ -68,13 +68,20 @@ public static class MauiProgram
 			.UseMauiApp((_) => new App())
 			.ConfigureLifecycleEvents((builder) =>
 			{
-				// builder.AddEvent("Created", () =>
-				// {
-				// });
-				builder.AddEvent("Destroying", () =>
-				{
-					Program.Dispose();
-				});
+#if ANDROID
+				builder.AddAndroid(android => android
+					// in background
+					// .OnStop((activity) =>
+					// {
+					// })
+
+					// killed
+					.OnDestroy((activity) =>
+					{
+						Program.Dispose();
+					})
+				);
+#endif
 			});
 
 		Program.ConfigureServices(builder.Services);
