@@ -365,42 +365,57 @@ public class BackupService(
         );
         ArgumentNullException.ThrowIfNull(paths);
 
+        BackupDTO? safeBackup = null;
         if (withSafeBackup)
         {
             // manual backup, no use of PrepareBackupThenRun to avoid infinite loop
-            await CreateBackup("backup_before_restore", flags);
+            var safeBackupTime = await CreateBackup("backup_before_restore", flags);
+            safeBackup = GetBackup(safeBackupTime);
+            ArgumentNullException.ThrowIfNull(safeBackup);
         }
 
         var settings = settingsService.GetSettings();
         var dbPath = settings.GetDbPath();
 
-        // remove current db file & old JSON files
-        // to avoid remaining old data
-        fileIOService.Delete(sessionService.MainDbPath);
-        DataNormalizeAction.GetLegacyFilepaths(dbPath)
-            .ForEach(filepath => fileIOService.Delete(filepath));
-
-        var time = Log.Logger.Time($"Extracting {archive.Entries.Count} files");
-
-        foreach (var entry in archive.Entries)
+        try
         {
-            if (
-                paths.TryGetValue(entry.FullName, out var path)
-                || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
-            )
+            // remove current db file & old JSON files
+            // to avoid remaining old data
+            fileIOService.Delete(sessionService.MainDbPath);
+            DataNormalizeAction.GetLegacyFilepaths(dbPath)
+                .ForEach(filepath => fileIOService.Delete(filepath));
+
+            var time = Log.Logger.Time($"Extracting {archive.Entries.Count} files");
+
+            foreach (var entry in archive.Entries)
             {
-                // log.LogInformation($"Extract {entry.FullName} to {path}");
+                if (
+                    paths.TryGetValue(entry.FullName, out var path)
+                    || paths.TryGetValue(entry.FullName.Replace('/', '\\'), out path)
+                )
+                {
+                    // log.LogInformation($"Extract {entry.FullName} to {path}");
 
-                entry.ExtractToFile(path, true);
+                    entry.ExtractToFile(path, true);
+                }
             }
+
+            time.Dispose();
+
+            logtime.Dispose();
+
+            savesLoadersService.Clear();
+            await sessionService.StartNewSession(checkInitialActions: true, flags);
         }
-
-        time.Dispose();
-
-        logtime.Dispose();
-
-        savesLoadersService.Clear();
-        await sessionService.StartNewSession(checkInitialActions: true, flags);
+        catch (Exception ex)
+        {
+            if (withSafeBackup && safeBackup != null)
+            {
+                Log.Error($"Exception during Backup Restore - Rollback to safe backup made just before", ex);
+                await RestoreBackup(safeBackup.CreatedAt, false, flags);
+            }
+            throw;
+        }
     }
 
     public async Task PrepareBackupThenRun(string backupName, DataUpdateFlags flags, Func<Task> action)
