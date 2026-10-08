@@ -38,13 +38,12 @@ public class SessionService(
         DataActionPayload Payload
     );
 
-    private string DbFolderPath => GetDbFolderPathIfAndroid()
-        ?? settingsService.GetSettings().GetDbPath();
-    public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
-    public string MainDbRelativePath => Path.Combine(
-        GetDbFolderPathIfAndroid() ?? settingsService.GetSettings().SettingsMutable.DB_PATH,
-        "pkvault.db");
-    public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
+    public string MainDbPath => Path.Combine(settingsService.GetSettings().GetDbPath(), "pkvault.db");
+    public string MainDbRelativePath => Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkvault.db");
+    public string SessionDbPath => Path.Combine(
+        // in Android context, DB cannot be accessed outside /data/data/
+        GetDbFolderPathIfAndroid() ?? settingsService.GetSettings().GetDbPath(),
+        "pkvault-session.db");
 
     public DateTime? StartTime { get; private set; }
 
@@ -315,11 +314,10 @@ public class SessionService(
     /// Android only: DB folder is always in BaseDirectory, no matter of CurrentDirectory
     private string? GetDbFolderPathIfAndroid()
     {
-        var settings = settingsService.GetSettings();
-        if (settings.RuntimeSystem == RuntimeSystem.ANDROID)
+        if (SettingsService.RuntimeSystem == RuntimeSystem.ANDROID)
             return MatcherUtil.NormalizePath(Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
-                settings.SettingsMutable.DB_PATH
+                settingsService.GetSettings().SettingsMutable.DB_PATH
             ));
         return null;
     }

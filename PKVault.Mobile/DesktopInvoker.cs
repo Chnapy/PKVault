@@ -214,11 +214,10 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                         : MatcherUtil.NormalizePath(request.basePath ?? "");
                     ArgumentException.ThrowIfNullOrWhiteSpace(targetPath);
 
-                    var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
                     var sessionService = ServiceProvider.GetRequiredService<ISessionService>();
                     var fileIOService = ServiceProvider.GetRequiredService<IFileIOService>();
 
-                    if (settingsService.GetSettings().RuntimeSystem != RuntimeSystem.ANDROID)
+                    if (SettingsService.RuntimeSystem != RuntimeSystem.ANDROID)
                         throw new PlatformNotSupportedException($"OS not compatible");
 
                     if (!sessionService.HasEmptyActionList())
@@ -229,7 +228,7 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                     foreach (var filePath in filesToMove)
                     {
                         if (filePath.StartsWith("./.__")
-                            || filePath.EndsWith(".db")
+                            || filePath.EndsWith("pkvault-session.db")
                         )
                             continue;
 
