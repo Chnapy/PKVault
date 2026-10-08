@@ -44,6 +44,7 @@ Similar to Pokémon Home, offline as online.
 - Storage & save manipulation
   - compatible with all pokémon games, from first generation to **Pokémon Legends: Z-A**
   - **move** pokémons between saves
+  - **move** items between saves, inventories and pokémons held items
   - [**convert** pokémons to any generation](https://chnapy.github.io/PKVault/convert.html) (ex. G7 to G2)
   - **store** pokémons outside saves using banks & boxes
   - allow use of multiple **"variants"** for stored pokémons
