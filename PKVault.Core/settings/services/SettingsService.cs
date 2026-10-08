@@ -28,7 +28,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
     private static readonly SemaphoreSlim semaphore = new(1);
 
     // public static string[] ProgramArgs = [];
-    public static readonly string AppDirectory = GetAppDirectory();
+    public static string AppDirectory = GetAppDirectory();
     public static bool FlatpakMigrated = false;
 
     private IFileIOService fileIOService => sp.GetRequiredService<IFileIOService>();

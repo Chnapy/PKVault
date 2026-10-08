@@ -20,6 +20,7 @@ public enum DesktopMessageType
 {
     FILE_EXPLORE,
     OPEN_FOLDER,
+    ANDROID_PKVAULT_DIRECTORY
 }
 
 public record DesktopMessageRequest

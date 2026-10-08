@@ -45,6 +45,9 @@ dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program File
 
     	<AcceptAndroidSDKLicenses>true</AcceptAndroidSDKLicenses>
 
+		<!-- limit to apk, since aab disables Preferences persistence in DEBUG -->
+		<AndroidPackageFormats>apk</AndroidPackageFormats>
+
 		<!-- Enable XAML source generation for faster build times and improved performance.
 		     This generates C# code from XAML at compile time instead of runtime inflation.
 		     To disable, remove this line.

@@ -1,5 +1,5 @@
 import z from 'zod';
-import type { DesktopMessageRequest, DesktopMessageResponse } from '../../../data/sdk/model';
+import { RuntimeSystem, type DesktopMessageRequest, type DesktopMessageResponse } from '../../../data/sdk/model';
 import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
 
 declare global {
@@ -11,21 +11,21 @@ declare global {
 
     type DotNetMethods = {
         Fetch: [
-            [string, RequestInit | undefined],
+            [ string, RequestInit | undefined ],
             Pick<Response, 'url' | 'ok' | 'status' | 'statusText'> & {
                 headers: Record<string, string>;
                 body?: string;
             },
         ];
         SendMessage: [
-            [DesktopMessageRequest],
+            [ DesktopMessageRequest ],
             DesktopMessageResponse | undefined
         ];
     };
 
     // injected by MAUI
     var HybridWebView: {
-        InvokeDotNet: <K extends keyof DotNetMethods>(methodName: K, paramValues: DotNetMethods[K][0]) => Promise<DotNetMethods[K][1]>;
+        InvokeDotNet: <K extends keyof DotNetMethods>(methodName: K, paramValues: DotNetMethods[ K ][ 0 ]) => Promise<DotNetMethods[ K ][ 1 ]>;
         SendRawMessage: (message: string) => unknown;
         __InvokeJavaScript: (taskId: unknown, methodName: string, args: unknown) => unknown;
     } | undefined;
@@ -45,9 +45,9 @@ const requestDesktop = (request: DesktopMessageRequest) => {
     console.log('send to desktop:', request);
 
     if (window.HybridWebView) {
-        return window.HybridWebView.InvokeDotNet('SendMessage', [request])
+        return window.HybridWebView.InvokeDotNet('SendMessage', [ request ])
             .then(response => {
-                
+
                 console.log('received from desktop:', response);
 
                 return response;
@@ -96,6 +96,9 @@ export const useDesktopMessage = () => {
             ? requestDesktop
             : undefined,
         openFile: settings?.canOpenFolder
+            ? requestDesktop
+            : undefined,
+        androidPkvaultDirectory: settings?.runtimeSystem === RuntimeSystem.ANDROID
             ? requestDesktop
             : undefined,
     };

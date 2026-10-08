@@ -29,6 +29,7 @@ public class SessionDbContext(
     // special "local" folder for your platform.
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
+        Log.Information($"DB Configure Data Source={sessionService.SessionDbPath}");
         options
             .UseSqlite($"Data Source={sessionService.SessionDbPath}")
             .LogTo(str => Log.Debug(str), LogUtil.DBLogLevel)

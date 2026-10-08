@@ -35,7 +35,31 @@ public static class MauiProgram
 		);
 #endif
 
+#if ANDROID
+		var currentDirectory = Preferences.Default.Get<string?>("pkvault-directory", null);
+		Console.WriteLine($"Preferences[pkvault-directory] == {currentDirectory}");
+
+		if (currentDirectory != null)
+		{
+			// check value and if throw error, rollback
+			try
+			{
+				Directory.SetCurrentDirectory(currentDirectory);
+				SettingsService.AppDirectory = currentDirectory;
+			}
+			catch (Exception ex)
+			{
+				Console.Error.WriteLine($"Android exception on Directory.SetCurrentDirectory", ex);
+
+				Preferences.Default.Remove("pkvault-directory");
+				Directory.SetCurrentDirectory(FileSystem.Current.AppDataDirectory);
+			}
+		}
+		else
+			Directory.SetCurrentDirectory(FileSystem.Current.AppDataDirectory);
+#else
 		Directory.SetCurrentDirectory(FileSystem.Current.AppDataDirectory);
+#endif
 
 		Program.Initialize(loggerConfig);
 

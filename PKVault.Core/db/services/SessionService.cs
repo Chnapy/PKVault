@@ -38,9 +38,28 @@ public class SessionService(
         DataActionPayload Payload
     );
 
-    private string DbFolderPath => settingsService.GetSettings().GetDbPath();
+    private string DbFolderPath
+    {
+        get
+        {
+            if (settingsService.GetSettings().RuntimeSystem == RuntimeSystem.ANDROID)
+                return MatcherUtil.NormalizePath(Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    settingsService.GetSettings().SettingsMutable.DB_PATH
+                ));
+            return settingsService.GetSettings().GetDbPath();
+        }
+    }
     public string MainDbPath => Path.Combine(DbFolderPath, "pkvault.db");
-    public string MainDbRelativePath => Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkvault.db");
+    public string MainDbRelativePath
+    {
+        get
+        {
+            if (settingsService.GetSettings().RuntimeSystem == RuntimeSystem.ANDROID)
+                return MainDbPath;
+            return Path.Combine(settingsService.GetSettings().SettingsMutable.DB_PATH, "pkvault.db");
+        }
+    }
     public string SessionDbPath => Path.Combine(DbFolderPath, "pkvault-session.db");
 
     public DateTime? StartTime { get; private set; }
@@ -275,8 +294,16 @@ public class SessionService(
         fileIOService.CreateDirectoryIfAny(MainDbPath);
         fileIOService.CreateDirectoryIfAny(SessionDbPath);
 
-        // migrations may fail in publish-trimmed if columns names not defined
-        await db.Database.MigrateAsync();
+        try
+        {
+            // migrations may fail in publish-trimmed if columns names not defined
+            // or if DB path is wrong
+            await db.Database.MigrateAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"DB Migrate failed, sessionDB={SessionDbPath} mainDB={MainDbPath} mainDBrelative={MainDbRelativePath}", ex);
+        }
 
         var appliedMigrations = await db.Database.GetAppliedMigrationsAsync();
 

@@ -1,6 +1,7 @@
 using Android.Content;
 using Android.OS.Storage;
 using Android.Provider;
+using PKVault.Core;
 using Uri = Android.Net.Uri;
 
 namespace PKVault.Mobile;
@@ -102,6 +103,8 @@ public class SafTreeMapper(Context appContext)
 
     public bool TryResolve(string path, out Uri uri, out bool isTree, out string relativePath)
     {
+        path = MatcherUtil.NormalizePath(Path.Combine(Directory.GetCurrentDirectory(), path));
+
         uri = default!;
         isTree = false;
         relativePath = "";
