@@ -57,22 +57,29 @@ public class SafDocument
     public static Uri? ResolveExisting(ContentResolver resolver, Uri treeUri, string relativePath)
     {
         var docId = DocumentsContract.GetTreeDocumentId(treeUri);
-
-        if (string.IsNullOrEmpty(relativePath))
-            return DocumentsContract.BuildDocumentUriUsingTree(treeUri, docId);
-
-        Uri? currentUri = null;
         foreach (var segment in relativePath.Split('/', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var children = ListChildren(resolver, treeUri, docId);
-            var match = children.FirstOrDefault(c => c.Name == segment);
-            if (match is null)
-                return null;
+            docId = ChildDocId(docId!, segment);
 
-            currentUri = Uri.Parse(match.Uri)!;
-            docId = DocumentsContract.GetDocumentId(currentUri);
+        var uri = DocumentsContract.BuildDocumentUriUsingTree(treeUri, docId)!;
+        return QueryMime(resolver, uri) is null ? null : uri;
+    }
+
+    static string ChildDocId(string parentDocId, string name)
+        => parentDocId.EndsWith(':') ? parentDocId + name : $"{parentDocId}/{name}";
+
+    static string? QueryMime(ContentResolver resolver, Uri documentUri)
+    {
+        try
+        {
+            using var c = resolver.Query(documentUri, [DocumentsContract.Document.ColumnMimeType], null, null, null);
+            var result = c != null && c.MoveToFirst() ? c.GetString(0) : null;
+            c?.Close();
+            return result;
         }
-        return currentUri;
+        catch
+        {
+            return null;
+        }
     }
 
     public static long? GetSize(ContentResolver resolver, Uri documentUri)
@@ -198,31 +205,31 @@ public class SafDocument
 
         for (var i = 0; i < segments.Length; i++)
         {
-            var isLast = i == segments.Length - 1;
-            var expectDirectory = !isLast || asDirectory;
+            var expectDirectory = i < segments.Length - 1 || asDirectory;
             var name = segments[i];
 
-            var match = ListChildren(resolver, treeUri, docId)
-                .FirstOrDefault(c => c.Name == name);
+            var childDocId = ChildDocId(docId!, name);
+            var childUri = DocumentsContract.BuildDocumentUriUsingTree(treeUri, childDocId)!;
+            var mime = QueryMime(resolver, childUri);
 
-            if (match is not null)
+            if (mime is not null)
             {
-                if (match.IsDirectory != expectDirectory)
+                if (mime == DocumentsContract.Document.MimeTypeDir != expectDirectory)
                     throw new IOException(expectDirectory
                         ? $"'{name}' exists and is a file"
                         : $"'{name}' exists and is a directory");
 
-                currentUri = Uri.Parse(match.Uri)!;
+                currentUri = childUri;
+                docId = childDocId;
             }
             else
             {
-                var mime = expectDirectory ? DocumentsContract.Document.MimeTypeDir! : GetMimeType(name);
-                currentUri = DocumentsContract.CreateDocument(resolver, currentUri, mime, name)
+                var newMime = expectDirectory ? DocumentsContract.Document.MimeTypeDir! : GetMimeType(name);
+                currentUri = DocumentsContract.CreateDocument(resolver, currentUri, newMime, name)
                     ?? throw new IOException(
-                        $"CreateDocument returned null (name={name}, parent={currentUri}, mime={mime})");
+                        $"CreateDocument returned null (name={name}, parent={currentUri}, mime={newMime})");
+                docId = DocumentsContract.GetDocumentId(currentUri);
             }
-
-            docId = DocumentsContract.GetDocumentId(currentUri);
         }
 
         return currentUri;
