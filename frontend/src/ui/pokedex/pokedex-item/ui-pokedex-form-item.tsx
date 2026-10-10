@@ -10,6 +10,7 @@ type UIPokedexFormItemProps = {
   isSeenAlpha?: boolean;
   isCaught?: boolean;
   isOwned?: boolean;
+  showLivingDex?: boolean;
   isOwnedShiny?: boolean;
   isMega?: boolean;
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
   isSeenAlpha,
   isCaught,
   isOwned,
+  showLivingDex,
   isOwnedShiny,
   isMega,
   children
@@ -29,7 +31,7 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
   return <Box pos='relative'>
     <Box
       style={{
-        filter: isSeen
+        filter: (showLivingDex ? isOwned : isSeen)
           ? undefined
           : 'brightness(0) opacity(0.4)',
       }}
