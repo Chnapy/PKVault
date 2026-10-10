@@ -261,6 +261,10 @@ FROM mobile-builder AS mobile-publish-android
 
 RUN apt-get update && apt-get install -y wget tar && rm -rf /var/lib/apt/lists/*
 
+ARG ANDROID_KEYSTORE_BASE64
+ARG ANDROID_KEYSTORE_PASSWORD
+ARG ANDROID_KEYSTORE_ALIAS
+
 ENV ANDROID_HOME=/tmp/android-sdk
 ENV JAVA_HOME=/tmp/microsoft-jdk
 
@@ -276,9 +280,16 @@ RUN USER=root USERNAME=root dotnet build "PKVault.Mobile/PKVault.Mobile.csproj" 
     -p:JavaSdkDirectory=$JAVA_HOME \
     -p:AndroidSdkDirectory=$ANDROID_HOME
 
+RUN echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /src/pkvault-android-keystore.jks
+
 RUN USER=root USERNAME=root dotnet publish "PKVault.Mobile/PKVault.Mobile.csproj" -f net10.0-android -c Release -o /app/publish \
     -p:JavaSdkDirectory=$JAVA_HOME \
-    -p:AndroidSdkDirectory=$ANDROID_HOME
+    -p:AndroidSdkDirectory=$ANDROID_HOME \
+    -p:AndroidKeyStore=true \
+    -p:AndroidSigningKeyStore=/src/pkvault-android-keystore.jks \
+    -p:AndroidSigningStorePass=$ANDROID_KEYSTORE_PASSWORD \
+    -p:AndroidSigningKeyAlias=$ANDROID_KEYSTORE_ALIAS \
+    -p:AndroidSigningKeyPass=$ANDROID_KEYSTORE_PASSWORD
 
 RUN ls -la /app/publish
 

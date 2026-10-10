@@ -248,7 +248,17 @@ jobs:
 
       - name: Build Android mobile image & extract app bundle
         if: ${{ matrix.arch == 'x64' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
         run: |
+          docker build . --target mobile-android \
+            --build-arg VERSION=${{ env.VERSION }} \
+            --build-arg ANDROID_KEYSTORE_BASE64="$ANDROID_KEYSTORE_BASE64" \
+            --build-arg ANDROID_KEYSTORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
+            --build-arg ANDROID_KEYSTORE_ALIAS="$ANDROID_KEYSTORE_ALIAS" \
+            -t tmp-mobile-android
           docker build . --target mobile-android --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
           docker create --name tmp-mobile-android tmp-mobile-android
 
