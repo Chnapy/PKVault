@@ -287,9 +287,9 @@ RUN USER=root USERNAME=root dotnet publish "PKVault.Mobile/PKVault.Mobile.csproj
     -p:AndroidSdkDirectory=$ANDROID_HOME \
     -p:AndroidKeyStore=true \
     -p:AndroidSigningKeyStore=/src/pkvault-android-keystore.jks \
-    -p:AndroidSigningStorePass=$ANDROID_KEYSTORE_PASSWORD \
-    -p:AndroidSigningKeyAlias=$ANDROID_KEYSTORE_ALIAS \
-    -p:AndroidSigningKeyPass=$ANDROID_KEYSTORE_PASSWORD
+    -p:AndroidSigningStorePass="${ANDROID_KEYSTORE_PASSWORD}" \
+    -p:AndroidSigningKeyAlias="${ANDROID_KEYSTORE_ALIAS}" \
+    -p:AndroidSigningKeyPass="${ANDROID_KEYSTORE_PASSWORD}"
 
 RUN ls -la /app/publish
 

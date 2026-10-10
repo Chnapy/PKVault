@@ -259,7 +259,6 @@ jobs:
             --build-arg ANDROID_KEYSTORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
             --build-arg ANDROID_KEYSTORE_ALIAS="$ANDROID_KEYSTORE_ALIAS" \
             -t tmp-mobile-android
-          docker build . --target mobile-android --build-arg VERSION=${{ env.VERSION }} -t tmp-mobile-android
           docker create --name tmp-mobile-android tmp-mobile-android
 
           docker cp tmp-mobile-android:/app/pkvault.apk _export/pkvault-${{ env.VERSION }}.apk
