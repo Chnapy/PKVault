@@ -29,7 +29,8 @@
     <AssemblyName>PKVault</AssemblyName>
     <ApplicationTitle>PKVault</ApplicationTitle>
     <ApplicationId>io.github.chnapy.pkvault</ApplicationId>
-    <ApplicationIcon>Resources/wwwroot/icon.ico</ApplicationIcon>
+    <ApplicationIcon Condition="'$(Configuration)' == 'Release'">Resources/wwwroot/icon.ico</ApplicationIcon>
+    <ApplicationIcon Condition="'$(Configuration)' == 'Debug'">../frontend/public/icon.ico</ApplicationIcon>
     <Product>PKVault</Product>
     <Description>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</Description>
     <AssemblyDescription>PKVault is a Pokemon storage and save manipulation tool based on PKHeX.</AssemblyDescription>
@@ -40,7 +41,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources/wwwroot/**/*" />
+    <EmbeddedResource Condition="'$(Configuration)' == 'Release'" Include="Resources/wwwroot/**/*" />
+    <EmbeddedResource Condition="'$(Configuration)' == 'Debug'" Include="Resources/devroot/**/*" />
 
     <TrimmerRootDescriptor Include="linker.xml" />
   </ItemGroup>

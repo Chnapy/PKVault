@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
@@ -23,6 +24,8 @@ class Program
 
     private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
     private static readonly string AssemblyStaticPrefix = "PKVault.Desktop.Resources.wwwroot.";
+
+    private const string FrontendDevBaseUrl = "http://localhost:5173";
 
     private static IFileChooser fileChooser = new DefaultFileChooser();
 
@@ -114,7 +117,15 @@ class Program
     private static Func<Task> SetupServer(out string baseUrl)
     {
         // IANA (RFC 6335) less-used ports
-        var server = PhotinoServer.CreateStaticFileServer([], 49152, 16000, "wwwroot", out baseUrl);
+        var server = PhotinoServer.CreateStaticFileServer(
+            [], 49152, 16000,
+#if DEBUG
+            "devroot",
+#else
+            "wwwroot",
+#endif
+            out baseUrl
+        );
 
         var contentTypeProvider = new FileExtensionContentTypeProvider();
 
@@ -142,6 +153,8 @@ class Program
                     var result = await coreRouter.Dispatch(SetupTask, scope.ServiceProvider, req.Method, req.Path, queryString, req.Body);
 
                     res.StatusCode = result.StatusCode;
+
+                    res.Headers.AccessControlAllowOrigin = "*";
 
                     foreach (var (key, value) in result.Header)
                         res.Headers[key] = value;
@@ -196,6 +209,10 @@ class Program
                     var uriParts = uri.Split('?')[0].Split('/');
 
                     var uriActionAndRest = uriParts.Skip(3);
+
+#if DEBUG
+                    context.Response.Redirect($"{FrontendDevBaseUrl}/{string.Join('/', uriActionAndRest)}");
+#else
                     var uriAction = uriActionAndRest.First();
                     var uriDirectories = uriActionAndRest.SkipLast(1);
                     var uriFilename = uriActionAndRest.Last();
@@ -212,6 +229,7 @@ class Program
 
                     context.Response.ContentType = contentType;
                     await stream.CopyToAsync(context.Response.Body);
+#endif
                 }
             }
             catch
@@ -226,7 +244,12 @@ class Program
 
     private static void SetupWindow(PhotinoWindow window, string baseUrl)
     {
-        using Stream iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png")!;
+        using Stream iconStream =
+#if DEBUG
+        new MemoryStream(Encoding.UTF8.GetBytes("../frontend/public/icon.png"));
+#else
+        Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png")!;
+#endif
 
         var tmpIconFilepath = Path.Combine(Path.GetTempPath(), $"pkvault-icon.png");
 
@@ -255,7 +278,11 @@ class Program
                 if (File.Exists(tmpIconFilepath))
                     File.Delete(tmpIconFilepath);
             })
+#if DEBUG
+            .Load($"{FrontendDevBaseUrl}?server={baseUrl}");
+#else
             .Load(baseUrl + $"/index.html");
+#endif
     }
 
     private static void InjectIntoFrontend(PhotinoWindow window)
