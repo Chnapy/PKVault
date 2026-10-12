@@ -29,9 +29,6 @@ public class MatcherUtil
             .Select(glob => glob.Trim())
             .Where(glob => glob.Length > 0 && glob[0] == '!')];
 
-        // network globs on Windows, ex: "\\192.168.1.8\data"
-        var networkGlobs = globs.FindAll(glob => glob.StartsWith(@"\\") && !glob.Contains('*'));
-
         var driveGlobs = globs.FindAll(IsAbsolute).FindAll(glob => glob.Length > 1 && glob[1] == ':');
         var driveLetters = driveGlobs.Select(glob => glob.ToUpper()[0]).Distinct();
         var driveResults = driveLetters.SelectMany(drive =>
@@ -95,7 +92,7 @@ public class MatcherUtil
                 )));
         });
 
-        string[] results = [.. driveResults, .. relativeResults, .. networkGlobs];
+        string[] results = [.. driveResults, .. relativeResults];
         return results
             .Select(NormalizePath)
             .Select(path => path.StartsWith(NormalizePath(Directory.GetCurrentDirectory()))
