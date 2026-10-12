@@ -422,11 +422,6 @@ class Program
                     return;
                 }
 
-                if (WindowsOS)
-                {
-                    responseSerialized = responseSerialized.Replace("\\", "\\\\");
-                }
-
                 var data = $"{{ \"detail\": {responseSerialized} }}";
 
                 await window.SendWebMessageAsync(data);
