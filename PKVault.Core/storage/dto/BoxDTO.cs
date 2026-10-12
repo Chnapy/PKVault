@@ -23,7 +23,9 @@ public record BoxDTO(
 
 public enum BoxType : int
 {
-    Inventory = 10, // items only
+    /// <summary> Items only, should not conflict with save box IDs </summary>
+    Inventory = -1000,
+
     Box = 0,
     Party = -1,
 
