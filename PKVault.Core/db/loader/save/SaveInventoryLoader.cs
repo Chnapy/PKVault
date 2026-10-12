@@ -137,6 +137,8 @@ public class SaveInventoryLoader(SaveWrapper save, ISettingsService settingsServ
             Inventory.CopyTo(save.GetSave());
             Inventory = save.CreateInventory();
 
+            HasWritten = true;
+
             Log.Debug($"Write {save.GetSave().GetType().Name} item: pouch.type={pouch.Type} item={item.Index} count={item.Count}");
 
             if (item.Count == oldCount)
