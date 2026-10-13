@@ -1,2 +1,92 @@
 --- This file displays changes of StaticSpecies_en compressed file from previous changes
 
+--- ..\PKVault.Core\static-data\generated\diff-data\StaticSpecies_en.diff
++++ ..\PKVault.Core\static-data\generated\diff-data\StaticSpecies_en.diff
+@@ -86783,8 +86783,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -86905,8 +86905,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -87027,8 +87027,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -87149,8 +87149,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -87271,8 +87271,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -87393,8 +87393,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -87515,8 +87515,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,
+@@ -87637,8 +87637,8 @@
+         {
+           "id": 666,
+           "name": "Meadow Vivillon",
+-          "spriteDefault": "sprites/pokemon/666-meadow.png",
+-          "spriteShiny": "sprites/pokemon/shiny/666-meadow.png"
++          "spriteDefault": "sprites/pokemon/666.png",
++          "spriteShiny": "sprites/pokemon/shiny/666.png"
+         },
+         {
+           "id": 10092,

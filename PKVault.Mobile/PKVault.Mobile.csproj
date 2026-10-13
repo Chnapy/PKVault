@@ -2,13 +2,13 @@
 
 
 <!-- 
-winget install Microsoft.OpenJDK.25
+winget install Microsoft.OpenJDK.21
 
 android emulator create medium_phone
 android emulator start medium_phone
 
-dotnet build -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program Files (x86)\Android"
-dotnet run -t:InstallAndroidDependencies "-p:AndroidSdkDirectory=C:\Program Files (x86)\Android"
+dotnet build -t:InstallAndroidDependencies -f net10.0-android "-p:AndroidSdkDirectory=C:\Program Files (x86)\Android"
+dotnet run -t:InstallAndroidDependencies -f net10.0-android "-p:AndroidSdkDirectory=C:\Program Files (x86)\Android"
 -->
 
 	<PropertyGroup>
