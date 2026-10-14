@@ -3,15 +3,15 @@ import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
 import { MAUIDesktop } from './desktops/maui-desktop';
 import { PhotinoDesktop } from './desktops/photino-desktop';
 
-const getSendRequestFn = async () => {
-    if (await MAUIDesktop.isEnabled())
+const getSendRequestFn = () => {
+    if (MAUIDesktop.isEnabled())
         return MAUIDesktop.sendRequest;
     if (PhotinoDesktop.isEnabled())
         return PhotinoDesktop.sendRequest;
 };
 
 const requestDesktop = async (request: DesktopMessageRequest) => {
-    const sendRequest = await getSendRequestFn();
+    const sendRequest = getSendRequestFn();
 
     const response = await sendRequest!(request);
     console.log('received from desktop:', response);

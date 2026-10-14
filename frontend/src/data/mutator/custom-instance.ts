@@ -22,7 +22,7 @@ export const customInstance = async <T extends ResponseBack>(url: string, init?:
     const targetUrl = normalizeUrlParams(getApiFullUrl(url));
 
     try {
-        if (await MAUIDesktop.isEnabled()) {
+        if (MAUIDesktop.isEnabled()) {
 
             const res = await MAUIDesktop.fetch(targetUrl, init);
 

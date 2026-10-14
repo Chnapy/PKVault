@@ -17,37 +17,18 @@ type DotNetMethods = {
 
 type InvokeDotNet = <K extends keyof DotNetMethods>(methodName: K, paramValues: DotNetMethods[ K ][ 0 ]) => Promise<DotNetMethods[ K ][ 1 ]>;
 
+type HybridWebView = {
+    /**
+     * @deprecated unsafe usage in Android context, use MAUIDesktop instead.
+     */
+    InvokeDotNet: InvokeDotNet;
+    SendRawMessage: (message: string) => unknown;
+    __InvokeJavaScript: (taskId: string, methodName: (...args: unknown[]) => Promise<unknown>, args: unknown[]) => Promise<void>;
+};
+
 declare global {
-    // injected by MAUI
-    // disabled since it is unsafe with Android
-    var HybridWebView: never | undefined;
+    var HybridWebView: HybridWebView | undefined;
 }
-
-let enabled: boolean | undefined;
-let concurrentFetchPromise: Promise<Response> | undefined;
-
-const fetchHybridWebView = () => {
-    const headers = new Headers();
-    // required to avoid frontend redirect to index.html
-    headers.set('Accept', 'text/javascript');
-
-    // injected file only in MAUI context
-    return fetch('_framework/hybridwebview.js', {
-        method: 'HEAD',
-        mode: 'no-cors',
-        headers,
-    });
-};
-
-const isEnabled = async () => {
-    // check _framework/hybridwebview.js presence, so we know we're in MAUI
-    if (enabled === undefined) {
-        concurrentFetchPromise ??= fetchHybridWebView();
-
-        enabled = (await concurrentFetchPromise).ok;
-    }
-    return enabled;
-};
 
 /**
  * Fix accents issue in Android only.
@@ -67,20 +48,29 @@ const jsonStringifyFixAndroid = (value: unknown) => JSON.stringify(value).replac
  * @see https://github.com/dotnet/maui/blob/main/src/Core/src/Handlers/HybridWebView/HybridWebView.ts
  */
 const invokeDotNetFixed: InvokeDotNet = async (methodName, paramValues) => {
-    type Body = {
+    // Must stay in sync with HybridWebViewHandler.InvokeDotNetPath / SendMessagePath.
+    const InvokeDotNetEndpoint = '__hwvInvokeDotNet';
+
+    interface JSInvokeMethodData {
         MethodName: string;
         ParamValues?: string[];
-    };
+    }
+
+    interface DotNetInvokeResult {
+        IsJson?: boolean;
+        Result?: string;
+        IsError?: boolean;
+        ErrorMessage?: string;
+        ErrorType?: string;
+        ErrorStackTrace?: string;
+    }
 
     type DotNetErrorLike = {
         dotNetErrorType?: string;
         dotNetStackTrace?: string;
     };
 
-    // Must stay in sync with HybridWebViewHandler.InvokeDotNetPath / SendMessagePath.
-    const InvokeDotNetEndpoint = '__hwvInvokeDotNet';
-
-    const body: Body = {
+    const body: JSInvokeMethodData = {
         MethodName: methodName
     };
 
@@ -104,7 +94,7 @@ const invokeDotNetFixed: InvokeDotNet = async (methodName, paramValues) => {
         body: message
     });
 
-    const response = await rawResponse.json();
+    const response: DotNetInvokeResult = await rawResponse.json();
 
     // a null response is a null response
     if (!response) {
@@ -125,12 +115,14 @@ const invokeDotNetFixed: InvokeDotNet = async (methodName, paramValues) => {
 
     // deserialize if there is JSON data
     if (response.IsJson) {
-        return JSON.parse(response.Result);
+        return JSON.parse(response.Result!);
     }
 
     // otherwise return the primitive
     return response.Result;
 };
+
+const isEnabled = () => window.HybridWebView !== undefined;
 
 export const MAUIDesktop = {
     isEnabled,
