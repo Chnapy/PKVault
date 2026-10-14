@@ -1,4 +1,5 @@
 import z from 'zod';
+import { MAUIDesktop } from '../../settings/globs-input/hooks/desktops/maui-desktop';
 
 const baseURL = new URL(window.location.href).searchParams.get('server') || window.location.origin;
 
@@ -21,9 +22,9 @@ export const customInstance = async <T extends ResponseBack>(url: string, init?:
     const targetUrl = normalizeUrlParams(getApiFullUrl(url));
 
     try {
-        if (window.HybridWebView) {
+        if (await MAUIDesktop.isEnabled()) {
 
-            const res = await window.HybridWebView.InvokeDotNet("Fetch", [ targetUrl, init ]);
+            const res = await MAUIDesktop.fetch(targetUrl, init);
 
             const headers = new Headers(res.headers);
 

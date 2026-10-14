@@ -193,6 +193,13 @@ class Program
                         return;
                     }
 
+                    // MAUI check should be ignored
+                    if (uri.EndsWith("/_framework/hybridwebview.js"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status404NotFound;
+                        return;
+                    }
+
                     var uriParts = uri.Split('?')[0].Split('/');
 
                     var uriActionAndRest = uriParts.Skip(3);

@@ -1,86 +1,21 @@
-import z from 'zod';
-import { RuntimeSystem, type DesktopMessageRequest, type DesktopMessageResponse } from '../../../data/sdk/model';
+import { RuntimeSystem, type DesktopMessageRequest } from '../../../data/sdk/model';
 import { useSettingsGet } from '../../../data/sdk/settings/settings.gen';
+import { MAUIDesktop } from './desktops/maui-desktop';
+import { PhotinoDesktop } from './desktops/photino-desktop';
 
-declare global {
-    // Photino
-    interface External {
-        sendMessage?: (message: string) => void;
-        receiveMessage?: (callback: (data: string) => void) => void;
-    }
+const getSendRequestFn = async () => {
+    if (await MAUIDesktop.isEnabled())
+        return MAUIDesktop.sendRequest;
+    if (PhotinoDesktop.isEnabled())
+        return PhotinoDesktop.sendRequest;
+};
 
-    type DotNetMethods = {
-        Fetch: [
-            [ string, RequestInit | undefined ],
-            Pick<Response, 'url' | 'ok' | 'status' | 'statusText'> & {
-                headers: Record<string, string>;
-                body?: string;
-            },
-        ];
-        SendMessage: [
-            [ DesktopMessageRequest ],
-            DesktopMessageResponse | undefined
-        ];
-    };
+const requestDesktop = async (request: DesktopMessageRequest) => {
+    const sendRequest = await getSendRequestFn();
 
-    // injected by MAUI
-    var HybridWebView: {
-        InvokeDotNet: <K extends keyof DotNetMethods>(methodName: K, paramValues: DotNetMethods[ K ][ 0 ]) => Promise<DotNetMethods[ K ][ 1 ]>;
-        SendRawMessage: (message: string) => unknown;
-        __InvokeJavaScript: (taskId: unknown, methodName: string, args: unknown) => unknown;
-    } | undefined;
-}
-
-const external = window.external as External | undefined;
-
-const desktopResponseSchema = z.object({
-    detail: z.object({
-        type: z.number()    // DesktopMessageType
-    })
-});
-
-const isDesktopMessageResponse = (data: unknown): data is { detail: DesktopMessageResponse } => desktopResponseSchema.safeParse(data).success;
-
-const requestDesktop = (request: DesktopMessageRequest) => {
-    console.log('send to desktop:', request);
-
-    if (window.HybridWebView) {
-        return window.HybridWebView.InvokeDotNet('SendMessage', [ request ])
-            .then(response => {
-
-                console.log('received from desktop:', response);
-
-                return response;
-            });
-    }
-
-    return new Promise<DesktopMessageResponse | undefined>(resolve => {
-        let resolved = false;
-
-        external?.sendMessage?.(JSON.stringify(request));
-
-        if (request.id !== undefined) {
-            external?.receiveMessage?.(message => {
-                if (resolved) {
-                    return;
-                }
-
-                console.log('received from desktop:', message);
-
-                const data = JSON.parse(message);
-
-                if (!isDesktopMessageResponse(data) || data.detail.type !== request.type || data.detail.id !== request.id) {
-                    return;
-                }
-
-                resolved = true;
-
-                resolve(data.detail);
-            });
-        } else {
-            resolve(undefined);
-        }
-    });
+    const response = await sendRequest!(request);
+    console.log('received from desktop:', response);
+    return response;
 };
 
 /**
