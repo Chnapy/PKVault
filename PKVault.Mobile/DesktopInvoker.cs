@@ -133,7 +133,7 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
                             else if (request.multiselect)
                             {
                                 var files = await FilePicker.Default.PickMultipleAsync();
-                                results = files.OfType<FileResult>().Select(f => f.FullPath).ToArray();
+                                results = files!.OfType<FileResult>().Select(f => f.FullPath).ToArray();
                             }
                             else
                             {
@@ -259,7 +259,7 @@ public class DesktopInvoker(IServiceProvider ServiceProvider, Task SetupTask) : 
 
             // await window.SendWebMessageAsync(data);
 
-            Log.Logger.Debug($"Response = {response}");
+            Log.Logger.Debug($"Response = {JsonSerializer.Serialize(response)}");
             // return data;
             return response;
         }
