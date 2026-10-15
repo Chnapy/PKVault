@@ -224,7 +224,10 @@ public class MovePkmBankAction(
             if (!variantPkm.IsEnabled)
                 throw new ArgumentException($"Attached variant is invalid and cannot be synchronized");
 
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(
+                new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]),
+                savePkmId: input.attached ? null : savePkm.Id
+            );
 
             if (!input.attached)
             {
