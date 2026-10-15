@@ -5,7 +5,7 @@ import { useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form';
 import { BoxType, type BankDTO, type BoxDTO } from '../../../../data/sdk/model';
 import type { StorageUpdateMainBoxMutationBody } from '../../../../data/sdk/storage/storage.gen';
 import { useTranslate } from '../../../../translate/i18n';
-import { switchUtil } from '../../../../util/switch-util';
+import { getBoxTypeLabel } from '../../../../util/get-box-type-label';
 import { UIButton } from '../../../form/button/ui-button';
 import { UISelect } from '../../../form/select/ui-select';
 import { UITextInput } from '../../../form/text-input/ui-text-input';
@@ -69,24 +69,7 @@ export const UIBoxEdit: React.FC<UIBoxEditProps> = ({ boxId, selected, defaultVa
             label={t('storage.box.edit.type')}
             data={Object.entries(BoxType).map(([ key, value ]) => ({
                 value,
-                label: switchUtil(key as keyof typeof BoxType, {
-                    Inventory: t('storage.box.edit.type.inventory'),
-                    Box: t('storage.box.edit.type.box'),
-                    SurpriseTrade: t('storage.box.edit.type.surprisetrade'),
-                    PGL: t('storage.box.edit.type.pgl'),
-                    Scripted: t('storage.box.edit.type.scripted'),
-                    Pokéwalker: t('storage.box.edit.type.pokéwalker'),
-                    BattleAgency: t('storage.box.edit.type.battleagency'),
-                    Shiny: t('storage.box.edit.type.shiny'),
-                    Ride: t('storage.box.edit.type.ride'),
-                    Resort: t('storage.box.edit.type.resort'),
-                    Underground: t('storage.box.edit.type.underground'),
-                    Fused: t('storage.box.edit.type.fused'),
-                    GTS: t('storage.box.edit.type.gts'),
-                    Daycare: t('storage.box.edit.type.daycare'),
-                    BattleBox: t('storage.box.edit.type.battlebox'),
-                    Party: t('storage.box.edit.type.party'),
-                }),
+                label: getBoxTypeLabel(BoxType[ key as keyof typeof BoxType ], t),
                 disabled: hasItems && value === BoxType.Inventory,
             }))}
             value={watchType}

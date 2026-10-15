@@ -326,11 +326,14 @@ public class MovePkmAction(
             throw new ArgumentException("Switch not possible with attached move");
         }
 
+        var targetAttached = existingSlots.Any(entity => entity.AttachedSaveId == saveLoaders.Save.Id
+            && entity.AttachedSavePkmIdBase == savePkm.IdBase);
+
         await SaveToMainWithoutCheckTarget(
             input, flags, (uint)input.sourceSaveId, targetBox, targetBoxSlot, savePkm
         );
 
-        if (existingSlots.Count > 0)
+        if (existingSlots.Count > 0 && !targetAttached)
         {
             await MainToSaveWithoutCheckTarget(
                 input, flags, (uint)input.sourceSaveId, sourceBox, savePkm.BoxSlot, existingSlots
@@ -470,7 +473,14 @@ public class MovePkmAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
+            var variantPkm = await pkmVariantLoader.GetPKM(pkmVariantEntity);
+            if (!variantPkm.IsEnabled)
+                throw new ArgumentException($"Attached variant is invalid and cannot be synchronized");
+
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(
+                new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]),
+                savePkmId: input.attached ? null : savePkm.Id
+            );
 
             if (!input.attached)
             {

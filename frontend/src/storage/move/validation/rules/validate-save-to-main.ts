@@ -8,10 +8,12 @@ export type ValidateSaveToMainSlot = ValidateRootSlot & {
   direction: 'save-to-main';
   sourceSave: Pick<SaveInfosDTO, 'displayedVersion' | 'context'>;
   sourceBox: Box;
-  sourcePkm?: Pick<PkmSaveDTO, 'context' | 'idBase' | 'saveId' | 'isEgg' | 'isShadow' | 'canMoveAttachedToMain' | 'canMoveToMain'>;
+  sourcePkm?: Pick<PkmSaveDTO, 'context' | 'idBase' | 'saveId' | 'isEgg' | 'isShadow' | 'isDuplicate' | 'canMoveAttachedToMain' | 'canMoveToMain'>;
   sourceItem?: Pick<InventoryItemDTO, 'id' | 'item' | 'version' | 'count'>;
   targetBox?: Box;
-  targetPkm?: Pick<PkmVariantDTO, 'boxId' | 'canMoveToSave' | 'canMoveAttachedToSave' | 'compatibleWithVersions'>;
+  targetPkm?: Pick<PkmVariantDTO, 'id' | 'boxId' | 'boxKey' | 'canMoveToSave' | 'canMoveAttachedToSave' | 'compatibleWithVersions'>;
+  targetPkmDuplicates?: Pick<PkmSaveDTO, 'id' | 'nickname' | 'boxId' | 'boxSlot'>[];
+  attachedVariant?: Pick<PkmVariantDTO, 'id' | 'boxKey' | 'boxId' | 'boxSlot' | 'nickname'>;
 };
 
 export type ValidateSaveToMainBank = ValidateRootSlot
@@ -26,6 +28,7 @@ export type ValidateSaveToMainBank = ValidateRootSlot
 export const validateSaveToMain = (
   slotInfos: ValidateSaveToMainSlot | ValidateSaveToMainBank,
   attached: boolean,
+  targetVariants: PkmVariantDTO[],
 ): DropValidationResult => {
   switch (slotInfos.mode) {
     case 'inventory':
@@ -42,6 +45,30 @@ export const validateSaveToMain = (
           slotInfos,
         };
       }
+
+      if (slotInfos.sourcePkm && slotInfos.attachedVariant) {
+        if (slotInfos.sourcePkm.isDuplicate && slotInfos.targetPkm?.boxKey !== slotInfos.attachedVariant.boxKey)
+          return {
+            canDrop: false,
+            reason: 'save-pkm-attached-duplicate-to-main',
+            slotInfos,
+          };
+
+        if (slotInfos.targetPkm && slotInfos.targetPkm?.boxKey !== slotInfos.attachedVariant.boxKey)
+          return {
+            canDrop: false,
+            reason: 'save-pkm-attached-to-main-pkm',
+            slotInfos,
+          };
+      }
+
+      if (slotInfos.sourcePkm && targetVariants.length > 1 && (!slotInfos.attachedVariant || !targetVariants.some(v => v.id === slotInfos.attachedVariant?.id)))
+        return {
+          canDrop: false,
+          reason: 'save-to-main-multiple-variants',
+          slotInfos,
+        };
+
       break;
   }
 

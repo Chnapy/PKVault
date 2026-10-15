@@ -25,15 +25,23 @@ public class SaveDeletePkmAction(
             }
 
             var attachedVariant = await pkmVariantLoader.GetEntityBySave(dto.SaveId, dto.IdBase);
+            var attachedSavePkms = saveLoaders.Pkms.GetDtosByIdBase(dto.IdBase);
+
             if (attachedVariant != null)
             {
-                attachedVariant.AttachedSaveId = null;
-                attachedVariant.AttachedSavePkmIdBase = null;
-                await pkmVariantLoader.UpdateEntity(attachedVariant);
+                if (attachedSavePkms.Count < 2)
+                {
+                    attachedVariant.AttachedSaveId = null;
+                    attachedVariant.AttachedSavePkmIdBase = null;
+                    await pkmVariantLoader.UpdateEntity(attachedVariant);
+                }
             }
 
             saveLoaders.Pkms.DeleteDto(pkmId);
             saveLoaders.Pkms.FlushParty();
+
+            foreach (var pkm in attachedSavePkms.Values)
+                flags.Saves.UseSave(input.saveId).SavePkms.Ids.Add(pkm.Id);
 
             return new(
                 type: DataActionType.SAVE_DELETE_PKM,

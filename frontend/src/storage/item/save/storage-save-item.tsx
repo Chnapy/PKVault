@@ -1,7 +1,7 @@
 import React from 'react';
+import { usePkmAttachState } from '../../../data/hooks/use-pkm-attach-state';
 import { usePkmLegality } from '../../../data/hooks/use-pkm-legality';
 import { usePkmSaveIndex } from '../../../data/hooks/use-pkm-save-index';
-import { usePkmVariantIndex } from '../../../data/hooks/use-pkm-variant-index';
 import { Gender } from '../../../data/sdk/model';
 import { withErrorCatcher } from '../../../error/with-error-catcher';
 import { Route } from '../../../routes/storage';
@@ -38,31 +38,16 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                     return;
 
                 return pick(pkm, [
-                    'id', 'idBase', 'saveId', 'context', 'species', 'nickname', 'level', 'boxId', 'boxSlot',
-                    'dynamicChecksum', 'form', 'gender', 'contextVersion', 'heldItem',
+                    'id', 'saveId', 'context', 'species', 'nickname', 'level', 'boxId', 'boxSlot',
+                    'form', 'gender', 'contextVersion', 'heldItem',
                     'isAlpha', 'isShiny', 'nSparkle', 'isEgg', 'isShadow', 'isStarter', 'isDuplicate', 'party',
                     'canEvolve',
                 ]);
             }, [ pkmId ])
         );
 
-        const canSynchronizeQuery = usePkmVariantIndex(
-            useSelectCallback(data => {
-                const savePkm = savePkmsQuery.data;
-                if (!savePkm)
-                    return;
-
-                const attachedPkmVariant = data.data.byAttachedSave[ savePkm.saveId ]?.[ savePkm.idBase ];
-                if (!attachedPkmVariant)
-                    return;
-
-                return {
-                    isAttached: true,
-                    canSynchronize: savePkm.dynamicChecksum !== attachedPkmVariant.dynamicChecksum,
-                };
-            }, [ savePkmsQuery.data ])
-        );
-        const { isAttached, canSynchronize } = canSynchronizeQuery.data ?? {};
+        const attachStateQuery = usePkmAttachState(saveId, pkmId);
+        const { isAttached, canSynchronize, attachBroken } = attachStateQuery.data ?? {};
 
         const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
         const pkmLegality = pkmLegalityQuery.data?.data;
@@ -132,6 +117,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 canEvolve={canEvolve}
                 attached={isAttached}
                 needSynchronize={canSynchronize}
+                attachBroken={attachBroken}
             />}
             heldItem={heldItemNode}
         />;

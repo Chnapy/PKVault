@@ -24,13 +24,14 @@ export type UIStorageItemIconsProps = {
     attached?: boolean;
     needSynchronize?: boolean;
     isDuplicate?: boolean;
+    attachBroken?: boolean;
     warning?: boolean;
 };
 
 export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
     heldItem, isStarter, isAlpha, isShiny, isN, level, party, nbrVariants = 0,
     hasDisabledVariant, isExternal, canEvolve, attached, needSynchronize,
-    isDuplicate, warning,
+    isDuplicate, attachBroken, warning,
 }) => {
     return <Box className={classes.uiStorageItemIcons}>
         {heldItem && <Box pos='absolute' left={0} bottom={0}>
@@ -77,7 +78,7 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
 
             {canEvolve && <UIPokedexIcons.Evolve size='xs' />}
 
-            {attached && <UIPokedexIcons.Attached size='xs' needSynchronize={needSynchronize} />}
+            {attached && <UIPokedexIcons.Attached size='xs' needSynchronize={needSynchronize} attachBroken={attachBroken} />}
 
             {/* {canCreateVariant && renderBubble(theme.bg.primary, <Icon name='plus' solid forButton />)} */}
 

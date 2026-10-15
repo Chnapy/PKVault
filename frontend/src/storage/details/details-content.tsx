@@ -1,12 +1,14 @@
 import { Alert, Box, Group, Stack } from '@mantine/core';
 import { AlertCircleIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react';
 import React from 'react';
+import { usePkmAttachState } from '../../data/hooks/use-pkm-attach-state';
 import { usePkmIndex } from '../../data/hooks/use-pkm-index';
 import { usePkmLegality } from '../../data/hooks/use-pkm-legality';
 import { usePkmVariantAttach } from '../../data/hooks/use-pkm-variant-attach';
 import { PKMLoadError, type PkmSaveDTO, type PkmVariantDTO } from '../../data/sdk/model';
 import { withErrorCatcher } from '../../error/with-error-catcher';
 import { useStaticData } from '../../hooks/use-static-data';
+import { ItemImg } from '../../img/item-img';
 import { Route } from '../../routes/storage';
 import { useTranslate } from '../../translate/i18n';
 import { UIPathLine } from '../../ui/path/ui-path-line';
@@ -23,12 +25,11 @@ import { UIDetailsStatsTotalRow } from '../../ui/storage/storage-details/content
 import { UIDetailsContent, type UIDetailsContentProps } from '../../ui/storage/storage-details/content/ui-details-content';
 import { UIDetailsContentExpanded } from '../../ui/storage/storage-details/content/ui-details-content-expanded';
 import { UIDetailsContentSummary } from '../../ui/storage/storage-details/content/ui-details-content-summary';
-import { ItemImg } from '../../img/item-img';
-import { MoveItem } from './move-item/move-item';
-import { Ribbon } from './ribbon/ribbon';
 import { switchUtilRequired } from '../../util/switch-util';
 import { useCurrentStorage } from '../panel/storage-panel-context';
 import { useStorageSelectExpanded } from './hooks/use-storage-select-expanded';
+import { MoveItem } from './move-item/move-item';
+import { Ribbon } from './ribbon/ribbon';
 
 const isVariant = (pkm: PkmVariantDTO | PkmSaveDTO) => 'filepath' in pkm;
 
@@ -51,7 +52,10 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
     const pkmLegalityQuery = usePkmLegality(selectedId, selectedSaveId ?? undefined);
     const pkmLegality = pkmLegalityQuery.data?.data;
 
-    if (!pkm || !pkmLegality)
+    const attachStateQuery = usePkmAttachState(selectedSaveId, selectedId);
+    const attachState = attachStateQuery.data;
+
+    if (!pkm || !pkmLegality || !attachState)
         return null;
 
     const natureObj = pkm.nature === undefined ? undefined : staticData.natures[ pkm.nature ];
@@ -62,7 +66,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
 
     const issues: React.ReactNode[] = [
         isVariant(pkm) && pkm.isExternal && <Alert
-            variant='default' title={<Group>
+            variant='default' title={<Group wrap='nowrap'>
                 <InfoIcon />
                 {t('details.external-pkm-file.title')}
             </Group>}
@@ -74,7 +78,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
             {t('details.external-pkm-file.2')}
         </Alert>,
         !pkm.isEnabled && <Alert variant='outline' color='red'
-            title={<Group>
+            title={<Group wrap='nowrap'>
                 <AlertCircleIcon />
                 {t('details.is-disabled.title')}
             </Group>}
@@ -83,7 +87,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         </Alert>,
         isVariant(pkm) && pkm.loadError && <Alert
             variant='outline' color='red'
-            title={<Group>
+            title={<Group wrap='nowrap'>
                 <AlertCircleIcon />
                 {t('details.load-error.title')}
             </Group>}
@@ -102,7 +106,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
         </Alert>,
         isVariant(pkm) && pkm.isEnabled && !getPkmVariantAttach(pkm, pkm.id).isAttachedValid && <Alert
             variant='outline' color='orange'
-            title={<Group>
+            title={<Group wrap='nowrap'>
                 <UIPokedexIcons.Warn size='xs' />
                 {t('details.attached-pkm-not-found.1')}
             </Group>}
@@ -112,9 +116,22 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
             <br />
             {t('details.attached-pkm-not-found.2')}
         </Alert>,
+        attachState.attachBroken && attachState.attachBrokenReason === 'isDuplicate' && !attachState.targetAnotherPkmId && <Alert
+            variant='outline' color='orange'
+            title={<Group wrap='nowrap'>
+                <UIPokedexIcons.Attached attachBroken size='xs' />
+                {t('details.attached-broken.1')}
+            </Group>}
+        >
+            {t('details.attached-broken.2')}
+            <Group wrap='nowrap' my='sm'>
+                <UIPokedexIcons.Duplicate size='xs' /> {t('details.attached-broken.3')}
+            </Group>
+            {t('details.attached-broken.4')}
+        </Alert>,
         pkm.isEnabled && pkmLegality && pkmLegality.illegalitiesCount > 0 && pkmLegality.validityReport && <Alert
             variant='outline' color='orange'
-            title={<Group>
+            title={<Group wrap='nowrap'>
                 <UIPokedexIcons.Warn size='xs' />
                 {t('details.legality.1')}
             </Group>}

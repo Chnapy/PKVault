@@ -1,11 +1,13 @@
 import type { TFunction } from 'i18next';
-import type { PkmVariantDTO } from '../../../../data/sdk/model';
+import { BoxType, type PkmVariantDTO } from '../../../../data/sdk/model';
 import { getEntityContextGenerationName } from '../../../../data/util/get-entity-context-generation-name';
+import { getBoxTypeLabel } from '../../../../util/get-box-type-label';
 import type { DropRefusalReason, SlotInfos } from '../types';
 
 export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefined, attached: boolean, t: TFunction<'ns'>): string | undefined => {
     const sourcePkm = info?.sourcePkm;
     const targetPkm = info?.targetPkm;
+    const attachedVariant = info?.attachedVariant;
 
     switch (reason) {
         case 'not-dragging': return undefined;
@@ -66,6 +68,28 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
             : t('storage.move.pkm-cannot', {
                 name: sourcePkm?.nickname,
             });
+        case 'save-to-main-multiple-variants': return undefined;
+        case 'save-pkm-attached-to-main-pkm': return t('storage.move.save-pkm-attached-to-main-pkm', {
+            name: sourcePkm?.nickname,
+            pkm: attachedVariant && `(${attachedVariant.nickname} ${attachedVariant.boxId >= 0
+                ? `${getBoxTypeLabel(BoxType.Box, t)} ${attachedVariant.boxId + 1}`
+                : getBoxTypeLabel(attachedVariant.boxId as BoxType, t)
+                } slot ${attachedVariant.boxSlot + 1})`,
+        });
+        case 'save-pkm-attached-duplicate-to-main': return t('storage.move.save-pkm-attached-duplicate-to-main', {
+            name: sourcePkm?.nickname,
+            pkm: attachedVariant && `(${attachedVariant.nickname} ${attachedVariant.boxId >= 0
+                ? `${getBoxTypeLabel(BoxType.Box, t)} ${attachedVariant.boxId + 1}`
+                : getBoxTypeLabel(attachedVariant.boxId as BoxType, t)
+                } slot ${attachedVariant.boxSlot + 1})`,
+        });
+        case 'main-to-save-with-duplicates': return t('storage.move.main-to-save-with-duplicates', {
+            name: sourcePkm?.nickname,
+            pkms: info?.targetPkmDuplicates?.map(pkm => `- ${pkm.nickname} (${pkm.boxId >= 0
+                ? `${getBoxTypeLabel(BoxType.Box, t)} ${pkm.boxId + 1}`
+                : getBoxTypeLabel(pkm.boxId as BoxType, t)
+                } slot ${pkm.boxSlot + 1})`).join('\n')
+        });
         case 'main-to-same-bank': return undefined;
         case 'same-pkm-id': return undefined;
         case 'bank-external': return t('storage.move.bank-external');
