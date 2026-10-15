@@ -220,6 +220,10 @@ public class MovePkmBankAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)
         {
+            var variantPkm = await pkmVariantLoader.GetPKM(pkmVariantEntity);
+            if (!variantPkm.IsEnabled)
+                throw new ArgumentException($"Attached variant is invalid and cannot be synchronized");
+
             await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]));
 
             if (!input.attached)

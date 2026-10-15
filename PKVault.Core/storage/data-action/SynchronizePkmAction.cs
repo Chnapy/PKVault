@@ -73,7 +73,7 @@ public class SynchronizePkmAction(
         );
     }
 
-    public async Task SynchronizeSaveToPkmVariant(SynchronizePkmActionInput input)
+    public async Task SynchronizeSaveToPkmVariant(SynchronizePkmActionInput input, string? savePkmId = null)
     {
         if (input.pkmVariantAndPkmSaveIds.Length == 0)
         {
@@ -95,13 +95,24 @@ public class SynchronizePkmAction(
             }
 
             var saveLoaders = savesLoadersService.GetLoadersRequired((uint)pkmVariantEntity.AttachedSaveId!);
-            var savePkms = saveLoaders.Pkms.GetDtosByIdBase(savePkmIdBase);
-            if (savePkms.Count != 1)
+
+            PkmSaveDTO? GetSavePkm()
             {
-                throw new InvalidOperationException($"Multiple savePkms found ({savePkms.Count}) for pkmVariant.id={pkmVariantId} savePkmIdBase={savePkmIdBase}");
+                if (savePkmId != null)
+                    return saveLoaders.Pkms.GetDto(savePkmId);
+
+                var savePkms = saveLoaders.Pkms.GetDtosByIdBase(savePkmIdBase);
+                if (savePkms.Count != 1)
+                {
+                    throw new InvalidOperationException($"Multiple savePkms found ({savePkms.Count}) for pkmVariant.id={pkmVariantId} savePkmIdBase={savePkmIdBase}");
+                }
+
+                return savePkms.First().Value;
             }
 
-            var savePkm = savePkms.First().Value;
+            var savePkm = GetSavePkm();
+            ArgumentNullException.ThrowIfNull(savePkm);
+
             foreach (var variant in pkmVariantEntities)
             {
                 Log.Debug($"Synchronize save->variant loop - {savePkm.IdBase} -> {variant.Id}");

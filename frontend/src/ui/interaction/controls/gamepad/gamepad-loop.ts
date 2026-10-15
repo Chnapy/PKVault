@@ -6,7 +6,7 @@ export const getGamepads = () => navigator?.getGamepads?.() ?? [];
 export const gamepadLoop = () => {
     const gamepadStates: GamepadStates = {};
 
-    if (!navigator?.getGamepads)
+    if (!navigator?.getGamepads && import.meta.env.MODE !== 'test')
         console.warn('navigator?.getGamepads is undefined, gamepad controls wont be available.');
 
     let id = -1;

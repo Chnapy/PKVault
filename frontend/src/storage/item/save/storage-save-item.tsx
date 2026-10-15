@@ -58,7 +58,9 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
 
                 return {
                     isAttached: true,
-                    canSynchronize: savePkm.dynamicChecksum !== attachedPkmVariant.dynamicChecksum,
+                    canSynchronize: savePkm.isDuplicate || !attachedPkmVariant.isEnabled
+                        ? 'attach-broken' as const
+                        : savePkm.dynamicChecksum !== attachedPkmVariant.dynamicChecksum,
                 };
             }, [ savePkmsQuery.data ])
         );
@@ -131,7 +133,8 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 party={savePkm.party >= 0 ? savePkm.party : undefined}
                 canEvolve={canEvolve}
                 attached={isAttached}
-                needSynchronize={canSynchronize}
+                needSynchronize={canSynchronize === true}
+                attachBroken={canSynchronize === 'attach-broken'}
             />}
             heldItem={heldItemNode}
         />;

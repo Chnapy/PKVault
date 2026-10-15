@@ -1,3 +1,4 @@
+import type { PkmSaveIndexes } from '../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../data/hooks/use-pkm-variant-index';
 import { validateCommon, type IsItemCompatibleFn } from './rules/validate-common';
 import { validateMainToMain } from './rules/validate-main-to-main';
@@ -10,6 +11,7 @@ export const validateSlotPair = (
     info: SlotInfos,
     attached: boolean,
     pkmVariantIndexes: PkmVariantIndexes,
+    targetPkmSaveIndexes: PkmSaveIndexes | undefined,
     isItemCompatible: IsItemCompatibleFn,
 ): DropValidationResult => {
 
@@ -34,6 +36,8 @@ export const validateSlotPair = (
             const sourceForContext = relatedPkmVariants.find(variant => variant.context === context);
             const sourceAttached = relatedPkmVariants.find(variant => variant.attachedSaveId);
 
+            attached ||= relatedPkmVariants.length > 1 || !sourceForContext;
+
             return validateMainToSave(
                 info,
                 sourceForContext,
@@ -49,7 +53,13 @@ export const validateSlotPair = (
 
         case 'save-to-bank':
         case 'save-to-main': {
-            return validateSaveToMain(info, attached);
+            const targetVariants = (info.targetPkm && pkmVariantIndexes.byBox[ info.targetPkm.boxId ]?.[ info.targetPkm.boxSlot ]) ?? [];
+
+            return validateSaveToMain(
+                info,
+                attached,
+                targetVariants,
+            );
         }
     }
 };

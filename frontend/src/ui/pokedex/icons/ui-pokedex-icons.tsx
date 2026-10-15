@@ -1,5 +1,5 @@
 import { ThemeIcon, type ThemeIconProps } from '@mantine/core';
-import { CopyIcon, EyeIcon, FolderIcon, LinkIcon, SparklesIcon, TriangleAlertIcon } from 'lucide-react';
+import { CopyIcon, EyeIcon, FolderIcon, LinkIcon, SlashIcon, SparklesIcon, TriangleAlertIcon } from 'lucide-react';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
 import { UIBallIcon } from '../../icon/ui-ball-icon';
 import { UIMegaIcon } from '../../icon/ui-mega-icon';
@@ -39,9 +39,14 @@ export const UIPokedexIcons = {
     Duplicate: ({ children, ...rest }: ThemeIconProps) => <ThemeIcon component='span' variant='transparent' color='yellow' {...rest}>
         <CopyIcon />
     </ThemeIcon>,
-    Attached: ({ needSynchronize, children, ...rest }: ThemeIconProps & {
+    Attached: ({ needSynchronize, attachBroken, children, ...rest }: ThemeIconProps & {
         needSynchronize?: boolean;
-    }) => <ThemeIcon component='span' variant='transparent' color={needSynchronize ? 'yellow' : undefined} {...rest}>
-            <LinkIcon />
+        attachBroken?: boolean;
+    }) => <ThemeIcon component='span' variant='transparent' color={attachBroken ? 'red' : needSynchronize ? 'yellow' : undefined} {...rest}>
+            {attachBroken
+                ? <SlashIcon transform='scale(-1,1)'>
+                    <LinkIcon style={{ transform: 'scale(-1,1) translateX(-100%)' }} />
+                </SlashIcon>
+                : <LinkIcon />}
         </ThemeIcon>,
 };

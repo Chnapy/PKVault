@@ -47,7 +47,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                         'id', 'species', 'nickname', 'level', 'boxId', 'boxSlot', 'contextVersion', 'context',
                         'form', 'gender', 'isEgg', 'isAlpha', 'isShiny', 'nSparkle', 'isShadow', 'isExternal', 'heldItem',
                     ]),
-                    attachedVariant: attachedVariant && pick(attachedVariant, [ 'attachedSaveId', 'attachedSavePkmIdBase', 'dynamicChecksum' ]),
+                    attachedVariant: attachedVariant && pick(attachedVariant, [ 'attachedSaveId', 'attachedSavePkmIdBase', 'dynamicChecksum', 'isEnabled' ]),
                     canEvolve,
                     hasDisabledVariant,
                 };
@@ -68,9 +68,12 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                 if (!attachedVariant?.attachedSavePkmIdBase)
                     return false;
 
+                if (!attachedVariant.isEnabled)
+                    return 'attach-broken';
+
                 const attachedSavePkms = data.data.byIdBase[ attachedVariant.attachedSavePkmIdBase ] ?? [];
-                if (attachedSavePkms.length === 0)
-                    return false;
+                if (attachedSavePkms.length !== 1)
+                    return 'attach-broken';
 
                 return attachedSavePkms.every(pkm => pkm.dynamicChecksum !== attachedVariant.dynamicChecksum);
             }, [ variantInfos?.attachedVariant ])
@@ -126,7 +129,8 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                 attached={!!attachedVariant}
                 heldItem={heldItemNode}
                 canEvolve={canEvolve}
-                needSynchronize={canSynchronize}
+                needSynchronize={canSynchronize === true}
+                attachBroken={canSynchronize === 'attach-broken'}
             />}
             heldItem={heldItemNode}
             onClick={() => navigate({

@@ -263,6 +263,7 @@ export const useDroppableValidation = (isItemCompatible: IsItemCompatibleFn) => 
                     { attached },
                     slotInfosList,
                     pkmVariantIndex!.data,
+                    undefined,
                     isItemCompatible,
                 );
 
@@ -328,6 +329,7 @@ export const useDroppableValidation = (isItemCompatible: IsItemCompatibleFn) => 
                             { attached },
                             slotInfosList,
                             pkmVariantIndex!.data,
+                            targetContainer.saveId ? targetPkmSaveIndex?.data : undefined,
                             isItemCompatible,
                         );
 

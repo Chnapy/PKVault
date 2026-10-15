@@ -1,4 +1,4 @@
-import type { BoxDTO, InventoryItemDTO, PkmVariantDTO } from '../../../../data/sdk/model';
+import { type BoxDTO, type InventoryItemDTO, type PkmVariantDTO } from '../../../../data/sdk/model';
 import type { DropValidationResult } from '../types';
 import type { ValidateRootSlot } from './validate-root';
 import type { ValidateSaveToMainSlot } from './validate-save-to-main';
@@ -8,11 +8,13 @@ type Box = Pick<BoxDTO, 'canSaveReceivePkm'>;
 export type ValidateMainToSaveSlot = ValidateRootSlot & {
   direction: 'main-to-save';
   sourceBox: Box;
-  sourcePkm?: Pick<PkmVariantDTO, 'boxId' | 'canMoveToSave' | 'canMoveAttachedToSave' | 'compatibleWithVersions'>;
+  sourcePkm?: Pick<PkmVariantDTO, 'id' | 'boxId' | 'boxKey' | 'canMoveToSave' | 'canMoveAttachedToSave' | 'compatibleWithVersions'>;
   sourceItem?: Pick<InventoryItemDTO, 'id' | 'item' | 'version' | 'count'>;
   targetSave: ValidateSaveToMainSlot[ 'sourceSave' ];
   targetBox?: Box;
   targetPkm?: ValidateSaveToMainSlot[ 'sourcePkm' ];
+  targetPkmDuplicates?: ValidateSaveToMainSlot[ 'targetPkmDuplicates' ];
+  attachedVariant?: Pick<PkmVariantDTO, 'id' | 'boxKey' | 'boxId' | 'boxSlot' | 'nickname'>;
 };
 
 export const validateMainToSave = (
@@ -72,6 +74,13 @@ export const validateMainToSave = (
           slotInfos,
         };
       }
+
+      if (attached && slotInfos.targetPkmDuplicates && slotInfos.targetPkmDuplicates.length > 0)
+        return {
+          canDrop: false,
+          reason: `main-to-save-with-duplicates`,
+          slotInfos,
+        };
       break;
   }
 
