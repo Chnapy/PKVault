@@ -4,6 +4,7 @@ import type React from 'react';
 import { useTranslate } from '../../../../translate/i18n';
 import { UIButton } from '../../../form/button/ui-button';
 import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
+import type { UIDetailsSaveTabProps } from './ui-details-save-tab';
 
 export type UIDetailsSaveData = {
     id: string;
@@ -11,16 +12,13 @@ export type UIDetailsSaveData = {
     imgSrc: string;
 };
 
-type UIDetailsSaveExpandedProps = UIDetailsSaveData & {
-    create?: boolean;
-    isMain?: boolean;
-    isEnabled?: boolean;
-    warning?: boolean;
-    selected?: boolean;
-    onSelect: () => unknown;
-};
+type UIDetailsSaveExpandedProps = UIDetailsSaveData
+    & Pick<UIDetailsSaveTabProps, 'create' | 'isMain' | 'isEnabled' | 'selected' | 'attached' | 'warning'>
+    & {
+        onSelect: () => unknown;
+    };
 
-export const UIDetailsSaveExpanded: React.FC<UIDetailsSaveExpandedProps> = ({ id, label, imgSrc, create, isMain, isEnabled = true, warning, selected, onSelect }) => {
+export const UIDetailsSaveExpanded: React.FC<UIDetailsSaveExpandedProps> = ({ id, label, imgSrc, create, isMain, isEnabled = true, attached, warning, selected, onSelect }) => {
     const { t } = useTranslate();
 
     return <UIButton
@@ -37,6 +35,7 @@ export const UIDetailsSaveExpanded: React.FC<UIDetailsSaveExpandedProps> = ({ id
     >
         <Group gap='xs' wrap='nowrap'>
             <Text component={selected ? 'b' : undefined} td={isMain ? 'underline' : undefined}>{label}</Text>
+            {attached && <UIPokedexIcons.Attached size='xs' />}
             {!isEnabled && <AlertCircleIcon />}
             {warning && isEnabled && <UIPokedexIcons.Warn size='xs' />}
         </Group>

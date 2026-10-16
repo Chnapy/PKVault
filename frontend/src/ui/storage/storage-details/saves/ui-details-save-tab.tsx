@@ -7,16 +7,17 @@ import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 export type UIDetailsSaveTabProps = UIExpandableTabsData
     & {
         imgSrc: string;
-        selected: boolean;
+        selected?: boolean;
         create?: boolean;
         isEnabled?: boolean;
         isMain?: boolean;
+        attached?: boolean;
         warning?: boolean;
         loading?: boolean;
         ref?: React.Ref<HTMLButtonElement>;
     };
 
-export const UIDetailsSaveTab: React.FC<UIDetailsSaveTabProps> = ({ id, label, imgSrc, selected, create, isEnabled = true, isMain = false, warning = false, loading, ref }) => {
+export const UIDetailsSaveTab: React.FC<UIDetailsSaveTabProps> = ({ id, label, imgSrc, selected, create, isEnabled = true, isMain = false, attached, warning = false, loading, ref }) => {
     return <Tabs.Tab
         ref={ref}
         value={id}
@@ -31,6 +32,7 @@ export const UIDetailsSaveTab: React.FC<UIDetailsSaveTabProps> = ({ id, label, i
     >
         <Group gap='xs' wrap='nowrap'>
             <Text component={selected ? 'b' : undefined} td={isMain ? 'underline' : undefined}>{label}</Text>
+            {attached && <UIPokedexIcons.Attached size='xs' />}
             {!isEnabled && <AlertCircleIcon />}
             {warning && isEnabled && <UIPokedexIcons.Warn size='xs' />}
         </Group>

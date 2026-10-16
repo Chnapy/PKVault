@@ -67,6 +67,8 @@ export const buildSlotInfosBank = (
                 return [];
             }
 
+            const attachedVariant = sourcePkm && pkmVariantIndexes?.byAttachedSave[ sourcePkm.saveId ]?.[ sourcePkm.idBase ];
+
             return [ {
                 mode,
                 direction: 'save-to-bank',
@@ -74,6 +76,7 @@ export const buildSlotInfosBank = (
                 sourcePkm,
                 sourceBox,
                 targetBank,
+                attachedVariant,
             } ];
         };
     }

@@ -119,7 +119,7 @@ public class MovePkmBankAction(
 
     private async Task<DataActionPayload> MainToMain(MovePkmBankActionInput input, string pkmVariantId, BoxDTO targetBox, int targetBoxSlot)
     {
-        var baseEntity = (await pkmVariantLoader.GetEntity(pkmVariantId)) ?? throw new KeyNotFoundException("PkmVariant not found");
+        var baseEntity = await pkmVariantLoader.GetEntityRequired(pkmVariantId);
         var entities = await pkmVariantLoader.GetEntitiesByBox(baseEntity.BoxId, baseEntity.BoxSlot);
         var pkm = await pkmVariantLoader.GetPKM(baseEntity);
 
@@ -220,6 +220,10 @@ public class MovePkmBankAction(
         // if moved to already attached pkm, just update it
         if (mainPkmAlreadyExists && pkmVariantEntity.AttachedSaveId != null)
         {
+            var entityBox = await boxLoader.GetEntity(pkmVariantEntity.BoxId);
+            if (entityBox?.BankId != targetBox.BankId)
+                throw new ArgumentException($"Attached pkm cannot change bank");
+
             var variantPkm = await pkmVariantLoader.GetPKM(pkmVariantEntity);
             if (!variantPkm.IsEnabled)
                 throw new ArgumentException($"Attached variant is invalid and cannot be synchronized");

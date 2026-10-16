@@ -42,12 +42,12 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
 
             const variants = data.data.byBox[ baseVariant.boxId ]?.[ baseVariant.boxSlot ] ?? [];
             const mainVariant = variants.find(v => v.isMain);
+            const attachedVariant = variants.find(v => v.attachedSaveId);
 
             const getCanCreateVariantContext = () => {
                 if (!mainVariant?.canCreateVariant || !otherStorageSave)
                     return;
 
-                const attachedVariant = variants.find(v => v.attachedSaveId);
                 if (attachedVariant?.context == otherStorageSave.context)
                     return;
 
@@ -64,10 +64,11 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                 ),
                 mainVariant: mainVariant && pick(mainVariant, [ 'id', 'boxId', 'boxSlot', 'compatibleWithVersions', 'canCreateVariant' ]),
                 canCreateVariantContext: getCanCreateVariantContext(),
+                attachedVariantId: attachedVariant?.id,
             };
         }, [ otherStorageSave, selectedId, selectedSaveId ])
     );
-    const { variants = [], mainVariant, canCreateVariantContext } = variantsQuery.data ?? {};
+    const { variants = [], mainVariant, canCreateVariantContext, attachedVariantId } = variantsQuery.data ?? {};
 
     const pkmLegalityMapQuery = usePkmLegalityMap(variants.map(pkm => pkm.id) ?? []);
     const pkmLegalityMap = pkmLegalityMapQuery.data?.data ?? {};
@@ -176,6 +177,7 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                     id={item.id}
                     saveId={null}
                     selected={selected}
+                    attached={item.id === attachedVariantId}
                     warning={!!pkmLegalityMap[ item.id ] && !pkmLegalityMap[ item.id ]!.isValid}
                 />,
             renderExpanded: (data, { reduce }) => <Group p='md'>
@@ -193,6 +195,7 @@ export const DetailsSaves: React.FC<DetailsSavesProps> = ({ actions }) => {
                         key={item.id}
                         {...item}
                         selected={selected}
+                        attached={item.id === attachedVariantId}
                         onSelect={() => {
                             onNavigate(item.id);
                             reduce();
