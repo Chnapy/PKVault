@@ -7,7 +7,7 @@ import { UIPokedexIcons } from '../../../pokedex/icons/ui-pokedex-icons';
 export type UIDetailsSaveTabProps = UIExpandableTabsData
     & {
         imgSrc: string;
-        selected: boolean;
+        selected?: boolean;
         create?: boolean;
         isEnabled?: boolean;
         isMain?: boolean;
