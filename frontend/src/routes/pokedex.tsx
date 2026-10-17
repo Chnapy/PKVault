@@ -19,6 +19,7 @@ const searchSchema = z.object({
   filterGenerations: z.array(z.number()).optional(), // generation.name
   showForms: z.boolean().optional(),
   showGenders: z.boolean().optional(),
+  showLivingDex: z.boolean().optional(),
 });
 
 export const Route = createFileRoute("/pokedex")({
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/pokedex")({
     filterGenerations: undefined,
     showForms: undefined,
     showGenders: undefined,
+    showLivingDex: undefined,
   }),
   search: {
     middlewares: [ retainSearchParams(true) ],

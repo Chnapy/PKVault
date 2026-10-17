@@ -12,10 +12,12 @@ type UIPokedexMainSectionHeaderProps = {
     ownedCount: number;
     shinyCount: number;
     totalCount: number;
+    showLivingDex?: boolean;
+    ownedLabel?: string;
 };
 
 export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProps> = ({
-    generation, regions, games, seenCount, caughtCount, ownedCount, shinyCount, totalCount
+    generation, regions, games, seenCount, caughtCount, ownedCount, shinyCount, totalCount, showLivingDex, ownedLabel
 }) => {
     const renderCount = (icon: React.ReactNode, count: number) => <Badge variant='default' leftSection={icon} fz='md' px='sm'>
         {count}
@@ -32,12 +34,18 @@ export const UIPokedexMainSectionHeader: React.FC<UIPokedexMainSectionHeaderProp
         <Group pr='md' wrap='nowrap'>
             {renderCount(<UIPokedexIcons.Seen size='sm' />, seenCount)}
             {renderCount(<UIPokedexIcons.Caught size='sm' />, caughtCount)}
-            {renderCount(<UIPokedexIcons.Owned size='sm' />, ownedCount)}
+            {showLivingDex
+                ? <Badge variant='default' leftSection={<UIPokedexIcons.Owned size='sm' />} fz='md' px='sm'>
+                    {ownedCount} / {totalCount} {ownedLabel}
+                </Badge>
+                : renderCount(<UIPokedexIcons.Owned size='sm' />, ownedCount)}
             {renderCount(<UIPokedexIcons.Shiny size='sm' />, shinyCount)}
-            <Divider orientation='vertical' />
-            {renderCount(<ThemeIcon variant='transparent' size='sm'>
-                <ListIcon />
-            </ThemeIcon>, totalCount)}
+            {!showLivingDex && <>
+                <Divider orientation='vertical' />
+                {renderCount(<ThemeIcon variant='transparent' size='sm'>
+                    <ListIcon />
+                </ThemeIcon>, totalCount)}
+            </>}
         </Group>
     </Group>;
 };
