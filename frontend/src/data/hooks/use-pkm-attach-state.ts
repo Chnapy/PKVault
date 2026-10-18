@@ -116,7 +116,9 @@ export const usePkmAttachState = (saveId: number | null, pkmId: string | undefin
 
     const isPending = queries.some(q => q.isPending && q.isEnabled);
 
-    const data = saveId ? saveQuery.data : mainQuery.data;
+    const data = (saveId ? saveQuery.data : mainQuery.data) ?? {
+        isAttached: false,
+    };
 
     return {
         isPending,

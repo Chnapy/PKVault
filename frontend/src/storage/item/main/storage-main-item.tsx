@@ -60,7 +60,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
         });
 
         const attachStateQuery = usePkmAttachState(null, pkmId);
-        const { isAttached, canSynchronize, attachBroken } = attachStateQuery.data ?? {};
+        const { isAttached, canSynchronize, attachBroken } = attachStateQuery.data;
 
         const variantsIds = variantInfos?.variants.map(variant => variant.id) ?? [];
 

@@ -47,7 +47,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
         );
 
         const attachStateQuery = usePkmAttachState(saveId, pkmId);
-        const { isAttached, canSynchronize, attachBroken } = attachStateQuery.data ?? {};
+        const { isAttached, canSynchronize, attachBroken } = attachStateQuery.data;
 
         const pkmLegalityQuery = usePkmLegality(pkmId, saveId);
         const pkmLegality = pkmLegalityQuery.data?.data;
