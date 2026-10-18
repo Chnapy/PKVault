@@ -55,7 +55,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
     const attachStateQuery = usePkmAttachState(selectedSaveId, selectedId);
     const attachState = attachStateQuery.data;
 
-    if (!pkm || !pkmLegality || !attachState)
+    if (!pkm || !pkmLegality)
         return null;
 
     const natureObj = pkm.nature === undefined ? undefined : staticData.natures[ pkm.nature ];
