@@ -153,9 +153,19 @@ public class StaticOthersLoader
         return Enum.GetValues<GameVersion>().Select(version =>
         {
             var saveVersion = GameVersionUtil.GetSingleVersion(version);
-            var blankSave = saveVersion == default
-                ? null
-                : BlankSaveFile.Get(saveVersion);
+
+            SaveFile? blankSave = null;
+            try
+            {
+                if (saveVersion != default)
+                    blankSave = BlankSaveFile.Get(saveVersion);
+            }
+            // may fail with future games (like WI/WA)
+            catch (ArgumentOutOfRangeException)
+            {
+                blankSave = null;
+            }
+
             HashSet<ushort> allowedInventoryItems;
             HashSet<ushort> allowedHeldItems;
             try

@@ -623,14 +623,14 @@ public class PKMConverterUtils
 
     public void CopyIVsFrom(PKM pkm, PKM pkmSrc)
     {
-        pkm.IVs = [
+        pkm.SetIVs([
             pkmSrc.IV_HP,
             pkmSrc.IV_ATK,
             pkmSrc.IV_DEF,
             pkmSrc.IV_SPE,
             pkmSrc.IV_SPA,
             pkmSrc.IV_SPD,
-        ];
+        ]);
     }
 
     public void CopyEVsFrom(PKM pkm, PKM pkmSrc)
@@ -697,10 +697,8 @@ public class PKMConverterUtils
                 || (r.Identifier == CheckIdentifier.Ability && r.Result == LegalityCheckResultCode.AbilityHiddenFail)
                 || r.Result == LegalityCheckResultCode.AbilityMismatch3
             );
-            if (customCount > 0)
-                return customCount;
 
-            return 0;
+            return customCount;
         }
 
         var currentSafestVersion = pkm.Version;

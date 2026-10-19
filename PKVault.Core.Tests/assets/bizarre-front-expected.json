@@ -3,7 +3,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 57,
+        "version": 61,
         "helditem": 91,
         "level": 5,
         "exp": 125,
@@ -43,7 +43,7 @@
         "species": 201,
         "form": 8,
         "gender": 2,
-        "version": 57,
+        "version": 61,
         "helditem": 91,
         "level": 5,
         "exp": 125,
@@ -122,6 +122,7 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
+            "EVs-EffortUntrainedMoreEXP_0",
             "Level-LevelMetBelow"
         ]
     },
@@ -168,6 +169,7 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
+            "EVs-EffortUntrainedMoreEXP_0",
             "Level-LevelMetBelow"
         ]
     },
@@ -214,6 +216,7 @@
         "language": 3,
         "illegalities": [
             "PID-PIDTypeMismatch",
+            "EVs-EffortUntrainedMoreEXP_0",
             "Level-LevelMetBelow"
         ]
     },
