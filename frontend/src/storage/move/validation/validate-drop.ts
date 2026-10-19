@@ -1,4 +1,3 @@
-import type { PkmSaveIndexes } from '../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../data/hooks/use-pkm-variant-index';
 import type { MoveParams } from '../move-container-fns';
 import type { IsItemCompatibleFn } from './rules/validate-common';
@@ -11,7 +10,6 @@ export const validateDrop = (
     params: MoveParams | undefined,
     slotInfosList: SlotInfos[],
     pkmVariantIndexes: PkmVariantIndexes,
-    targetPkmSaveIndexes: PkmSaveIndexes | undefined,
     isItemCompatible: IsItemCompatibleFn,
 ): DropValidationResult => {
 
@@ -23,7 +21,6 @@ export const validateDrop = (
             info,
             params?.attached ?? false,
             pkmVariantIndexes,
-            targetPkmSaveIndexes,
             isItemCompatible,
         );
         if (!result.canDrop) return result;
@@ -47,7 +44,6 @@ export const validateDrop = (
                 swapInfo,
                 params?.attached ?? false,
                 pkmVariantIndexes,
-                targetPkmSaveIndexes,
                 isItemCompatible,
             );
             if (!swapResult.canDrop) return swapResult;

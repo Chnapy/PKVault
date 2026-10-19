@@ -351,6 +351,7 @@
   "storage.move.items-to-pkm-empty-slot": "Items should be moved to a pokémon or an inventory",
   "storage.move.main-disabled": "Disabled pokémon cannot be moved outside its storage",
   "storage.move.main-incompatible-version": "Pokémon {{name}} is not compatible with save",
+  "storage.move.main-to-save-with-duplicates": "Pokémon {{name}} cannot be moved attached to this save because identical attached pokémons already exist, consider detaching them before your action:\n{{pkms}}",
   "storage.move.multiple-items-to-pkm": "Only a single item can be moved to a pokémon",
   "storage.move.pkm-cannot": "Pokémon {{name}} cannot be moved",
   "storage.move.pkm-cannot-attached": "Pokémon {{name}} cannot be moved attached",

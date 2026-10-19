@@ -58,6 +58,13 @@ export const validateMainToSave = (
         };
       }
 
+      if (attached && slotInfos.targetSaveDuplicatePkms?.length)
+        return {
+          canDrop: false,
+          reason: `main-to-save-with-duplicates`,
+          slotInfos,
+        };
+
       if (!sourceForContext && slotInfos.targetPkm) {
         return {
           canDrop: false,

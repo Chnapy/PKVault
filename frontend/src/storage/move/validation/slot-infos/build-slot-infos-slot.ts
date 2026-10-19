@@ -84,7 +84,19 @@ export const buildSlotInfosSlot = (
                 return [];
             }
 
+            const relatedPkmVariants = sourcePkm
+                ? pkmVariantIndexes.byBox[ sourcePkm.boxId ]?.[ sourcePkm.boxSlot ] ?? []
+                : [];
+            const context = targetPkm?.context ?? targetSave.context;
+
+            const sourceForContext = relatedPkmVariants.find(variant => variant.context === context);
+
             const attachedVariant = targetPkm && pkmVariantIndexes?.byAttachedSave[ targetPkm.saveId ]?.[ targetPkm.idBase ];
+            const variantAttachedBySourceBaseId = sourceForContext
+                && pkmVariantIndexes?.byAttachedSave[ targetSave.id ]?.[ sourceForContext.idBase ];
+            const targetSaveDuplicatePkms = variantAttachedBySourceBaseId
+                ? targetPkmSaveIndexes?.byIdBase[ variantAttachedBySourceBaseId.idBase ] ?? []
+                : [];
 
             return [ {
                 mode,
@@ -97,6 +109,7 @@ export const buildSlotInfosSlot = (
                 targetSlot,
                 targetPkm,
                 attachedVariant,
+                targetSaveDuplicatePkms,
             } ];
         };
         case 'save-to-main': {
@@ -155,6 +168,13 @@ export const buildSlotInfosSlot = (
                 return [];
             }
 
+            const attachedVariant = sourcePkm && pkmVariantIndexes?.byAttachedSave[ sourcePkm.saveId ]?.[ sourcePkm.idBase ];
+            const variantAttachedBySourceBaseId = sourcePkm
+                && pkmVariantIndexes?.byAttachedSave[ targetSave.id ]?.[ sourcePkm.idBase ];
+            const targetSaveDuplicatePkms = variantAttachedBySourceBaseId
+                ? targetPkmSaveIndexes?.byIdBase[ variantAttachedBySourceBaseId.idBase ] ?? []
+                : [];
+
             return [ {
                 mode,
                 direction: 'save-to-save',
@@ -166,6 +186,8 @@ export const buildSlotInfosSlot = (
                 targetBox,
                 targetPkm,
                 targetSlot,
+                attachedVariant,
+                targetSaveDuplicatePkms,
             } ];
         };
     }

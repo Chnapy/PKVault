@@ -351,6 +351,7 @@
   "storage.move.items-to-pkm-empty-slot": "Itens devem ser movidos para um Pokémon ou para o inventário",
   "storage.move.main-disabled": "Pokémon desativado não pode ser movido para fora de seu armazenamento",
   "storage.move.main-incompatible-version": "O pokémon {{name}} não é compatível com o save",
+  "storage.move.main-to-save-with-duplicates": "O Pokémon {{name}} não pode ser movido para este save, pois já existem Pokémon idênticos anexados nele, considere desanexá-los antes de realizar a ação:\n{{pkms}}",
   "storage.move.multiple-items-to-pkm": "Apenas um item pode ser movido para um Pokémon",
   "storage.move.pkm-cannot": "O pokémon {{name}} não pode ser movido",
   "storage.move.pkm-cannot-attached": "O pokémon {{name}} não pode ser movido anexado",

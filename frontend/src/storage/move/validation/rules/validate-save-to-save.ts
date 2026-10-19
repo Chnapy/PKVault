@@ -1,4 +1,4 @@
-import type { BoxDTO, InventoryItemDTO, PkmSaveDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BoxDTO, InventoryItemDTO, PkmSaveDTO, PkmVariantDTO, SaveInfosDTO } from '../../../../data/sdk/model';
 import type { DropValidationResult } from '../types';
 import type { ValidateRootSlot } from './validate-root';
 
@@ -76,6 +76,14 @@ export const validateSaveToSave = (
           slotInfos,
         };
       }
+
+      if (slotInfos.sourcePkm && slotInfos.attachedVariant && slotInfos.targetSaveDuplicatePkms?.length
+        && slotInfos.targetSaveDuplicatePkms.every(pkm => pkm.id !== slotInfos.sourcePkm?.id))
+        return {
+          canDrop: false,
+          reason: `main-to-save-with-duplicates`,
+          slotInfos,
+        };
       break;
   }
 

@@ -195,8 +195,7 @@ public class MovePkmAction(
 
             if (switchAttachedVariant != null && switchAttachedVariant.AttachedSaveId != sourceSaveLoaders.Save.Id)
             {
-                switchAttachedVariant.AttachedSaveId = sourceSaveLoaders.Save.Id;
-                switchAttachedVariant.AttachedSavePkmIdBase = switchedSourcePkmDto.IdBase;
+                await SetVariantAttachedSaveWithCheck(switchAttachedVariant, sourceSaveLoaders.Save.Id, switchedSourcePkmDto.IdBase);
                 await pkmVariantLoader.UpdateEntity(switchAttachedVariant);
             }
         }
@@ -209,8 +208,7 @@ public class MovePkmAction(
 
         if (sourceAttachedVariant != null && sourceAttachedVariant.AttachedSaveId != targetSaveLoaders.Save.Id)
         {
-            sourceAttachedVariant.AttachedSaveId = targetSaveLoaders.Save.Id;
-            sourceAttachedVariant.AttachedSavePkmIdBase = sourcePkmDto.IdBase;
+            await SetVariantAttachedSaveWithCheck(sourceAttachedVariant, targetSaveLoaders.Save.Id, sourcePkmDto.IdBase);
             await pkmVariantLoader.UpdateEntity(sourceAttachedVariant);
         }
 
@@ -393,8 +391,7 @@ public class MovePkmAction(
 
         if (input.attached)
         {
-            pkmVariant.AttachedSaveId = saveLoaders.Save.Id;
-            pkmVariant.AttachedSavePkmIdBase = pkmSaveDTO.IdBase;
+            await SetVariantAttachedSaveWithCheck(pkmVariant, saveLoaders.Save.Id, pkmSaveDTO.IdBase);
             await pkmVariantLoader.UpdateEntity(pkmVariant);
         }
         else
@@ -477,6 +474,18 @@ public class MovePkmAction(
         }
 
         await new DexMainService(sp).EnablePKM(savePkm.Pkm, savePkm.Save);
+    }
+
+    public async Task SetVariantAttachedSaveWithCheck(PkmVariantEntity variant, uint saveId, string pkmIdBase)
+    {
+        var variantsAttachedToSave = await pkmVariantLoader.GetEntitiesBySave(saveId);
+
+        var hasOtherVariantAlreadyAttached = variantsAttachedToSave.Values.Any(v => v.AttachedSavePkmIdBase == pkmIdBase && v.Id != variant.Id);
+        if (hasOtherVariantAlreadyAttached)
+            throw new ArgumentException($"An other variant is already attached to a save pkm with same ID");
+
+        variant.AttachedSaveId = saveId;
+        variant.AttachedSavePkmIdBase = pkmIdBase;
     }
 
     private async Task CheckG3NationalDex(SaveWrapper save, int species)
