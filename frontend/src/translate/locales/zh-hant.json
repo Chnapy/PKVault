@@ -351,7 +351,6 @@
   "storage.move.items-to-pkm-empty-slot": "道具應該移動到寶可夢或物品欄",
   "storage.move.main-disabled": "已停用的寶可夢無法移出其儲存空間",
   "storage.move.main-incompatible-version": "寶可夢 {{name}} 與此存檔不相容",
-  "storage.move.main-to-save-with-duplicates": "寶可夢 {{name}} 無法移動到此存檔，因為已存在相同的寶可夢：\n{{pkms}}",
   "storage.move.multiple-items-to-pkm": "只能將一件道具移到寶可夢身上",
   "storage.move.pkm-cannot": "無法移動寶可夢 {{name}}",
   "storage.move.pkm-cannot-attached": "無法透過連結方式移動寶可夢 {{name}}",
