@@ -1,4 +1,3 @@
-import type { PkmSaveIndexes } from '../../../data/hooks/use-pkm-save-index';
 import type { PkmVariantIndexes } from '../../../data/hooks/use-pkm-variant-index';
 import { validateCommon, type IsItemCompatibleFn } from './rules/validate-common';
 import { validateMainToMain } from './rules/validate-main-to-main';
@@ -11,7 +10,6 @@ export const validateSlotPair = (
     info: SlotInfos,
     attached: boolean,
     pkmVariantIndexes: PkmVariantIndexes,
-    targetPkmSaveIndexes: PkmSaveIndexes | undefined,
     isItemCompatible: IsItemCompatibleFn,
 ): DropValidationResult => {
 

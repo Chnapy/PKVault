@@ -24,7 +24,6 @@ export const swapSlotInfos = (slotInfos: SlotInfosSlot): SlotInfosSlot => {
                 targetPkm: slotInfos.sourcePkm,
                 targetBox: slotInfos.sourceBox,
                 targetSlot: slotInfos.sourcePkm?.boxSlot ?? slotInfos.sourceItem?.boxSlot,
-                targetPkmDuplicates: slotInfos.targetPkmDuplicates,
                 attachedVariant: slotInfos.attachedVariant,
             };
         };
@@ -38,7 +37,6 @@ export const swapSlotInfos = (slotInfos: SlotInfosSlot): SlotInfosSlot => {
                 targetBox: slotInfos.sourceBox,
                 targetSlot: slotInfos.sourcePkm?.boxSlot ?? slotInfos.sourceItem?.boxSlot,
                 targetSave: slotInfos.sourceSave,
-                targetPkmDuplicates: slotInfos.targetPkmDuplicates,
                 attachedVariant: slotInfos.attachedVariant,
             };
         };

@@ -31,7 +31,7 @@ public record PkmSaveDTO(
     public override bool CanEdit => base.CanEdit && !IsLocked && BoxLoader.CanIdReceivePkm(BoxId, Save.Version);
     public override bool CanMoveToSave => base.CanMoveToSave && !IsLocked;
     public bool CanMoveToMain => IsEnabled && Pkm.Version > 0 && Pkm.Generation > 0 && CanDelete && !IsShadow && !IsEgg && !IsLocked && Party == -1;
-    public bool CanMoveAttachedToMain => CanMoveToMain && !IsDuplicate;
+    public bool CanMoveAttachedToMain => CanMoveToMain;
 
     private StorageSlotSource BoxSlotFlags => Save.GetBoxSlotFlags(BoxId, BoxSlot);
 

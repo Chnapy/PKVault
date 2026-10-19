@@ -16,8 +16,8 @@ export type ValidateRootSlot = {
     targetBox?: Box;
     targetPkm?: Pkm;
     targetSlot?: number;
-    targetPkmDuplicates?: Pick<PkmSaveDTO, 'id' | 'nickname' | 'boxId' | 'boxSlot'>[];
     attachedVariant?: Pick<PkmVariantDTO, 'id' | 'boxKey' | 'boxId' | 'boxSlot' | 'nickname'>;
+    targetSaveDuplicatePkms?: Pick<PkmSaveDTO, 'id' | 'idBase' | 'boxId' | 'boxSlot' | 'nickname'>[];
 };
 
 export const validateRoot = (slotInfosList: ValidateRootSlot[]): DropValidationResult => {

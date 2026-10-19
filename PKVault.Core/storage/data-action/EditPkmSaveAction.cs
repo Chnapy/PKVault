@@ -43,7 +43,7 @@ public class EditPkmSaveAction(
         var pkmVariant = await pkmVariantLoader.GetEntityBySave(pkmSave.SaveId, pkmSave.IdBase);
         if (pkmVariant != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, pkmSave.IdBase)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([new(pkmVariant.Id, pkmSave.IdBase, pkmSave.Id)]));
         }
     }
 }

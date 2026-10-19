@@ -90,12 +90,13 @@ export const buildSlotInfosSlot = (
             const context = targetPkm?.context ?? targetSave.context;
 
             const sourceForContext = relatedPkmVariants.find(variant => variant.context === context);
-            // const sourceAttached = relatedPkmVariants.find(variant => variant.attachedSaveId);
-            const targetPkmDuplicates = sourceForContext
-                ? targetPkmSaveIndexes?.byIdBase[ sourceForContext.idBase ] ?? []
-                : [];
 
             const attachedVariant = targetPkm && pkmVariantIndexes?.byAttachedSave[ targetPkm.saveId ]?.[ targetPkm.idBase ];
+            const variantAttachedBySourceBaseId = sourceForContext
+                && pkmVariantIndexes?.byAttachedSave[ targetSave.id ]?.[ sourceForContext.idBase ];
+            const targetSaveDuplicatePkms = variantAttachedBySourceBaseId
+                ? targetPkmSaveIndexes?.byIdBase[ variantAttachedBySourceBaseId.idBase ] ?? []
+                : [];
 
             return [ {
                 mode,
@@ -107,8 +108,8 @@ export const buildSlotInfosSlot = (
                 targetBox,
                 targetSlot,
                 targetPkm,
-                targetPkmDuplicates,
                 attachedVariant,
+                targetSaveDuplicatePkms,
             } ];
         };
         case 'save-to-main': {
@@ -132,14 +133,6 @@ export const buildSlotInfosSlot = (
             const targetPkmVariants = pkmVariantIndexes?.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
             const normalizedTargetPkmMains = targetPkmVariants.length === 0 ? [ undefined ] : targetPkmVariants;
 
-            const context = sourceSave.context;
-
-            const sourceForContext = targetPkmVariants.find(variant => variant.context === context);
-            // const sourceAttached = relatedPkmVariants.find(variant => variant.attachedSaveId);
-            const targetPkmDuplicates = sourceForContext
-                ? targetPkmSaveIndexes?.byIdBase[ sourceForContext.idBase ] ?? []
-                : [];
-
             const attachedVariant = sourcePkm && pkmVariantIndexes?.byAttachedSave[ sourcePkm.saveId ]?.[ sourcePkm.idBase ];
 
             return normalizedTargetPkmMains.map(targetPkm => ({
@@ -152,7 +145,6 @@ export const buildSlotInfosSlot = (
                 targetBox,
                 targetSlot,
                 targetPkm,
-                targetPkmDuplicates,
                 attachedVariant,
             }));
         };
@@ -176,6 +168,13 @@ export const buildSlotInfosSlot = (
                 return [];
             }
 
+            const attachedVariant = sourcePkm && pkmVariantIndexes?.byAttachedSave[ sourcePkm.saveId ]?.[ sourcePkm.idBase ];
+            const variantAttachedBySourceBaseId = sourcePkm
+                && pkmVariantIndexes?.byAttachedSave[ targetSave.id ]?.[ sourcePkm.idBase ];
+            const targetSaveDuplicatePkms = variantAttachedBySourceBaseId
+                ? targetPkmSaveIndexes?.byIdBase[ variantAttachedBySourceBaseId.idBase ] ?? []
+                : [];
+
             return [ {
                 mode,
                 direction: 'save-to-save',
@@ -187,6 +186,8 @@ export const buildSlotInfosSlot = (
                 targetBox,
                 targetPkm,
                 targetSlot,
+                attachedVariant,
+                targetSaveDuplicatePkms,
             } ];
         };
     }

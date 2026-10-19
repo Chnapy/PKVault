@@ -13,7 +13,6 @@ export type ValidateMainToSaveSlot = ValidateRootSlot & {
   targetSave: ValidateSaveToMainSlot[ 'sourceSave' ];
   targetBox?: Box;
   targetPkm?: ValidateSaveToMainSlot[ 'sourcePkm' ];
-  targetPkmDuplicates?: ValidateSaveToMainSlot[ 'targetPkmDuplicates' ];
   attachedVariant?: Pick<PkmVariantDTO, 'id' | 'boxKey' | 'boxId' | 'boxSlot' | 'nickname'>;
 };
 
@@ -59,6 +58,13 @@ export const validateMainToSave = (
         };
       }
 
+      if (attached && slotInfos.targetSaveDuplicatePkms?.length)
+        return {
+          canDrop: false,
+          reason: `main-to-save-with-duplicates`,
+          slotInfos,
+        };
+
       if (!sourceForContext && slotInfos.targetPkm) {
         return {
           canDrop: false,
@@ -74,13 +80,6 @@ export const validateMainToSave = (
           slotInfos,
         };
       }
-
-      if (attached && slotInfos.targetPkmDuplicates && slotInfos.targetPkmDuplicates.length > 0)
-        return {
-          canDrop: false,
-          reason: `main-to-save-with-duplicates`,
-          slotInfos,
-        };
       break;
   }
 

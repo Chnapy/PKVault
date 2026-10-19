@@ -149,14 +149,6 @@ public class MovePkmBankAction(
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
 
-        if (input.attached)
-        {
-            if (savePkm.IsDuplicate)
-            {
-                throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
-            }
-        }
-
         var existingSlots = await pkmVariantLoader.GetEntitiesByBox(targetBox.Id, targetBoxSlot);
         if (existingSlots.Count > 0)
         {
@@ -228,10 +220,7 @@ public class MovePkmBankAction(
             if (!variantPkm.IsEnabled)
                 throw new ArgumentException($"Attached variant is invalid and cannot be synchronized");
 
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(
-                new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]),
-                savePkmId: input.attached ? null : savePkm.Id
-            );
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([new(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!, savePkm.Id)]));
 
             if (!input.attached)
             {

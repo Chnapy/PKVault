@@ -3,8 +3,10 @@ using Serilog;
 
 namespace PKVault.Core;
 
+public record SynchronizePkmActionInputItem(string PkmVariantId, string SavePkmIdBase, string? SavePkmId);
+
 public record SynchronizePkmActionInput(
-    (string PkmVariantId, string SavePkmIdBase)[] pkmVariantAndPkmSaveIds
+    SynchronizePkmActionInputItem[] pkmVariantAndPkmSaveIds
 );
 
 public class SynchronizePkmAction(
@@ -32,7 +34,7 @@ public class SynchronizePkmAction(
         {
             pkmVariantsBySaveId.TryGetValue(saveLoader.Save.Id, out var pkmVariantsBySave);
 
-            var result = new List<(string PkmVariantId, string SavePkmIdBase)>();
+            var result = new List<SynchronizePkmActionInputItem>();
 
             foreach (var pkmVariant in pkmVariantsBySave ?? [])
             {
@@ -47,7 +49,7 @@ public class SynchronizePkmAction(
 
                     if (variantPkm.IsEnabled && variantPkm.DynamicChecksum != savePkm.DynamicChecksum)
                     {
-                        result.Add((pkmVariant.Id, pkmVariant.AttachedSavePkmIdBase));
+                        result.Add(new(pkmVariant.Id, pkmVariant.AttachedSavePkmIdBase, savePkm.Id));
                     }
                 }
             }
@@ -73,7 +75,7 @@ public class SynchronizePkmAction(
         );
     }
 
-    public async Task SynchronizeSaveToPkmVariant(SynchronizePkmActionInput input, string? savePkmId = null)
+    public async Task SynchronizeSaveToPkmVariant(SynchronizePkmActionInput input)
     {
         if (input.pkmVariantAndPkmSaveIds.Length == 0)
         {
@@ -82,9 +84,9 @@ public class SynchronizePkmAction(
 
         var evolves = await staticDataService.GetStaticEvolves();
 
-        async Task act(string pkmVariantId, string savePkmIdBase)
+        async Task act(string pkmVariantId, string savePkmIdBase, string? savePkmId)
         {
-            Log.Information($"Synchronize save->variant {savePkmIdBase} -> {pkmVariantId}");
+            Log.Information($"Synchronize save->variant {savePkmId ?? savePkmIdBase} -> {pkmVariantId}");
 
             var pkmVariantEntity = await pkmVariantLoader.GetEntityRequired(pkmVariantId);
             var pkmVariantEntities = (await pkmVariantLoader.GetEntitiesByBox(pkmVariantEntity.BoxId, pkmVariantEntity.BoxSlot)).Values.ToList();
@@ -148,9 +150,9 @@ public class SynchronizePkmAction(
             }
         }
 
-        foreach (var (pkmVariantId, savePkmIdBase) in input.pkmVariantAndPkmSaveIds)
+        foreach (var (pkmVariantId, savePkmIdBase, savePkmId) in input.pkmVariantAndPkmSaveIds)
         {
-            await act(pkmVariantId, savePkmIdBase);
+            await act(pkmVariantId, savePkmIdBase, savePkmId);
         }
     }
 
@@ -219,7 +221,7 @@ public class SynchronizePkmAction(
             flags.Saves.UseSave(saveLoaders.Save.Id).SavePkms.Ids.Add(savePkm.Id);
         }
 
-        foreach (var (pkmVariantId, savePkmIdBase) in input.pkmVariantAndPkmSaveIds)
+        foreach (var (pkmVariantId, savePkmIdBase, _) in input.pkmVariantAndPkmSaveIds)
         {
             await act(pkmVariantId, savePkmIdBase);
         }

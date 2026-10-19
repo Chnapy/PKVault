@@ -85,10 +85,10 @@ export const getHelpText = (reason: DropRefusalReason, info: SlotInfos | undefin
         });
         case 'main-to-save-with-duplicates': return t('storage.move.main-to-save-with-duplicates', {
             name: sourcePkm?.nickname,
-            pkms: info?.targetPkmDuplicates?.map(pkm => `- ${pkm.nickname} (${pkm.boxId >= 0
+            pkms: info?.targetSaveDuplicatePkms?.map(pkm => `- ${pkm.nickname} (${pkm.boxId >= 0
                 ? `${getBoxTypeLabel(BoxType.Box, t)} ${pkm.boxId + 1}`
                 : getBoxTypeLabel(pkm.boxId as BoxType, t)
-                } slot ${pkm.boxSlot + 1})`).join('\n')
+                } slot ${pkm.boxSlot + 1})`).join('\n'),
         });
         case 'main-to-same-bank': return undefined;
         case 'same-pkm-id': return undefined;

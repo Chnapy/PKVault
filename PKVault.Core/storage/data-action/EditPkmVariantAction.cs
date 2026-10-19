@@ -69,7 +69,7 @@ public class EditPkmVariantAction(
 
         if (attachedVariant != null)
         {
-            await synchronizePkmAction.SynchronizePkmVariantToSave(new([(attachedVariant.Id, attachedVariant.AttachedSavePkmIdBase!)]), flags);
+            await synchronizePkmAction.SynchronizePkmVariantToSave(new([new(attachedVariant.Id, attachedVariant.AttachedSavePkmIdBase!, null)]), flags);
         }
     }
 

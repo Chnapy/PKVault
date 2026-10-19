@@ -12,7 +12,6 @@ export type ValidateSaveToMainSlot = ValidateRootSlot & {
   sourceItem?: Pick<InventoryItemDTO, 'id' | 'item' | 'version' | 'count'>;
   targetBox?: Box;
   targetPkm?: Pick<PkmVariantDTO, 'id' | 'boxId' | 'boxKey' | 'canMoveToSave' | 'canMoveAttachedToSave' | 'compatibleWithVersions'>;
-  targetPkmDuplicates?: Pick<PkmSaveDTO, 'id' | 'nickname' | 'boxId' | 'boxSlot'>[];
   attachedVariant?: Pick<PkmVariantDTO, 'id' | 'boxKey' | 'boxId' | 'boxSlot' | 'nickname'>;
 };
 
