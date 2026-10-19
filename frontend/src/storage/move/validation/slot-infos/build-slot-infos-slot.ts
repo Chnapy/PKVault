@@ -84,17 +84,6 @@ export const buildSlotInfosSlot = (
                 return [];
             }
 
-            const relatedPkmVariants = sourcePkm
-                ? pkmVariantIndexes.byBox[ sourcePkm.boxId ]?.[ sourcePkm.boxSlot ] ?? []
-                : [];
-            const context = targetPkm?.context ?? targetSave.context;
-
-            const sourceForContext = relatedPkmVariants.find(variant => variant.context === context);
-            // const sourceAttached = relatedPkmVariants.find(variant => variant.attachedSaveId);
-            const targetPkmDuplicates = sourceForContext
-                ? targetPkmSaveIndexes?.byIdBase[ sourceForContext.idBase ] ?? []
-                : [];
-
             const attachedVariant = targetPkm && pkmVariantIndexes?.byAttachedSave[ targetPkm.saveId ]?.[ targetPkm.idBase ];
 
             return [ {
@@ -107,7 +96,6 @@ export const buildSlotInfosSlot = (
                 targetBox,
                 targetSlot,
                 targetPkm,
-                targetPkmDuplicates,
                 attachedVariant,
             } ];
         };
@@ -132,14 +120,6 @@ export const buildSlotInfosSlot = (
             const targetPkmVariants = pkmVariantIndexes?.byBox[ dropBoxId ]?.[ targetSlot ] ?? [];
             const normalizedTargetPkmMains = targetPkmVariants.length === 0 ? [ undefined ] : targetPkmVariants;
 
-            const context = sourceSave.context;
-
-            const sourceForContext = targetPkmVariants.find(variant => variant.context === context);
-            // const sourceAttached = relatedPkmVariants.find(variant => variant.attachedSaveId);
-            const targetPkmDuplicates = sourceForContext
-                ? targetPkmSaveIndexes?.byIdBase[ sourceForContext.idBase ] ?? []
-                : [];
-
             const attachedVariant = sourcePkm && pkmVariantIndexes?.byAttachedSave[ sourcePkm.saveId ]?.[ sourcePkm.idBase ];
 
             return normalizedTargetPkmMains.map(targetPkm => ({
@@ -152,7 +132,6 @@ export const buildSlotInfosSlot = (
                 targetBox,
                 targetSlot,
                 targetPkm,
-                targetPkmDuplicates,
                 attachedVariant,
             }));
         };

@@ -84,7 +84,7 @@
   "details.id": "ID",
   "details.is-disabled": "Questo Pokémon è disabilitato, le azioni disponibili sono ridotte al minimo.",
   "details.is-disabled.title": "PKM disabilitato",
-  "details.is-duplicate": "Nel salvataggio esistono copie di questo Pokémon, l'azione \"sposta collegato\" non sarà disponibile.",
+  "details.is-duplicate": "Nel salvataggio sono presenti dei duplicati di questo Pokémon, la sincronizzazione verrà disabilitata.",
   "details.issues.description": "Sono presenti dei problemi",
   "details.issues.title": "Problemi",
   "details.language": "Lingua",

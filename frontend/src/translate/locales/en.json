@@ -84,7 +84,7 @@
   "details.id": "ID",
   "details.is-disabled": "This pokémon is disabled, available actions are restricted to minimum.",
   "details.is-disabled.title": "Disabled PKM",
-  "details.is-duplicate": "Copies of this pokémon exists in save, \"move attached\" action won't be available.",
+  "details.is-duplicate": "Duplicates of this pokémon exist in save, sync will be disabled.",
   "details.issues.description": "Issues are present",
   "details.issues.title": "Issues",
   "details.language": "Language",

@@ -20,7 +20,6 @@ export type DropRefusalReason =
     | 'main-disabled-to-save'
     | 'main-no-variant-to-save-occupied'
     | 'main-already-attached-to-save'
-    | 'main-to-save-with-duplicates'
     | 'pkm-save-cannot-move'
     | 'save-to-pkm-save-cannot-move'
     | 'save-to-save-not-same-context'

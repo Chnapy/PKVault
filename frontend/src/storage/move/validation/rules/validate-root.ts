@@ -1,4 +1,4 @@
-import { BoxType, type BoxDTO, type InventoryItemDTO, type PkmBaseDTO, type PkmSaveDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../../data/sdk/model';
+import { BoxType, type BoxDTO, type InventoryItemDTO, type PkmBaseDTO, type PkmVariantDTO, type SaveInfosDTO } from '../../../../data/sdk/model';
 import type { StorageMode } from '../../../../ui/inventory/context/storage-mode-context';
 import type { DropValidationResult } from '../types';
 
@@ -16,7 +16,6 @@ export type ValidateRootSlot = {
     targetBox?: Box;
     targetPkm?: Pkm;
     targetSlot?: number;
-    targetPkmDuplicates?: Pick<PkmSaveDTO, 'id' | 'nickname' | 'boxId' | 'boxSlot'>[];
     attachedVariant?: Pick<PkmVariantDTO, 'id' | 'boxKey' | 'boxId' | 'boxSlot' | 'nickname'>;
 };
 

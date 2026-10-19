@@ -84,7 +84,7 @@
   "details.id": "ID",
   "details.is-disabled": "此寶可夢已停用，可用動作將受到限制。",
   "details.is-disabled.title": "已停用的 PKM",
-  "details.is-duplicate": "存檔中有此寶可夢的副本，因此無法使用「移動連結副本」動作。",
+  "details.is-duplicate": "檔案中存在重複的該寶可夢，同步功能將被停用。",
   "details.issues.description": "發現問題",
   "details.issues.title": "問題",
   "details.language": "語言",

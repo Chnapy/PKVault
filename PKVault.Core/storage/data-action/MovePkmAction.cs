@@ -273,15 +273,6 @@ public class MovePkmAction(
             );
         }
 
-        if (input.attached)
-        {
-            var hasDuplicates = pkmVariants.Any(pkm => saveLoaders.Pkms.GetDtosByIdBase(pkm.Id).Count > 0);
-            if (hasDuplicates)
-            {
-                throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
-            }
-        }
-
         var existingSlot = saveLoaders.Pkms.GetDto(targetBox.Id, targetBoxSlot);
         if (input.attached && existingSlot != null)
         {
@@ -311,14 +302,6 @@ public class MovePkmAction(
 
         var savePkm = saveLoaders.Pkms.GetDto(pkmId)
             ?? throw new ArgumentException($"Save Pkm not found, id={pkmId}");
-
-        if (input.attached)
-        {
-            if (savePkm.IsDuplicate)
-            {
-                throw new ArgumentException($"Target save already have a pkm with same ID, move attached cannot be done.");
-            }
-        }
 
         var existingSlots = (await pkmVariantLoader.GetEntitiesByBox(input.targetBoxId, targetBoxSlot)).Values.ToList();
         if (input.attached && existingSlots.Count > 0)
@@ -426,7 +409,7 @@ public class MovePkmAction(
 
         if (pkmVariant.AttachedSaveId != null)
         {
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([(pkmVariant.Id, pkmVariant.AttachedSavePkmIdBase!)]));
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([new(pkmVariant.Id, pkmVariant.AttachedSavePkmIdBase!, pkmSaveDTO.Id)]));
         }
     }
 
@@ -477,10 +460,7 @@ public class MovePkmAction(
             if (!variantPkm.IsEnabled)
                 throw new ArgumentException($"Attached variant is invalid and cannot be synchronized");
 
-            await synchronizePkmAction.SynchronizeSaveToPkmVariant(
-                new([(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!)]),
-                savePkmId: input.attached ? null : savePkm.Id
-            );
+            await synchronizePkmAction.SynchronizeSaveToPkmVariant(new([new(pkmVariantEntity.Id, pkmVariantEntity.AttachedSavePkmIdBase!, savePkm.Id)]));
 
             if (!input.attached)
             {

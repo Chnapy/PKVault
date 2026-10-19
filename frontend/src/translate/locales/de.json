@@ -84,7 +84,7 @@
   "details.id": "ID",
   "details.is-disabled": "Dieses Pokemon ist deaktiviert. Verfügbare Aktionen sind eingeschränkt.",
   "details.is-disabled.title": "Deaktiviertes PKM",
-  "details.is-duplicate": "Es existieren Kopien dieses Pokemon im Spielstand. Die Aktion „Verknüpft verschieben“ ist nicht verfügbar.",
+  "details.is-duplicate": "Es existieren Duplikate dieses Pokémon im Spielstand, die Synchronisierung wird deaktiviert.",
   "details.issues.description": "Es liegen Probleme vor",
   "details.issues.title": "Probleme",
   "details.language": "Language",

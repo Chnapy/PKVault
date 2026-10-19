@@ -84,7 +84,7 @@
   "details.id": "ID",
   "details.is-disabled": "Este pokémon está desativado, as ações disponíveis estão restritas ao mínimo.",
   "details.is-disabled.title": "Pokémon desativado",
-  "details.is-duplicate": "Cópias deste pokémon existem no save, a ação \"mover anexado\" não estará disponível.",
+  "details.is-duplicate": "Existem duplicatas deste Pokémon no arquivo de salvamento, a sincronização será desativada.",
   "details.issues.description": "Há problemas com os dados deste Pokémon.",
   "details.issues.title": "Problemas",
   "details.language": "Idioma",

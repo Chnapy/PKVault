@@ -107,7 +107,7 @@ export const MoveAttachedButton: React.FC<
                     <LinkIcon />
                 </Group>}
                 rightSection={hasDuplicate && <UIPokedexIcons.Duplicate />}
-                disabled={!draggingMoveAttached.enabled || hasDuplicate}
+                disabled={!draggingMoveAttached.enabled}
             >
                 {t('storage.actions.move-attached')}
             </UIButton>

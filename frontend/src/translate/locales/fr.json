@@ -84,7 +84,7 @@
   "details.id": "ID",
   "details.is-disabled": "Ce pokémon est désactivé, les actions disponibles sont limitées au minimum.",
   "details.is-disabled.title": "PKM désactivé",
-  "details.is-duplicate": "Des copies de ce pokémon existent dans la sauvegarde, l'action \"déplacer rattaché\" ne sera pas disponible.",
+  "details.is-duplicate": "Des doublons de ce pokémon existent dans la sauvegarde, la synchronisation sera désactivée.",
   "details.issues.description": "Des problèmes sont présents",
   "details.issues.title": "Problèmes",
   "details.language": "Langue",
