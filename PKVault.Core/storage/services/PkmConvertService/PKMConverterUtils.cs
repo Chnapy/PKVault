@@ -686,6 +686,9 @@ public class PKMConverterUtils
             if (la.Valid)
                 return 0;
 
+            if (!la.Parsed)
+                return int.MaxValue;
+
             var invalidResults = la.Results.Where(r => !r.Valid);
             if (!invalidResults.Any())
                 return 0;

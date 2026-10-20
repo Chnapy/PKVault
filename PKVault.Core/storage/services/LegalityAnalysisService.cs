@@ -45,6 +45,10 @@ public class LegalityAnalysisWrapper
             return "";
 
         var localizer = LegalityLocalizationContext.Create(la, language);
+
+        if (!la.Parsed)
+            return localizer.Settings.Lines.AnalysisUnavailable;
+
         var info = la.Info;
         var pk = info.Entity;
 
