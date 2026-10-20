@@ -188,6 +188,7 @@ public partial class GenerateConvertView
                     Pkms: pkms
                 );
             })
+            .Where(entry => entry.Saves.Length > 0)
             .ToArray()
             .OrderBy(entry => PkmConvertService.GetPKMTypeWeight(entry.Saves.First().PKMType))
             .ToArray();

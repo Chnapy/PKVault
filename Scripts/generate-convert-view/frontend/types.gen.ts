@@ -127,44 +127,48 @@ export enum GameVersion {
     VL = 51,
     ZA = 52,
     CP = 53,
-    RB = 54,
-    RBY = 55,
-    GS = 56,
-    GSC = 57,
-    RS = 58,
-    RSE = 59,
-    FRLG = 60,
-    RSBOX = 61,
-    COLO = 62,
-    XD = 63,
-    DP = 64,
-    DPPt = 65,
-    HGSS = 66,
-    BW = 67,
-    B2W2 = 68,
-    XY = 69,
-    ORASDEMO = 70,
-    ORAS = 71,
-    SM = 72,
-    USUM = 73,
-    GG = 74,
-    SWSH = 75,
-    BDSP = 76,
-    SV = 77,
-    Gen1 = 78,
-    Gen2 = 79,
-    Gen3 = 80,
-    Gen4 = 81,
-    Gen5 = 82,
-    Gen6 = 83,
-    Gen7 = 84,
-    Gen7b = 85,
-    Gen8 = 86,
-    Gen9 = 87,
-    StadiumJ = 88,
-    Stadium = 89,
-    Stadium2 = 90,
-    EFL = 91,
+    WI = 54,
+    WA = 55,
+    FRX = 56,
+    LGX = 57,
+    RB = 58,
+    RBY = 59,
+    GS = 60,
+    GSC = 61,
+    RS = 62,
+    RSE = 63,
+    FRLG = 64,
+    RSBOX = 65,
+    COLO = 66,
+    XD = 67,
+    DP = 68,
+    DPPt = 69,
+    HGSS = 70,
+    BW = 71,
+    B2W2 = 72,
+    XY = 73,
+    ORASDEMO = 74,
+    ORAS = 75,
+    SM = 76,
+    USUM = 77,
+    GG = 78,
+    SWSH = 79,
+    BDSP = 80,
+    SV = 81,
+    Gen1 = 82,
+    Gen2 = 83,
+    Gen3 = 84,
+    Gen4 = 85,
+    Gen5 = 86,
+    Gen6 = 87,
+    Gen7 = 88,
+    Gen7b = 89,
+    Gen8 = 90,
+    Gen9 = 91,
+    StadiumJ = 92,
+    Stadium = 93,
+    Stadium2 = 94,
+    EFL = 95,
     Invalid = 255,
 }
 export interface StaticStat {
@@ -208,7 +212,8 @@ export interface StaticItemsData {
 }
 export interface StaticVersionsItems {
     Versions: number[];
-    ComboItems: { [key: string]: string; };
+    ComboInventoryItems: { [key: string]: string; };
+    AllowedHeldItems: number[];
 }
 export interface StaticItem {
     Id: string;
@@ -343,6 +348,7 @@ export interface PkmBaseDTO {
     CanMoveToSave: boolean;
     CanEdit: boolean;
     CanEvolve: boolean;
+    CanHeldItem: boolean;
     LoadError: PKMLoadError | undefined;
     HasLoadError: boolean;
     IsEnabled: boolean;
