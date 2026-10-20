@@ -152,7 +152,7 @@ window.onload = async () => {
             case 'Ball':
                 const key = othersData.Items.VersionItems
                     .find(entry => entry.Versions.includes(version ?? 0))
-                    ?.ComboItems[ value as number ] ?? '';
+                    ?.ComboInventoryItems[ value as number ] ?? '';
                 return othersData.Items.Items[ key ]?.Name;
             case 'LanguageID':
                 return LanguageID[ value as number ];
