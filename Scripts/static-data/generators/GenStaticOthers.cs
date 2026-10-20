@@ -766,6 +766,10 @@ public class GenStaticOthers(
             GameVersion.VL => [pokeApiService.GetVersion(41)],
             GameVersion.ZA => [pokeApiService.GetVersion(47)],
             GameVersion.CP => [pokeApiService.GetVersion(49)],
+            GameVersion.WI => [],
+            GameVersion.WA => [],
+            GameVersion.FRX => [pokeApiService.GetVersion(10)],
+            GameVersion.LGX => [pokeApiService.GetVersion(11)],
             #endregion
 
             // The following values are not actually stored values in pk data,

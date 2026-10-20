@@ -14,7 +14,8 @@ internal static class MissingRibbonSetExtensions
         dest.RibbonCountG3Cute = set.RibbonCountG3Cute;
         dest.RibbonCountG3Smart = set.RibbonCountG3Smart;
         dest.RibbonCountG3Tough = set.RibbonCountG3Tough;
-        dest.RibbonWorld = set.RibbonWorld;
+        if (dest is IRibbonSetEvent3 de && set is IRibbonSetEvent3 se)
+            de.RibbonWorld = se.RibbonWorld;
     }
 
     public static void CopyRibbonSetUnique3(this IRibbonSetUnique3 set, IRibbonSetUnique3 dest)

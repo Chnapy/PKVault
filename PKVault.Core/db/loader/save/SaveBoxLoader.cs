@@ -147,22 +147,22 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
     private string? GetWallpaperName(int box)
     {
         if (box < 0)
-        {
             return null;
-        }
 
-        if (save.GetSave() is IBoxDetailWallpaper wp)
-        {
-            if (save.GetSave() is SAV9ZA)
-            {
-                return GetWallpaperResourceName(EntityContext.Gen8b.GetSingleGameVersion(), 1);
-            }
+        if (save.GetSave() is SAV3Colosseum or SAV3XD) // fixed for each box
+            return GetWallpaperResourceName(save.Version, box);
 
-            var wallpaper = wp.GetBoxWallpaper(box);
-            return GetWallpaperResourceName(save.Version, wallpaper);
-        }
+        if (save.GetSave() is SAV4BR) // fixed for each box
+            return GetWallpaperResourceName(GameVersion.DP, box % 16);
 
-        return null;
+        if (save.GetSave() is SAV9ZA)
+            return GetWallpaperResourceName(EntityContext.Gen8b.GetSingleGameVersion(), 1);
+
+        if (save.GetSave() is not IBoxDetailWallpaper wp)
+            return null;
+
+        var wallpaper = wp.GetBoxWallpaper(box);
+        return GetWallpaperResourceName(save.Version, wallpaper);
     }
 
     public static int GetInventoryBoxId(InventoryType type) => 1000 + (byte)type;
@@ -188,8 +188,10 @@ public class SaveBoxLoader(SaveWrapper save, IServiceProvider sp) : ISaveBoxLoad
         EntityContext.Gen3 when version == GameVersion.E => "e",
         EntityContext.Gen3 when GameVersion.FRLG.Contains(version) && index > 12 => "frlg",
         EntityContext.Gen3 => "rs",
+        _ when version == GameVersion.COLO => "colo",
+        _ when version == GameVersion.XD => "xd",
 
-        EntityContext.Gen4 when index <= 16 => "dp",
+        EntityContext.Gen4 when GameVersion.DP.Contains(version) || index <= 16 => "dp",
         EntityContext.Gen4 when version == GameVersion.Pt => "pt",
         EntityContext.Gen4 when GameVersion.HGSS.Contains(version) => "hgss",
 

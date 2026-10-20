@@ -57,7 +57,11 @@ public class GameVersionUtil
 
         return version switch
         {
+            // trigger errors
+            GameVersion.WI => null,
+            GameVersion.WA => null,
             GameVersion.BATREV => PersonalTable.DP,
+
             // default
             GameVersion.Any => null,
             _ => GameData.GetPersonal(version),

@@ -170,7 +170,15 @@ public partial class GenerateConvertView
 
                 var saveList = saves.Where(s => s?.Version == versionToUse);
                 if (!saveList.Any())
-                    saveList = [new(BlankSaveFile.Get(versionToUse))];
+                {
+                    try
+                    {
+                        saveList = [new(BlankSaveFile.Get(versionToUse))];
+                    }
+                    // may fail with future games (like WI/WA)
+                    catch (ArgumentOutOfRangeException)
+                    { }
+                }
 
                 var pkms = saveList.SelectMany(save => save.GetAllPKM()).ToArray();
 
@@ -180,6 +188,7 @@ public partial class GenerateConvertView
                     Pkms: pkms
                 );
             })
+            .Where(entry => entry.Saves.Length > 0)
             .ToArray()
             .OrderBy(entry => PkmConvertService.GetPKMTypeWeight(entry.Saves.First().PKMType))
             .ToArray();

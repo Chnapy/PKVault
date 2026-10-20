@@ -262,6 +262,14 @@ export const getGameInfos = (version: GameVersion | null, isEnabled: boolean = t
       [ GameVersion.CP ]: () => ({
         // color: baseTheme.other.game.,
       }),
+      [ GameVersion.WI ]: () => ({
+        // color: baseTheme.other.game.,
+      }),
+      [ GameVersion.WA ]: () => ({
+        // color: baseTheme.other.game.,
+      }),
+      [ GameVersion.FRX ]: () => getGameInfos(GameVersion.FR, isEnabled),
+      [ GameVersion.LGX ]: () => getGameInfos(GameVersion.LG, isEnabled),
 
       // Game groupings
 
