@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="NJsonSchema.CodeGeneration.TypeScript" Version="11.6.1" />
     <PackageReference Include="PokeApi.Models" Version="[1.0.193]" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" NoWarn="NU1902,NU1903" />
     <PackageReference Include="DiffPlex" Version="1.9.0" />
 
     <ProjectReference Include="..\PKVault.Core\PKVault.Core.csproj" />
