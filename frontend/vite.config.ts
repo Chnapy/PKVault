@@ -6,10 +6,9 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig } from "vite";
 import { patchCssModules } from 'vite-css-modules';
 import devtoolsJson from 'vite-plugin-devtools-json';
-import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
-import svgr from "vite-plugin-svgr";
-import { prepareDocs } from './src/help/prepare-docs';
-import { prepareCssVar } from './src/ui/prepare-css-var';
+// import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
+import { prepareDocs } from './src/help/prepare-docs.ts';
+import { prepareCssVar } from './src/ui/prepare-css-var.ts';
 
 if (process.env.NODE_ENV === 'development') {
   prepareDocs('../docs/functional');
@@ -21,7 +20,9 @@ if (process.env.NODE_ENV === 'development') {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    ViteImageOptimizer(),
+    // use only to find images to optimize,
+    // should not be kept in regular dev & build process
+    // ViteImageOptimizer(),
     patchCssModules({
       generateSourceTypes: true,
       declarationMap: true
@@ -31,7 +32,6 @@ export default defineConfig({
       target: "react",
       autoCodeSplitting: true,
     }),
-    svgr(),
     react(),
     babel({ presets: [ reactCompilerPreset() ] }),
   ],

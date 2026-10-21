@@ -1,4 +1,4 @@
-import type { BoxDTO, InventoryItemDTO, PkmSaveDTO, PkmVariantDTO, SaveInfosDTO } from '../../../../data/sdk/model';
+import type { BoxDTO, InventoryItemDTO, PkmSaveDTO, SaveInfosDTO } from '../../../../data/sdk/model';
 import type { DropValidationResult } from '../types';
 import type { ValidateRootSlot } from './validate-root';
 

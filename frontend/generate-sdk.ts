@@ -1,13 +1,13 @@
 #!/bin/node
 
 import fs from 'fs';
-import fsExtra from 'fs-extra';
-import { generate, setVerbose } from 'orval';
+import { generate, setLogLevel } from 'orval';
 import path from 'path';
 import prettier from 'prettier';
 
 const debug: boolean = false;
-setVerbose(debug);
+if (debug)
+  setLogLevel('debug');
 const debugLog = (...data: unknown[]) => debug && console.log(...data);
 
 console.log('- SDK generation by diff start -');
@@ -18,34 +18,53 @@ type MemFS = Map<string, string>;
 const patchFS = (memfs: MemFS) => {
   const savedFs = {
     existsSync: fs.existsSync.bind(fs),
-    outputFile: fsExtra.outputFile.bind(fsExtra),
-    ensureFile: fsExtra.ensureFile.bind(fsExtra),
+    statSync: fs.statSync.bind(fs),
+    promisesReadFile: fs.promises.readFile,
+    promisesMkdir: fs.promises.mkdir,
+    promisesWriteFile: fs.promises.writeFile,
   };
 
   fs.existsSync = (filePath: unknown) => {
-    debugLog('existsSync', filePath);
+    debugLog('existsSync', filePath, memfs.has(path.resolve(String(filePath))), savedFs.existsSync(String(filePath)));
     return memfs.has(path.resolve(String(filePath))) || savedFs.existsSync(String(filePath));
   };
 
-  fsExtra.outputFile = async (filePath: string, data: unknown) => {
+  // @ts-expect-error signature misc
+  fs.statSync = (filePath, options) => {
+    debugLog('statSync', filePath, memfs.has(path.resolve(String(filePath))));
+
+    if (memfs.has(path.resolve(String(filePath))))
+      return {
+        isFile: () => true,
+      } as fs.Stats;
+
+    return savedFs.statSync(filePath, options) as never;
+  };
+
+  fs.promises.readFile = async (filePath: fs.PathLike | fs.promises.FileHandle, options) => {
+    if (typeof filePath !== 'string')
+      throw new Error();
+
+    return memfs.get(path.resolve(String(filePath))) as never
+      || await savedFs.promisesReadFile(filePath, options);
+  };
+
+  fs.promises.writeFile = async (filePath: fs.PathLike | fs.promises.FileHandle, data: unknown) => {
+    if (typeof filePath !== 'string')
+      throw new Error();
+
     memfs.set(path.resolve(filePath), String(data));
 
     if (debug) {
       const exist = savedFs.existsSync(filePath);
 
-      debugLog('outputFile', filePath, String(data).length, {
+      debugLog('writeFile', filePath, String(data).length, {
         exist,
         equals: exist && fs.readFileSync(filePath, 'utf8') === data
       });
     }
 
     // saved.writeFile(filePath, data, 'utf8');  // this is what cause slowness: 132 files at once
-  };
-
-  fsExtra.ensureFile = async (filePath: string) => {
-    debugLog('ensureFile', filePath);
-    const abs = path.resolve(String(filePath));
-    if (!memfs.has(abs)) memfs.set(abs, '');
   };
 
   return savedFs;
@@ -56,7 +75,7 @@ const passToChangedFiles = async (memfs: MemFS, memChanges: MemFS) => {
     let changed = false;
 
     try {
-      const readContent = await fsExtra.readFile(filepath, 'utf8');
+      const readContent = await savedFs.promisesReadFile(filepath, 'utf8');
       changed = readContent.trim() !== writeContent.trim();
     } catch {
       changed = true;
@@ -87,7 +106,7 @@ console.log(memChanges.size, 'changed files to write');
 
 for (const [ filepath, content ] of memChanges) {
   console.log('writing', filepath);
-  await savedFs.outputFile(filepath, content, 'utf8');
+  await savedFs.promisesWriteFile(filepath, content, 'utf8');
 }
 
 console.log(memChanges.size, 'changed files written');

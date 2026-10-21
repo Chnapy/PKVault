@@ -1,7 +1,8 @@
 import { Group } from '@mantine/core';
 import React from 'react';
 import { inputIconResources } from '../../icon/resources/input-icon-resources';
-import { getControlIcon, inputIcon } from '../../interaction/controls/icons/get-control-icon';
+import { ControlIcon } from '../../interaction/controls/icons/control-icon';
+import { getControlIcon } from '../../interaction/controls/icons/get-control-icon';
 import { useAllCurrentControls } from '../../interaction/controls/use-all-current-controls';
 import { useControlsCurrentType } from '../../interaction/controls/use-controls-current-type';
 import classes from './ui-footer.module.css';
@@ -57,7 +58,7 @@ const UIFooterContent: React.FC = () => {
     }, [ controlsCount ]);
 
     return <>
-        {inputIcon(inputIconResources.type[ controlsType ])}
+        <ControlIcon rawSvg={inputIconResources.type[ controlsType ]} />
 
         <Group
             justify='flex-start'

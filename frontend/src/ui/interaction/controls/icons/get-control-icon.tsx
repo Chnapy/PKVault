@@ -1,10 +1,8 @@
 import { HandIcon } from 'lucide-react';
-import { inputIconResources, type InputIcon } from '../../../icon/resources/input-icon-resources';
+import { inputIconResources } from '../../../icon/resources/input-icon-resources';
 import type { GamepadMappingsAllButton } from '../gamepad/gamepad-mapper';
 import type { ControlTriggerType, ControlTriggerValues, MouseMappings } from '../provider/controls-context';
-import classes from './control-icon.module.css';
-
-export const inputIcon = (Icon: InputIcon, i?: number, props?: React.SVGProps<SVGSVGElement>) => <Icon key={i} viewBox="0 0 64 64" className={classes.controlIcon} {...props} />;
+import { ControlIcon } from './control-icon';
 
 export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values: ControlTriggerValues[ T ][], allowPressedSuite: number = 0) => {
     if (values.length === 0) return [];
@@ -15,11 +13,11 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
         case 'mouse':
             return (values as MouseMappings[]).map((value, i) => {
                 switch (value) {
-                    case 'left-click': return inputIcon(inputIconResources.mouse.leftClick, i);
-                    case 'right-click': return inputIcon(inputIconResources.mouse.rightClick, i);
-                    case 'move': return inputIcon(inputIconResources.mouse.move, i);
+                    case 'left-click': return <ControlIcon key={i} rawSvg={inputIconResources.mouse.leftClick} />;
+                    case 'right-click': return <ControlIcon key={i} rawSvg={inputIconResources.mouse.rightClick} />;
+                    case 'move': return <ControlIcon key={i} rawSvg={inputIconResources.mouse.move} />;
                     case 'drag': return <HandIcon key={i} />;
-                    case 'scroll': return inputIcon(inputIconResources.mouse.scroll, i);
+                    case 'scroll': return <ControlIcon key={i} rawSvg={inputIconResources.mouse.scroll} />;
                 }
             }).filter(Boolean);
         case 'keyboard': {
@@ -48,7 +46,7 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
             })
                 .forEach(icon => icon && kbIcons.push(icon));
 
-            return [ ...kbIcons ].map((icon, i) => inputIcon(icon, i));
+            return [ ...kbIcons ].map((icon, i) => <ControlIcon key={i} rawSvg={icon} />);
         }
         case 'gamepad': {
             const gpValues = new Set([ ...values ] as GamepadMappingsAllButton[]);
@@ -86,16 +84,14 @@ export const getControlIcon = <T extends ControlTriggerType>(trigger: T, values:
                     gpIcons.push(gpIcon);
             });
 
-            return gpIcons.map((icon, i) => inputIcon(icon, i)).map((icon, i) => keepPressed
+            return gpIcons.map((icon, i) => <ControlIcon key={i} rawSvg={icon} />).map((icon, i) => keepPressed
                 ? <div key={i} style={{ display: 'flex', position: 'relative' }}>
                     {icon}
 
-                    {inputIcon(inputIconResources.misc.keepPress, undefined, {
-                        style: {
-                            position: 'absolute',
-                            color: 'var(--mantine-color-gray-4)',
-                        }
-                    })}
+                    <ControlIcon rawSvg={inputIconResources.misc.keepPress} style={{
+                        position: 'absolute',
+                        color: 'var(--mantine-color-gray-4)',
+                    }} />
                 </div>
                 : icon).filter(Boolean);
         }
