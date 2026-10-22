@@ -54,7 +54,7 @@ export const useActionDescription = () => {
                 }),
             [ DataActionType.MOVE_ITEM ]: () =>
                 t('storage.save-actions.type.move-item', {
-                    itemName: staticData.getItem(parameters[ 1 ] as GameVersion, Number(parameters[ 0 ]))?.name,
+                    itemName: staticData.getItem(parameters[ 1 ] as GameVersion, Number(parameters[ 0 ]))?.name ?? '???',
                     sourceSave: typeof parameters[ 2 ] === 'number' ? staticData.versions[ parameters[ 2 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),
                     sourcePkm: typeof parameters[ 3 ] === 'string' ? parameters[ 3 ] : '',
                     targetSave: typeof parameters[ 4 ] === 'number' ? staticData.versions[ parameters[ 4 ] ?? -1 ]?.name : t('storage.save-actions.part.storage'),

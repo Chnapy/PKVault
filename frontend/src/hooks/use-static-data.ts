@@ -26,10 +26,14 @@ export const useStaticData = () => {
             : getItemKey(version, itemValue);
 
         if (key === undefined) {
+            console.warn('Item key not found', { version, itemValue });
             return;
         }
 
-        return items.items[ key ];
+        const value = items.items[ key ];
+        if (!value)
+            console.warn('Item key not found', { version, itemValue, key });
+        return value;
     };
 
     const isItemCompatible = (version: GameVersion, itemKey: string, held: boolean) => {

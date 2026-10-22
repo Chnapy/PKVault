@@ -56,7 +56,7 @@ export const DexEvolutionTriggerLine: React.FC<DexEvolutionTriggerLineProps> = (
 
     const getSpeciesName = (key?: number) => key !== undefined ? staticData.species[ key ]?.forms[ context ]?.[ 0 ]?.name : undefined;
 
-    const getItemName = (key?: string) => key !== undefined ? staticData.getItem(GameVersion.Any, key)?.name : undefined;
+    const getItemName = (key?: string) => key !== undefined ? staticData.getItem(GameVersion.Any, key)?.name ?? '???' : undefined;
 
     const getMoveName = (key?: number) => key !== undefined ? staticData.moves[ key ]?.name : undefined;
 

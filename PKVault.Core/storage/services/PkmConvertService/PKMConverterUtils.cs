@@ -477,7 +477,11 @@ public class PKMConverterUtils
             throw new Exception($"GameVersion cannot be 0");
 
         var srcVersionItems = staticVersionsItems.First(vi => vi.Versions.Contains((byte)srcVersion));
-        var itemKey = srcVersionItems.ComboInventoryItems[(ushort)srcHeldItem];
+        if (!srcVersionItems.ComboInventoryItems.TryGetValue((ushort)srcHeldItem, out var itemKey))
+        {
+            Log.Warning($"Item {srcHeldItem} not found in ComboInventoryItems, srcVersion={srcVersion}");
+            return default;
+        }
 
         foreach (var targetVersion in targetVersions)
         {
