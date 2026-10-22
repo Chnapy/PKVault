@@ -153,7 +153,7 @@ window.onload = async () => {
                 const key = othersData.Items.VersionItems
                     .find(entry => entry.Versions.includes(version ?? 0))
                     ?.ComboInventoryItems[ value as number ] ?? '';
-                return othersData.Items.Items[ key ]?.Name;
+                return othersData.Items.Items[ key ]?.Name ?? `Unknown (${value})`;
             case 'LanguageID':
                 return LanguageID[ value as number ];
             default: return value;

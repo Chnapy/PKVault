@@ -163,7 +163,7 @@ export const DetailsContent: React.FC = withErrorCatcher('default', () => {
                     ? (pkm.heldItem > 0
                         ? <Group gap={4}>
                             <ItemImg item={pkm.heldItem} version={pkm.contextVersion} />
-                            {staticData.getItem(pkm.contextVersion, pkm.heldItem)?.name}
+                            {staticData.getItem(pkm.contextVersion, pkm.heldItem)?.name ?? '???'}
                         </Group>
                         : '-')
                     : null}

@@ -252,7 +252,7 @@ public partial class GenerateConvertView
         var setupedMemoryUsedMB = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 / 1_000_000;
         Log.Information($"Memory checks: setuped={setupedMemoryUsedMB} MB");
 
-        List<Exception> exs = [];
+        List<(ushort Species, byte Form, Exception ex)> exs = [];
 
         await Parallel.ForEachAsync(
             workItems,
@@ -266,7 +266,11 @@ public partial class GenerateConvertView
                     evolves, fileIOService, pkmLegalityService, pkmConvertService,
                     p.Entry, p.VersionsSaves, p.SecondaryVersionsToPrimary
                 );
-                exs.AddRange(suiteExs);
+                exs.AddRange(suiteExs.Select(ex => (
+                    p.Entry.Species,
+                    p.Entry.Form,
+                    ex
+                )));
             }
         );
 
@@ -274,7 +278,7 @@ public partial class GenerateConvertView
         {
             Log.Error($"Errors caught during convert processes: {exs.Count}");
             for (var i = 0; i < exs.Count; i++)
-                Log.Error(exs[i], $"Exception {i + 1}/{exs.Count}");
+                Log.Error(exs[i].ex, $"Exception {i + 1}/{exs.Count}: Species={exs[i].Species} Form={exs[i].Form}");
         }
         else
             Log.Information($"No error caught during any convert process.");

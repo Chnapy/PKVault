@@ -19,7 +19,8 @@ export const ItemImg: React.FC<ItemImgProps> = ({ item, version, ...imgProps }) 
     let staticForm = staticData.getItem(version, item);;
 
     if (!staticForm?.sprite) {
-        console.log('UNKNOWN ITEM SPRITE -', item);
+        if (staticForm)
+            console.log('UNKNOWN ITEM SPRITE -', item);
         staticForm = staticData.itemUnknown;    // gives "?" sprite
     }
 

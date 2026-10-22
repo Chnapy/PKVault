@@ -196,7 +196,7 @@ public class StaticOthersLoader
 
         IReadOnlyList<ComboItem> getInventoryItemStrings(GameVersion _version, GameStrings strings)
         {
-            var (save, allowedInventoryItems, _) = allSavesAllowedItems[(byte)_version];
+            var (save, _, _) = allSavesAllowedItems[(byte)_version];
 
             if (save == default)
             {
@@ -207,7 +207,7 @@ public class StaticOthersLoader
                 return [];
             }
 
-            var allowedInventoryItemsCombo = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version), allowedInventoryItems.ToArray());
+            var allowedInventoryItemsCombo = Util.GetCBList(strings.GetItemStrings(save.Context, save.Version));
             allowedInventoryItemsCombo.RemoveAll(i => i.Value > save.MaxItemID);
 
             return allowedInventoryItemsCombo.OrderBy(i => i.Value).ToArray();
@@ -222,7 +222,14 @@ public class StaticOthersLoader
                 version => version,
                 version =>
                 {
-                    var inventoryItemsEn = getInventoryItemStrings(version, GameInfo.Strings);
+                    IReadOnlyList<ComboItem> inventoryItemsEn = getInventoryItemStrings(version, GameInfo.Strings)
+                        .Select(item =>
+                        {
+                            if (string.IsNullOrWhiteSpace(item.Text))
+                                item = new("???", item.Value);
+                            return item;
+                        })
+                        .ToArray();
                     var heldItemsEn = inventoryItemsEn
                         .Where(item =>
                             allSavesAllowedItems[(byte)version].AllowedHeldItems.Contains((ushort)item.Value))
