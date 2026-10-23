@@ -5,9 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <Version>2.4.5</Version>
-    <ApplicationDisplayVersion>2.4.5</ApplicationDisplayVersion>
-    <ApplicationVersion>2.4.5</ApplicationVersion>
+    <Version>2.5.0</Version>
+    <ApplicationDisplayVersion>2.5.0</ApplicationDisplayVersion>
+    <ApplicationVersion>2.5.0</ApplicationVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Authors>Richard Haddad</Authors>
     <Copyright>Richard Haddad</Copyright>
