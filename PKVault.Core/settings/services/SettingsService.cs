@@ -10,7 +10,7 @@ namespace PKVault.Core;
 public interface ISettingsService
 {
     public Task UpdateSettings(SettingsMutableDTO settingsMutable, bool restartSession, bool scanSaves, DataUpdateFlags flags);
-    public Task UpdateSettingsSimple(SettingsMutableDTO settingsMutable, string userId);
+    public Task UpdateSettingsSimple(SettingsMutableDTO settingsMutable, string userId, DataUpdateFlags? flags = null);
     public Task<SettingsDTO> GetSettingsWithUserId();
     public SettingsDTO GetSettings();
     public SettingsDTO RefreshSettings(DataUpdateFlags flags);
@@ -46,7 +46,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             ? await scope.ServiceProvider.GetRequiredService<IMetaLoader>().GetUserId()
             : BaseSettings.UserId;
 
-        await UpdateSettingsSimple(settingsMutable, userId);
+        await UpdateSettingsSimple(settingsMutable, userId, flags);
         flags.Settings = true;
 
         if (restartSession)
@@ -65,7 +65,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
         }
     }
 
-    public async Task UpdateSettingsSimple(SettingsMutableDTO settingsMutable, string userId)
+    public async Task UpdateSettingsSimple(SettingsMutableDTO settingsMutable, string userId, DataUpdateFlags? flags = null)
     {
         await fileIOService.WriteJSONFile(
             FilePath,
@@ -73,7 +73,7 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             settingsMutable
         );
 
-        BaseSettings = ReadBaseSettings() with
+        BaseSettings = ReadBaseSettings(flags) with
         {
             UserId = userId
         };
@@ -119,8 +119,12 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
 
         if (hasLanguageChange)
         {
+            // for save language overrides (G1 to G3)
+            scanSaves = true;
+
             flags.StaticData = true;
             flags.MainPkmVariants.All = true;
+            flags.SaveInfos = true;
             flags.Saves.All = true;
         }
 
@@ -256,6 +260,15 @@ public class SettingsService(IServiceProvider sp) : ISettingsService
             SettingsMutableDTOJsonContext.Default.SettingsMutableDTO,
             GetDefaultSettingsMutable()
         );
+
+        var languageId = GameLanguage.GetLanguage(
+            SettingsDTO.GetLanguageForPKHeX(mutableDto.LANGUAGE)
+        );
+
+        SaveLanguage.OverrideLanguageGen1 = languageId;
+        SaveLanguage.OverrideLanguageGen2 = languageId;
+        SaveLanguage.OverrideLanguageGen3RS = languageId;
+        SaveLanguage.OverrideLanguageGen3FRLG = languageId;
 
         flags?.Settings = true;
 
