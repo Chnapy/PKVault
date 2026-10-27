@@ -6,7 +6,7 @@ import { SpeciesImg } from '../../../img/species-img';
 import type { SpeciesFormItem } from "../../../pokedex/list/hooks/use-pokedex-items";
 import { UIPokedexFormItem } from '../../../ui/pokedex/pokedex-item/ui-pokedex-form-item';
 
-export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatcher("item", ({
+export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id"> & { showLivingDex?: boolean }> = withErrorCatcher("item", ({
   species,
   context,
   form,
@@ -17,6 +17,7 @@ export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatch
   isCaught,
   isOwned,
   isOwnedShiny,
+  showLivingDex,
 }) => {
   const staticData = useStaticData();
 
@@ -28,6 +29,7 @@ export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatch
     isSeenAlpha={isSeenAlpha}
     isCaught={isCaught}
     isOwned={isOwned}
+    showLivingDex={showLivingDex}
     isOwnedShiny={isOwnedShiny || isSeenShiny}
     isMega={isMega}
   >
