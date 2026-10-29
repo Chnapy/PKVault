@@ -54,7 +54,8 @@ class Program
 
         try
         {
-            SettingsService.FlatpakMigrateIfAny();
+            if (!WindowsOS)
+                SettingsService.FlatpakMigrateIfAny();
 
             var window = new PhotinoWindow();
 
@@ -233,12 +234,7 @@ class Program
 
     private static void SetupWindow(PhotinoWindow window, string baseUrl)
     {
-        using Stream iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png")!;
-
-        var tmpIconFilepath = Path.Combine(Path.GetTempPath(), $"pkvault-icon.png");
-
-        using var fileStream = File.Create(tmpIconFilepath);
-        iconStream.CopyTo(fileStream);
+        var tmpIconFilepath = LoadAppIcon();
 
         window
             .SetTitle("PKVault")
@@ -259,10 +255,37 @@ class Program
             .RegisterWindowCreatedHandler((sender, e) =>
             {
                 // remove created temp icon since not useful anymore
-                if (File.Exists(tmpIconFilepath))
-                    File.Delete(tmpIconFilepath);
+                try
+                {
+                    if (!string.IsNullOrWhiteSpace(tmpIconFilepath) && File.Exists(tmpIconFilepath))
+                        File.Delete(tmpIconFilepath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, $"Error deleting file {tmpIconFilepath}, skipping");
+                }
             })
             .Load(baseUrl + $"/index.html");
+    }
+
+    private static string? LoadAppIcon()
+    {
+        var tmpIconFilepath = Path.Combine(Path.GetTempPath(), $"pkvault-icon.png");
+
+        try
+        {
+            using Stream iconStream = Assembly.GetManifestResourceStream($"{AssemblyStaticPrefix}icon.png")!;
+
+            using var fileStream = File.Create(tmpIconFilepath);
+            iconStream.CopyTo(fileStream);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Error writing file {tmpIconFilepath}, skipping");
+            return null;
+        }
+
+        return tmpIconFilepath;
     }
 
     private static void InjectIntoFrontend(PhotinoWindow window)
