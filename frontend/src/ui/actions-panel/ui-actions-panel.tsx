@@ -37,7 +37,7 @@ export const UIActionsPanel: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
 };
 
 const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, onSave }) => {
-    const { t } = useTranslate();
+    const { t, i18n } = useTranslate();
 
     const hasActions = data.length > 0;
 
@@ -82,7 +82,9 @@ const UIActionsPanelContent: React.FC<UIActionsPanelProps> = ({ data, onDelete, 
         <Title
             order={5}
             lh={1}
-            w={94}
+            w={i18n.language === 'en'
+                ? 'min-content'
+                : 94}
             ta='center'
         >{t('storage.save-actions.title')}</Title>
 
