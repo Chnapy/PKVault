@@ -153,6 +153,7 @@ public class SavePkmLoader(
             dto.Pkm,
             save.GetBlankPKM().GetMutablePkm().GetType(),
             new(
+                SourcePkm: dto.Pkm.GetMutablePkm(),
                 TargetPkm: dto.Pkm.GetMutablePkm(),
                 TargetSave: save
             )

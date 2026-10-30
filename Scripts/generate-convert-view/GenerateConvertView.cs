@@ -484,6 +484,7 @@ public partial class GenerateConvertView
                         pkmSource,
                         destType,
                         new(
+                            SourcePkm: pkmSource.GetMutablePkm(),
                             TargetPkm: null,
                             TargetSave: new(mainVersionSaveTarget.Saves.First().GetSave())
                         )

@@ -69,6 +69,7 @@ public class PK8Converter(PKMConverterUtils utils)
             MetDate = pk8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk8.MetLevel,
             Ability = pk8.Ability,
+            CanGigantamax = pk8.CanGigantamax,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -119,6 +120,7 @@ public class PK8Converter(PKMConverterUtils utils)
             MetDate = pk8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pk8.MetLevel,
             Ability = pk8.Ability,
+            CanGigantamax = pk8.CanGigantamax,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -127,6 +129,18 @@ public class PK8Converter(PKMConverterUtils utils)
         };
 
         utils.CopyCommonPropertiesFrom(pa8, pk8, 8, ctx);
+
+        if (pa8.IsAlpha && ctx.SourcePkm is PA9 srcPa9)
+        {
+            var alphaMove = srcPa9.PersonalInfo.AlphaMove;
+            var permit = pa8.Permit;
+
+            pa8.AlphaMove = alphaMove;
+
+            var masteredIndex = permit.RecordPermitIndexes.IndexOf(alphaMove);
+            pa8.SetMasteredRecordFlag(masteredIndex, true);
+        }
+
         utils.CopyIVsFrom(pa8, pk8);
         utils.CopyEVsFrom(pa8, pk8);
 
@@ -216,6 +230,7 @@ public class PK8Converter(PKMConverterUtils utils)
             MetDate = pb8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pb8.MetLevel,
             Ability = pb8.Ability,
+            CanGigantamax = pb8.CanGigantamax,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),
@@ -266,6 +281,7 @@ public class PK8Converter(PKMConverterUtils utils)
             MetDate = pa8.MetDate ?? EncounterDate.GetDateSwitch(),
             MetLevel = pa8.MetLevel,
             Ability = pa8.Ability,
+            CanGigantamax = pa8.CanGigantamax,
 
             // EggLocation = Locations.LinkTrade6,
             // EggMetDate = pk7.MetDate ?? EncounterDate.GetDateSwitch(),

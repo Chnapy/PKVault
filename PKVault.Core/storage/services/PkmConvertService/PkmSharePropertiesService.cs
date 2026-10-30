@@ -31,6 +31,7 @@ public class PkmSharePropertiesService(IPkmConvertService pkmConvertService, PKM
             source,
             targetPkm.GetType(),
             new(
+                SourcePkm: source.GetMutablePkm(),
                 TargetPkm: targetPkm,
                 TargetSave: save is null ? null : new(save)
             )

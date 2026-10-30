@@ -7,6 +7,7 @@ using Serilog;
 namespace PKVault.Core;
 
 public record ConvertContext(
+    PKM SourcePkm,
     PKM? TargetPkm,
     SaveWrapper? TargetSave
 );
@@ -596,6 +597,9 @@ public class PKMConverterUtils
         pkm.Gender = pkmSrc.Gender;
         pkm.Form = pkmSrc.Form;
         pkm.Language = pkmSrc.Language;
+
+        if (pkm is IAlpha pkmAlpha && ctx.SourcePkm is IAlphaReadOnly sourceAlpha)
+            pkmAlpha.IsAlpha = sourceAlpha.IsAlpha;
 
         pkm.SetNickname(pkmSrc.IsNicknamed ? pkmSrc.Nickname : "");
 
