@@ -31,7 +31,7 @@ mkdir -p /app/publish/pkvault.AppDir/usr/share/applications
 cp ./pkvault.desktop /app/publish/pkvault.AppDir/
 
 # icon file
-cp ../common/icons/pkvault_scalable.svg /app/publish/pkvault.AppDir/pkvault.svg
+cp ../common/icons/pkvault_256x256.png /app/publish/pkvault.AppDir/pkvault.png
 
 # build
 /usr/local/bin/appimagetool --appimage-extract
