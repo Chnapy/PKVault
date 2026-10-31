@@ -136,6 +136,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();
@@ -190,6 +191,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();
@@ -254,6 +256,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();
@@ -315,6 +318,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();
@@ -375,6 +379,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();
@@ -438,6 +443,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();
@@ -501,6 +507,7 @@ public class PkmConvertServiceTests
         if (result is not GBPKM && blank is not GBPKM)
         {
             var result2 = service.ConvertTo(new(sourcePkm), blank.GetType(), new(
+                SourcePkm: sourcePkm,
                 TargetPkm: result,
                 TargetSave: null
             )).GetMutablePkm();

@@ -33,7 +33,7 @@ public class PkmConvertService(ISettingsService settingsService, PKMConverterUti
     {
         Log.Debug($"Convert {sourcePkm.GetMutablePkm().GetType().Name} -> {targetPkmType.Name}");
 
-        ctx ??= new(null, null);
+        ctx ??= new(sourcePkm.GetMutablePkm(), null, null);
 
         var fallbackLang = settingsService.GetSettings().GetSafeLanguageID();
 
