@@ -85,6 +85,7 @@ export const updateCacheMutationResponse = (client: QueryClient, data: unknown) 
 
         // TODO required when saveId is specified as variable
         applyResponseData(client, mainBoxes, getStorageGetBoxesQueryKey({ saveId: undefined }));
+        applyResponseData(client, mainBoxes, getStorageGetBoxesQueryKey({ saveId: null }));
     }
 
     if (mainPkmVariants) {
