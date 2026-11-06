@@ -5,6 +5,7 @@ import { PackageOpenIcon } from 'lucide-react';
 import React from "react";
 import { withErrorCatcher } from "../../error/with-error-catcher";
 import { useStaticData } from "../../hooks/use-static-data";
+import { Route } from '../../routes/pokedex';
 import { useTranslate } from '../../translate/i18n';
 import { UIPokedexMainSection } from '../../ui/pokedex/main/section/ui-pokedex-main-section';
 import { UIPokedexMainSectionHeader } from '../../ui/pokedex/main/section/ui-pokedex-main-section-header';
@@ -22,6 +23,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
   const itemsRef = React.useRef<HTMLElement>(null);
 
   const staticData = useStaticData();
+  const showLivingDex = Route.useSearch({ select: (search) => search.showLivingDex ?? false });
 
   const {
     isPending,
@@ -97,6 +99,8 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
               ownedCount={ownedCount}
               shinyCount={shinyCount}
               totalCount={totalCount}
+              showLivingDex={showLivingDex}
+              ownedLabel={t('dex.list.owned')}
             />
           </Card.Section>,
           <Card.Section key={i + 100} inheritPadding withBorder>
@@ -109,7 +113,7 @@ export const PokedexList: React.FC<PopoverTargetChildProps> = withErrorCatcher("
                   isSeen={isSeen}
                 >
                   {itemsToRender.map((item) => (
-                    <DexFormItem key={item.id} {...item} />
+                    <DexFormItem key={item.id} {...item} showLivingDex={showLivingDex} />
                   ))}
                 </PokedexItem>
               ))}
