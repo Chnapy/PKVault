@@ -169,9 +169,9 @@ public class MovePkmAction(
             throw new ArgumentException($"Save Pkm not compatible with save for id={sourcePkmDto.Id}, context={sourcePkmDto.Context}, save.context={targetSaveLoaders.Save.Context}");
         }
 
-        if (!targetSaveLoaders.Save.Personal.IsPresentInGame(sourcePkmDto.Species, sourcePkmDto.Form))
+        if (!targetSaveLoaders.Save.Personal.IsPresentInGame(sourcePkmDto.Species, sourcePkmDto.Pkm.GetRawForm()))
         {
-            throw new ArgumentException($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
+            throw new ArgumentException($"Save Pkm Species not compatible with save for id={sourcePkmDto.Id}, species={sourcePkmDto.Species} form={sourcePkmDto.Form}/{sourcePkmDto.Pkm.GetRawForm()}, save.maxSpecies={targetSaveLoaders.Save.MaxSpeciesID}");
         }
 
         var targetPkmDto = targetSaveLoaders.Pkms.GetDto(input.targetBoxId, targetBoxSlot);
@@ -377,7 +377,7 @@ public class MovePkmAction(
 
         var pkm = await pkmVariantLoader.GetPKM(pkmVariant);
 
-        if (!saveLoaders.Save.Personal.IsPresentInGame(pkm.Species, pkm.Form))
+        if (!saveLoaders.Save.Personal.IsPresentInGame(pkm.Species, pkm.GetRawForm()))
         {
             throw new ArgumentException($"PkmVariantEntity Species not compatible with save for id={pkmVariant.Id}, species={pkm.Species}, save.maxSpecies={saveLoaders.Save.MaxSpeciesID}");
         }

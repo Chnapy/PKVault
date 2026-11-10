@@ -63,6 +63,7 @@ public class ImmutablePKM(PKM Pkm, PKMLoadError? loadError = null)
     // public int Ability => Pkm.Ability;
     public byte CurrentFriendship => Pkm.CurrentFriendship;
     public byte Form => GetForm(Pkm);
+    public byte GetRawForm() => Pkm.Form;
     public bool IsEgg => Pkm.IsEgg;
     public bool IsNicknamed => Pkm.IsNicknamed;
     public uint EXP => Pkm.EXP;
