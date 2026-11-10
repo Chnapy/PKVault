@@ -2,6 +2,7 @@ import { Box, Group, Stack } from '@mantine/core';
 import { ExternalLinkIcon, FileXIcon, HeartIcon } from 'lucide-react';
 import type React from 'react';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
+import { UIDynaIcon } from '../../icon/ui-dyna-icon';
 import { UIIconWrapper } from '../../icon/ui-icon-wrapper';
 import { UINIcon } from '../../icon/ui-n-icon';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
@@ -14,6 +15,7 @@ export type UIStorageItemIconsProps = {
     isStarter?: boolean;
     party?: number;
     isAlpha?: boolean;
+    canGigantamax?: boolean;
     isShiny?: boolean;
     isN?: boolean;
     level?: number;
@@ -29,7 +31,7 @@ export type UIStorageItemIconsProps = {
 };
 
 export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
-    heldItem, isStarter, isAlpha, isShiny, isN, level, party, nbrVariants = 0,
+    heldItem, isStarter, isAlpha, canGigantamax, isShiny, isN, level, party, nbrVariants = 0,
     hasDisabledVariant, isExternal, canEvolve, attached, needSynchronize,
     isDuplicate, attachBroken, warning,
 }) => {
@@ -72,6 +74,10 @@ export const UIStorageItemIcons: React.FC<UIStorageItemIconsProps> = ({
 
             {isN && <UIIconWrapper variant='transparent'>
                 <UINIcon />
+            </UIIconWrapper>}
+
+            {canGigantamax && <UIIconWrapper variant='transparent'>
+                <UIDynaIcon />
             </UIIconWrapper>}
 
             {/* {!canMoveOutside && renderBubble(theme.bg.red, <Icon name='logout' solid forButton />)} */}

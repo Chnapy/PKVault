@@ -64,6 +64,7 @@ export const DexEvolutionLeaf: React.FC<DexEvolutionLeafProps> = ({ value, label
                     isOwnedShiny={dexData?.isOwnedShiny}
                     isSeenAlpha={dexData?.isSeenAlpha}
                     isSeenShiny={dexData?.isSeenShiny}
+                    isOwnedGigantamax={dexData?.isOwnedGigantamax}
                 />}
             >
                 <Stack align='flex-start' gap='sm' py='sm' style={{ flexGrow: 1 }}>

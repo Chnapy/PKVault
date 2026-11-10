@@ -237,4 +237,4 @@ public abstract class DexGenService(SaveFile save) //where Save : SaveFile
     public abstract Task EnableSpeciesForm(EnableSpeciesFormPayload payload);
 }
 
-public record EnableSpeciesFormPayload(ushort Species, byte Form, Gender Gender, bool IsSeen, bool IsSeenShiny, bool IsSeenAlpha, bool IsCaught, LanguageID[] Languages);
+public record EnableSpeciesFormPayload(ushort Species, byte Form, Gender Gender, bool IsSeen, bool IsSeenShiny, bool IsSeenAlpha, bool IsOwnedGigantamax, bool IsCaught, LanguageID[] Languages);

@@ -295,6 +295,7 @@ public class DataNormalizeAction(
                         IsCaught = f.IsCaught,
                         IsCaughtShiny = f.IsCaughtShiny,
                         IsCaughtAlpha = false,
+                        IsOwnedGigantamax = false,
                         Languages = [languageId]    // pkm language is lost here, so we use app language as fallback
                     }))
             );

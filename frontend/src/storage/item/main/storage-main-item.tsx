@@ -43,7 +43,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
                     ),
                     mainVariant: mainVariant && pick(mainVariant, [
                         'id', 'species', 'nickname', 'level', 'boxId', 'boxSlot', 'contextVersion', 'context',
-                        'form', 'gender', 'isEgg', 'isAlpha', 'isShiny', 'nSparkle', 'isShadow', 'isExternal', 'heldItem',
+                        'form', 'gender', 'isEgg', 'isAlpha', 'canGigantamax', 'isShiny', 'nSparkle', 'isShadow', 'isExternal', 'heldItem',
                     ]),
                     canEvolve,
                     hasDisabledVariant,
@@ -78,7 +78,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
 
         const { mainVariant, variants, hasDisabledVariant, canEvolve } = variantInfos;
 
-        const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, isShiny, nSparkle, isShadow, isExternal, heldItem } = mainVariant;
+        const { id, species, nickname, level, boxSlot, contextVersion, context, form, gender, isEgg, isAlpha, canGigantamax, isShiny, nSparkle, isShadow, isExternal, heldItem } = mainVariant;
 
         const heldItemNode = <StorageItemHeldItem
             heldItem={heldItem} contextVersion={contextVersion}
@@ -102,6 +102,7 @@ export const StorageMainItem: React.FC<StorageMainItemProps> = withErrorCatcher(
             {...rest}
             icons={<UIStorageItemIcons
                 isAlpha={isAlpha}
+                canGigantamax={canGigantamax}
                 isShiny={isShiny}
                 isN={nSparkle}
                 isExternal={isExternal}

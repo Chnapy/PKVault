@@ -12,6 +12,7 @@ type UIPokedexFormItemProps = {
   isOwned?: boolean;
   isOwnedShiny?: boolean;
   isMega?: boolean;
+  isOwnedGigantamax?: boolean;
   children: React.ReactNode;
 };
 
@@ -23,6 +24,7 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
   isOwned,
   isOwnedShiny,
   isMega,
+  isOwnedGigantamax,
   children
 }) => {
 
@@ -44,6 +46,8 @@ export const UIPokedexFormItem: React.FC<UIPokedexFormItemProps> = ({
     </Group>
     <Stack pos='absolute' bottom={0} right={0} align='flex-end' gap='sm' p='sm'>
       {isMega && <UIPokedexIcons.Mega size='xs' />}
+
+      {isOwnedGigantamax && <UIPokedexIcons.Dyna size='xs' />}
 
       {isSeenAlpha && <UIPokedexIcons.Alpha size='xs' />}
 

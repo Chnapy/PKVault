@@ -19,7 +19,7 @@ public class Dex6AOService(SAV6AO save) : DexGenService(save)
 
         var isSeenForm = formCount > 0 && dex.GetFormFlag(formIndex + form, 0);
         var isSeenShinyForm = formCount > 0 && dex.GetFormFlag(formIndex + form, 1);
-        
+
         var isCaught = isOwned || save.GetCaught(species);
         var isSeenShiny = isOwnedShiny || (formCount > 0 ? isSeenShinyForm : isSeenShinyBase);
         var isSeen = isSeenShiny || isCaught || (formCount > 0 ? isSeenForm : isSeenBase);
@@ -38,7 +38,8 @@ public class Dex6AOService(SAV6AO save) : DexGenService(save)
             IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
-            IsOwnedShiny: isOwnedShiny
+            IsOwnedShiny: isOwnedShiny,
+            IsOwnedGigantamax: false
         );
     }
 
