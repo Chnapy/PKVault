@@ -27,7 +27,8 @@ public class Dex123Service(SaveFile save_) : DexGenService(save_)
             IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
-            IsOwnedShiny: isOwnedShiny
+            IsOwnedShiny: isOwnedShiny,
+            IsOwnedGigantamax: false
         );
     }
 

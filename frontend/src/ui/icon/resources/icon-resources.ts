@@ -1,4 +1,5 @@
 import alpha from '../../../assets/pkhex/alpha.png';
+import dyna from '../../../assets/pkhex/dyna.png';
 import shiny from '../../../assets/pkhex/rare_icon.png';
 
 import physical from '../../../assets/move_categories/physical.png';
@@ -39,6 +40,7 @@ export const iconResources = {
     pkhex: {
         shiny,
         alpha,
+        dyna,
     },
     moveCategory: {
         physical,

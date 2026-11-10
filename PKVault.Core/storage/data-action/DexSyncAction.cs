@@ -38,6 +38,7 @@ public class DexSyncAction(
                         form.IsSeen,
                         form.IsSeenShiny,
                         form.IsSeenAlpha,
+                        form.IsOwnedGigantamax,
                         form.IsCaught,
                         LanguagesHash: languagesHash
                     ));
@@ -56,13 +57,14 @@ public class DexSyncAction(
             {
                 var baseForm = g.First();
 
-                bool IsSeen = false, IsSeenShiny = false, IsSeenAlpha = false, IsCaught = false;
+                bool IsSeen = false, IsSeenShiny = false, IsSeenAlpha = false, IsOwnedGigantamax = false, IsCaught = false;
                 HashSet<LanguageID> languages = [];
                 foreach (var form in g)
                 {
                     IsSeen |= form.IsSeen;
                     IsSeenShiny |= form.IsSeenShiny;
                     IsSeenAlpha |= form.IsSeenAlpha;
+                    IsOwnedGigantamax |= form.IsOwnedGigantamax;
                     IsCaught |= form.IsCaught;
                     if (form.LanguagesHash.Length > 0)
                     {
@@ -82,6 +84,7 @@ public class DexSyncAction(
                     IsSeen,
                     IsSeenShiny,
                     IsSeenAlpha,
+                    IsOwnedGigantamax,
                     IsCaught,
                     Languages: languages.Order().ToArray()
                 );
@@ -116,8 +119,9 @@ public class DexSyncAction(
                             form.Form,
                             form.Gender,
                             form.IsCaught,
-                            false,
-                            false,
+                            form.IsSeenShiny,
+                            form.IsSeenAlpha,
+                            form.IsOwnedGigantamax,
                             form.Languages,
                             createOnly: false
                         );
@@ -131,6 +135,7 @@ public class DexSyncAction(
                             form.IsSeen,
                             form.IsSeenShiny,
                             form.IsSeenAlpha,
+                            form.IsOwnedGigantamax,
                             form.IsCaught,
                             form.Languages
                         ));

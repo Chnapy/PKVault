@@ -118,6 +118,9 @@ namespace PKVault.Core.Migrations
                     b.Property<bool>("IsCaughtShiny")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsOwnedGigantamax")
+                        .HasColumnType("INTEGER");
+
                     b.PrimitiveCollection<string>("Languages")
                         .IsRequired()
                         .HasColumnType("TEXT");

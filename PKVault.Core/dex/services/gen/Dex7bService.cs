@@ -31,7 +31,8 @@ public class Dex7bService(SAV7b save) : DexGenService(save)
             IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
-            IsOwnedShiny: isOwnedShiny
+            IsOwnedShiny: isOwnedShiny,
+            IsOwnedGigantamax: false
         );
     }
 

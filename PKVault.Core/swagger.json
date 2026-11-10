@@ -3635,6 +3635,7 @@
           "isCaught",
           "isOwned",
           "isOwnedShiny",
+          "isOwnedGigantamax",
           "context",
           "generation"
         ],
@@ -3693,6 +3694,9 @@
             "type": "boolean"
           },
           "isOwnedShiny": {
+            "type": "boolean"
+          },
+          "isOwnedGigantamax": {
             "type": "boolean"
           },
           "context": {

@@ -17,6 +17,7 @@ export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatch
   isCaught,
   isOwned,
   isOwnedShiny,
+  isOwnedGigantamax,
 }) => {
   const staticData = useStaticData();
 
@@ -30,6 +31,7 @@ export const DexFormItem: React.FC<Omit<SpeciesFormItem, "id">> = withErrorCatch
     isOwned={isOwned}
     isOwnedShiny={isOwnedShiny || isSeenShiny}
     isMega={isMega}
+    isOwnedGigantamax={isOwnedGigantamax}
   >
     <SpeciesImg
       species={species}

@@ -3,6 +3,7 @@ import type React from 'react';
 import type { Gender } from '../../../data/sdk/model';
 import { getSpeciesNO } from '../../../pokedex/list/dex-item/util/get-species-no';
 import { UIAlphaIcon } from '../../icon/ui-alpha-icon';
+import { UIDynaIcon } from '../../icon/ui-dyna-icon';
 import { UIGender } from '../../icon/ui-gender';
 import { UIShinyIcon } from '../../icon/ui-shiny-icon';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
@@ -17,6 +18,7 @@ export type UIPokedexDetailsMainProps = {
     isOwned?: boolean;
     isShiny?: boolean;
     isAlpha?: boolean;
+    isOwnedGigantamax?: boolean;
     isMega?: boolean;
     types: React.ReactNode;
     children: React.ReactNode;
@@ -24,7 +26,7 @@ export type UIPokedexDetailsMainProps = {
 
 export const UIPokedexDetailsMain: React.FC<UIPokedexDetailsMainProps> = ({
     species, speciesName, gender,
-    isSeen, isCaught, isOwned, isShiny, isAlpha, isMega,
+    isSeen, isCaught, isOwned, isShiny, isAlpha, isOwnedGigantamax, isMega,
     types, children,
 }) => {
     return <Stack gap='xs' w={280} maw='100%'>
@@ -38,6 +40,9 @@ export const UIPokedexDetailsMain: React.FC<UIPokedexDetailsMainProps> = ({
             {isAlpha && <UIPokedexIcons.Alpha>
                 <UIAlphaIcon size='big' />
             </UIPokedexIcons.Alpha>}
+            {isOwnedGigantamax && <UIPokedexIcons.Dyna>
+                <UIDynaIcon size='big' />
+            </UIPokedexIcons.Dyna>}
             {isShiny && <UIPokedexIcons.Shiny>
                 <UIShinyIcon size='big' />
             </UIPokedexIcons.Shiny>}
