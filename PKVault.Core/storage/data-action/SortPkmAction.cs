@@ -265,8 +265,6 @@ public class SortPkmAction(
 
             var species = entry.Key;
 
-            var currentBox = await GetCurrentBox();
-
             var currentSpecies = pkmSpecies[currentIndex];
 
             // if (currentSpecies < species)
@@ -283,10 +281,10 @@ public class SortPkmAction(
             }
             else
             {
+                BoxDTO currentBox;
+
                 for (; ; currentIndex++)
                 {
-                    currentBox = await GetCurrentBox();
-
                     if (currentIndex >= pkmSpecies.Count) break;
                     currentSpecies = pkmSpecies[currentIndex];
 
@@ -294,6 +292,7 @@ public class SortPkmAction(
                     {
                         break;
                     }
+                    currentBox = await GetCurrentBox();
 
                     await applyValue((Index: currentIndex, BoxId: currentBox.Id, BoxSlot: currentSlot));
 
