@@ -126,7 +126,6 @@ public class SortPkmAction(
                 applyValue: async (entry) =>
                 {
                     var currentValue = pkmVariants[entry.Index].Variant;
-                    var currentPkm = await pkmVariantLoader.GetPKM(currentValue);
 
                     boxesDict.TryGetValue(entry.BoxId, out var box);
 
@@ -144,7 +143,9 @@ public class SortPkmAction(
                 onSpaceMissing: async () =>
                 {
                     var box = await mainCreateBoxAction.CreateBox(new(bankId, null));
-                    boxes.Add(boxLoader.CreateDTO(box));
+                    var dto = boxLoader.CreateDTO(box);
+                    boxes.Add(dto);
+                    boxesDict.Add(dto.Id, dto);
                 },
                 leaveEmptySlot,
                 pokedexName
@@ -178,22 +179,25 @@ public class SortPkmAction(
 
     private async Task<List<P>> GetSortedPkms<P>(List<P> pkms, Func<P, ushort> GetSpecies, Func<P, byte> GetForm, Func<P, Gender> GetGender, string pokedexName)
     {
-        var staticSpecies = await staticDataService.GetStaticSpecies();
         var staticPokedex = await GetPokedex(pokedexName);
 
         var maxIndex = staticPokedex.PokemonIndexes.Values.Max();
+        // one rank per species not-in-pokedex
+        var unknownRanks = new Dictionary<ushort, int>();
 
         return [.. pkms
             .OrderBy(pkm => {
                 var species = GetSpecies(pkm);
 
-                return staticSpecies.TryGetValue(species, out var speciesData)
-                    ? (
-                        speciesData.PokedexIndexes.TryGetValue(pokedexName, out var dexIndex)
-                            ? dexIndex
-                            : ++maxIndex
-                    )
-                    : ++maxIndex;
+                if (staticPokedex.PokemonIndexes.TryGetValue(species, out var dexIndex))
+                    return dexIndex;
+
+                if (!unknownRanks.TryGetValue(species, out var rank))
+                {
+                    rank = ++maxIndex;
+                    unknownRanks[species] = rank;
+                }
+                return rank;
             })
             .ThenBy(GetForm)
             .ThenBy(GetGender)
@@ -212,7 +216,18 @@ public class SortPkmAction(
         return staticPokedex;
     }
 
-    private async Task RunSort(List<BoxDTO> boxes, List<ushort> pkmSpecies, Func<(int Index, string BoxId, int BoxSlot), Task> applyValue, Func<Task> onSpaceMissing, bool leaveEmptySlot, string pokedexName)
+    private async Task RunSort(
+        List<BoxDTO> boxes,
+        // species of each storage pkms, sort defined by GetSortedPkms
+        List<ushort> pkmSpecies,
+        // set pkm from given Index to BoxSlot
+        Func<(int Index, string BoxId, int BoxSlot), Task> applyValue,
+        // create new box, or throw error in saves
+        Func<Task> onSpaceMissing,
+        bool leaveEmptySlot,
+        // national, kanto, johto, etc
+        string pokedexName
+    )
     {
         var staticPokedex = await GetPokedex(pokedexName);
 
@@ -229,16 +244,18 @@ public class SortPkmAction(
             indexes.Add(new(species, ++lastIndex));
         }
 
-        var currentIndex = 0;
+        // pkm indexes grouped by species, original relative order preserved
+        var pkmIndexesBySpecies = Enumerable.Range(0, pkmSpecies.Count).ToLookup(i => pkmSpecies[i]);
+
+        var remaining = pkmSpecies.Count;
         var currentBoxIndex = 0;
         var currentSlot = 0;
 
         async Task<BoxDTO> GetCurrentBox()
         {
-            if (currentBoxIndex > boxes.Count - 1)
+            while (currentBoxIndex > boxes.Count - 1)
             {
                 await onSpaceMissing();
-                return await GetCurrentBox();
             }
 
             return boxes[currentBoxIndex];
@@ -261,44 +278,31 @@ public class SortPkmAction(
 
         foreach (var entry in indexes)
         {
-            if (currentIndex >= pkmSpecies.Count) break;
+            // all pkms placed, no trailing empty slots
+            if (remaining == 0)
+                break;
 
-            var species = entry.Key;
+            var pkmIndexes = pkmIndexesBySpecies[entry.Key];
 
-            var currentBox = await GetCurrentBox();
-
-            var currentSpecies = pkmSpecies[currentIndex];
-
-            // if (currentSpecies < species)
-            // {
-            //     throw new Exception($"Error with species {currentSpecies}");
-            // }
-
-            if (currentSpecies != species)
+            if (!pkmIndexes.Any())
             {
+                // species of the pokedex missing in storage
                 if (leaveEmptySlot)
                 {
                     await IncrementBoxSlot();
                 }
+                continue;
             }
-            else
+
+            foreach (var pkmIndex in pkmIndexes)
             {
-                for (; ; currentIndex++)
-                {
-                    currentBox = await GetCurrentBox();
+                var currentBox = await GetCurrentBox();
 
-                    if (currentIndex >= pkmSpecies.Count) break;
-                    currentSpecies = pkmSpecies[currentIndex];
+                // set pkm from given Index to BoxSlot
+                await applyValue((Index: pkmIndex, BoxId: currentBox.Id, BoxSlot: currentSlot));
+                remaining--;
 
-                    if (currentSpecies != species)
-                    {
-                        break;
-                    }
-
-                    await applyValue((Index: currentIndex, BoxId: currentBox.Id, BoxSlot: currentSlot));
-
-                    await IncrementBoxSlot();
-                }
+                await IncrementBoxSlot();
             }
         }
     }
