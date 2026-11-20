@@ -39,7 +39,8 @@ public class Dex3ColoService(SAV3Colosseum save) : DexGenService(save)
             IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
-            IsOwnedShiny: isOwnedShiny
+            IsOwnedShiny: isOwnedShiny,
+            IsOwnedGigantamax: false
         );
     }
 

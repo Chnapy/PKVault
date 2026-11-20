@@ -26,6 +26,7 @@ public record DexItemForm(
     bool IsCaught,
     bool IsOwned,
     bool IsOwnedShiny,
+    bool IsOwnedGigantamax,
     EntityContext Context = default,
     byte Generation = default
 ) : IWithId;

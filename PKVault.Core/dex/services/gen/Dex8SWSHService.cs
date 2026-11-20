@@ -19,10 +19,11 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
         var isSeenShinyForm = Dex.GetSeenRegion(species, form, gender == Gender.Female ? 3 : 2);
 
         // var isCaughtGigantamax = Dex.GetCaughtGigantamax1(species) || Dex.GetCaughtGigantamaxed(species);
-        
+
         var isCaught = isOwned || Dex.GetCaught(species);
         var isSeenShiny = isOwnedShiny || isSeenShinyForm;
         var isSeen = isCaught || isSeenShiny || isSeenForm;
+        var isOwnedGigantamax = Dex.GetCaughtGigantamaxed(species) || Dex.GetCaughtGigantamax1(species);
 
         return new DexItemForm(
             Id: DexLoader.GetId(species, form, gender),
@@ -38,7 +39,8 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
             IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
-            IsOwnedShiny: isOwnedShiny
+            IsOwnedShiny: isOwnedShiny,
+            IsOwnedGigantamax: isOwnedGigantamax
         );
     }
 
@@ -67,6 +69,9 @@ public class Dex8SWSHService(SAV8SWSH save) : DexGenService(save)
 
         if (payload.IsCaught)
             save.Blocks.Zukan.SetCaught(payload.Species, true);
+
+        if (payload.IsOwnedGigantamax)
+            save.Blocks.Zukan.SetCaughtGigantamax(payload.Species, true);
 
         var safeLanguages = payload.Languages.Where(AllLanguages.Contains);
         if (!safeLanguages.Any())

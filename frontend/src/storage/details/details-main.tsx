@@ -53,6 +53,7 @@ export const DetailsMain: React.FC = () => {
         isEnabled={pkm.isEnabled}
         isShiny={pkm.isShiny}
         isAlpha={pkm.isAlpha}
+        canGigantamax={pkm.canGigantamax}
         isN={pkm.nSparkle}
         types={pkm.types.map(type => <TypeItem key={type} type={type} />)}
         markings={pkm.markings && <UIMarkingList markings={pkm.markings} />}

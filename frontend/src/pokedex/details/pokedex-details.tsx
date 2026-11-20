@@ -184,6 +184,7 @@ export const PokedexDetails: React.FC = () => {
       gender={selectedForm.gender}
       isShiny={selectedForm.isSeenShiny}
       isAlpha={selectedForm.isSeenAlpha}
+      isOwnedGigantamax={selectedForm.isOwnedGigantamax}
       isMega={isMega}
       isSeen={selectedForm.isSeen}
       isCaught={selectedForm.isCaught}

@@ -47,6 +47,7 @@ export type SpeciesFormItem = {
     isCaught?: boolean;
     isOwned?: boolean;
     isOwnedShiny?: boolean;
+    isOwnedGigantamax?: boolean;
 };
 
 /**
@@ -123,10 +124,10 @@ export const usePokedexItems = (): PokedexItems => {
 
                 const getContext = (): EntityContext => {
                     const initialContext = Math.max(oldGroup?.context ?? -1, form.context) as EntityContext;
-                    if (staticForms[initialContext]?.[formValue])
+                    if (staticForms[ initialContext ]?.[ formValue ])
                         return initialContext;
 
-                    return (Object.keys(staticForms).reverse().find(val => staticForms[val]?.[formValue]) ?? initialContext) as EntityContext;
+                    return (Object.keys(staticForms).reverse().find(val => staticForms[ val ]?.[ formValue ]) ?? initialContext) as EntityContext;
                 };
 
                 const group: SpeciesFormItem = {
@@ -142,6 +143,7 @@ export const usePokedexItems = (): PokedexItems => {
                     isCaught: oldGroup?.isCaught || form.isCaught,
                     isOwned: oldGroup?.isOwned || form.isOwned,
                     isOwnedShiny: oldGroup?.isOwnedShiny || form.isOwnedShiny,
+                    isOwnedGigantamax: oldGroup?.isOwnedGigantamax || form.isOwnedGigantamax,
                 };
 
                 return {
@@ -203,8 +205,8 @@ export const usePokedexItems = (): PokedexItems => {
         const isOwned = itemsToRender.some(item => item.isOwned);
         const isOwnedShiny = itemsToRender.some(item => item.isOwnedShiny);
 
-        const minSpecies = Math.min(acc[generation]?.minSpecies ?? Infinity, species);
-        const maxSpecies = Math.max(acc[generation]?.maxSpecies ?? 0, species);
+        const minSpecies = Math.min(acc[ generation ]?.minSpecies ?? Infinity, species);
+        const maxSpecies = Math.max(acc[ generation ]?.maxSpecies ?? 0, species);
 
         const seenCount = acc[ generation ]?.seenCount ?? 0;
         const caughtCount = acc[ generation ]?.caughtCount ?? 0;

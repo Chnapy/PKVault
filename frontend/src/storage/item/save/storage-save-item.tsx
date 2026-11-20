@@ -40,7 +40,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
                 return pick(pkm, [
                     'id', 'saveId', 'context', 'species', 'nickname', 'level', 'boxId', 'boxSlot',
                     'form', 'gender', 'contextVersion', 'heldItem',
-                    'isAlpha', 'isShiny', 'nSparkle', 'isEgg', 'isShadow', 'isStarter', 'isDuplicate', 'party',
+                    'isAlpha', 'canGigantamax', 'isShiny', 'nSparkle', 'isEgg', 'isShadow', 'isStarter', 'isDuplicate', 'party',
                     'canEvolve',
                 ]);
             }, [ pkmId ])
@@ -64,7 +64,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
             return null;
         }
 
-        const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, isShiny, nSparkle, isEgg, isShadow, canEvolve } = savePkm;
+        const { id, species, nickname, level, boxSlot, form, gender, contextVersion, isAlpha, canGigantamax, isShiny, nSparkle, isEgg, isShadow, canEvolve } = savePkm;
 
         const heldItemNode = <StorageItemHeldItem
             heldItem={savePkm.heldItem} contextVersion={contextVersion}
@@ -106,6 +106,7 @@ export const StorageSaveItem: React.FC<StorageSaveItemProps> = withErrorCatcher(
             })}
             icons={<UIStorageItemIcons
                 isAlpha={isAlpha}
+                canGigantamax={canGigantamax}
                 isShiny={isShiny}
                 isN={nSparkle}
                 isStarter={savePkm.isStarter}

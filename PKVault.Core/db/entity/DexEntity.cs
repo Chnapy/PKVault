@@ -13,5 +13,6 @@ public class DexFormEntity : IEntity
     public required bool IsCaught { get; set; }
     public required bool IsCaughtShiny { get; set; }
     public required bool IsCaughtAlpha { get; set; }
+    public required bool IsOwnedGigantamax { get; set; }
     public required List<LanguageID> Languages { get; set; }
 }

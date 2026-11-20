@@ -133,7 +133,7 @@ public class SynchronizePkmAction(
                 );
 
                 var correctSpeciesForm = EvolveUtil.IsSameOrDescendantOf(evolves, variantPkm.Species, savePkm.Pkm.Species)
-                    && versions.Any(version => GameVersionUtil.IsPresentInGame(version, savePkm.Pkm.Species, savePkm.Pkm.Form));
+                    && versions.Any(version => GameVersionUtil.IsPresentInGame(version, savePkm.Pkm.Species, savePkm.Pkm.GetRawForm()));
                 if (!correctSpeciesForm)
                 {
                     Log.Debug($"!correctSpeciesForm => {variant.Id} / save.Species={savePkm.Pkm.Species} save.Form={savePkm.Pkm.Form} / variant.Species={variantPkm.Species}");
@@ -191,7 +191,7 @@ public class SynchronizePkmAction(
 
             var variantPkm = await pkmVariantLoader.GetPKM(pkmVariantEntity);
 
-            var correctSpeciesForm = saveLoaders.Save.Personal.IsPresentInGame(variantPkm.Species, variantPkm.Form);
+            var correctSpeciesForm = saveLoaders.Save.Personal.IsPresentInGame(variantPkm.Species, variantPkm.GetRawForm());
             if (!correctSpeciesForm)
             {
                 return;

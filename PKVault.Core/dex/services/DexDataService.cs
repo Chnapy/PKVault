@@ -41,7 +41,10 @@ public class DexDataService(StaticDataService staticDataService, ISettingsServic
         var version = context.GetSingleGameVersion();
         var pi = pkm.PersonalInfo;
 
-        if (!GameVersionUtil.IsPresentInGame(version, species, form))
+        // ensure Alcremie form is accepted
+        var formToCheck = species == (ushort)Species.Alcremie ? (byte)0 : form;
+
+        if (!GameVersionUtil.IsPresentInGame(version, species, formToCheck))
         {
             return GetMoves(context - 1, species, form);
         }

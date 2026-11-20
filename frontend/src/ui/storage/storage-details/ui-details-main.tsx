@@ -13,6 +13,7 @@ import { UIPokedexIcons } from '../../pokedex/icons/ui-pokedex-icons';
 import { UISpriteSizeWrapper } from '../../sprite-img/ui-sprite-size-wrapper';
 import { UIDetailsLevel } from './ui-details-level';
 import { useTranslate } from '../../../translate/i18n';
+import { UIDynaIcon } from '../../icon/ui-dyna-icon';
 
 export type UIDetailsMainProps = {
     saveId?: number;
@@ -22,6 +23,7 @@ export type UIDetailsMainProps = {
     isEnabled: boolean;
     isShiny?: boolean;
     isAlpha?: boolean;
+    canGigantamax?: boolean;
     isN?: boolean;
     types: React.ReactNode;
     markings: React.ReactNode;
@@ -43,7 +45,7 @@ export type UIDetailsMainProps = {
 
 export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
     saveId,
-    ball, nickname, gender, isEnabled, isShiny, isAlpha, isN,
+    ball, nickname, gender, isEnabled, isShiny, isAlpha, canGigantamax, isN,
     species, speciesName, level, pokerusDays = 0, isPokerusCured,
     canEvolve, isDuplicate, warning,
     types, teraType, main, heldItem, markings, attachedBtn,
@@ -98,6 +100,7 @@ export const UIDetailsMain: React.FC<UIDetailsMainProps> = ({
                 </UIButton>
 
                 {isAlpha && <UIAlphaIcon size='big' />}
+                {canGigantamax && <UIDynaIcon size='big' />}
                 {isShiny && <UIShinyIcon size='big' />}
                 {isN && <Tooltip label={t('details.n.description')}>
                     <UIPokedexIcons.N />

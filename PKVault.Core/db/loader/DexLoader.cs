@@ -38,7 +38,8 @@ public class DexLoader : EntityLoader<DexItemForm, DexFormEntity>, IDexLoader
         IsSeenAlpha: entity.IsCaughtAlpha,
         IsCaught: entity.IsCaught,
         IsOwned: dynamicInfos?.IsOwned ?? false,
-        IsOwnedShiny: dynamicInfos?.IsOwnedShiny ?? false
+        IsOwnedShiny: dynamicInfos?.IsOwnedShiny ?? false,
+        IsOwnedGigantamax: dynamicInfos?.IsOwnedGigantamax ?? false
     );
 
     public async Task<Dictionary<ushort, DexFormEntity[]>> GetEntitiesBySpecies()

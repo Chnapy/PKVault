@@ -67,7 +67,8 @@ public class Dex9SVService(SAV9SV save) : DexGenService(save)
             IsSeenAlpha: false,
             IsCaught: isCaught,
             IsOwned: isOwned,
-            IsOwnedShiny: isOwnedShiny
+            IsOwnedShiny: isOwnedShiny,
+            IsOwnedGigantamax: false
         );
     }
 

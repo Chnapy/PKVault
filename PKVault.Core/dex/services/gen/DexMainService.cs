@@ -87,7 +87,7 @@ public class DexMainService(
         await EnableSpeciesForm(
             default,
             default,
-            payload.Species, payload.Form, payload.Gender, payload.IsCaught, false, false, payload.Languages,
+            payload.Species, payload.Form, payload.Gender, payload.IsCaught, payload.IsSeenShiny, payload.IsSeenAlpha, payload.IsOwnedGigantamax, payload.Languages,
             createOnly: false
         );
     }
@@ -97,11 +97,15 @@ public class DexMainService(
         var context = save?.Context ?? pk.Context;
         var version = save?.Version ?? pk.Version;
 
+        var isOwnedGigantamax = save?.GetSave() is SAV8SWSH sav8
+            ? sav8.Blocks.Zukan.GetCaughtGigantamaxed(pk.Species) || sav8.Blocks.Zukan.GetCaughtGigantamax1(pk.Species)
+            : false;
+
         await EnableSpeciesForm(
             context,
             version,
             pk.Species, pk.Form, pk.Gender,
-            true, pk.IsShiny, pk.IsAlpha,
+            true, pk.IsShiny, pk.IsAlpha, isOwnedGigantamax,
             [pk.LanguageID],
             createOnly
         );
@@ -111,7 +115,7 @@ public class DexMainService(
         EntityContext context,
         GameVersion version,
         ushort species, byte form, Gender gender,
-        bool isCaught, bool isCaughtShiny, bool isCaughtAlpha, LanguageID[] languages,
+        bool isCaught, bool isCaughtShiny, bool isCaughtAlpha, bool isOwnedGigantamax, LanguageID[] languages,
         bool createOnly
     )
     {
@@ -139,6 +143,7 @@ public class DexMainService(
             IsCaught = false,
             IsCaughtShiny = false,
             IsCaughtAlpha = false,
+            IsOwnedGigantamax = false,
             Languages = []
         };
 
@@ -160,6 +165,9 @@ public class DexMainService(
 
         if (isCaughtAlpha)
             entity.IsCaughtAlpha = true;
+
+        if (isOwnedGigantamax)
+            entity.IsOwnedGigantamax = true;
 
         // write if caught only
         if (!entity.IsCaught)
