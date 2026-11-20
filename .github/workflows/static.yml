@@ -27,23 +27,48 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Convert View
+        env:
+          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: |
-          docker build . --target convert-view-builder -t tmp-convert
-          docker create --name tmp-convert tmp-convert
+          set -euo pipefail
 
-          docker cp tmp-convert:/app/publish _export
+          if [ -z "${SIXLABORS_LICENSE_KEY:-}" ]; then
+            echo "::error::SIXLABORS_LICENSE_KEY is not configured."
+            exit 1
+          fi
 
-          docker rm tmp-convert
-          docker rmi tmp-convert
+          container_id=""
+          cleanup() {
+            if [ -n "${container_id}" ]; then
+              docker rm -f "${container_id}" >/dev/null 2>&1 || true
+            fi
+            docker rmi tmp-convert >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
 
+          docker build \
+            --target convert-view-builder \
+            --build-arg SIXLABORS_LICENSE_KEY="${SIXLABORS_LICENSE_KEY}" \
+            -t tmp-convert \
+            .
+
+          container_id=$(docker create tmp-convert)
+          mkdir -p _export
+          docker cp "${container_id}:/app/publish/." _export/
+
+          echo "Exported site files:"
           ls -la _export
+
+          if [ -z "$(find _export -type f -print -quit)" ]; then
+            echo "::error::The Docker build exported no site files."
+            exit 1
+          fi
 
   build-deploy:
     name: Deploy to Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    # allow deployment to GitHub Pages
     permissions:
       contents: read
       pages: write
@@ -55,16 +80,42 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Convert View
+        env:
+          SIXLABORS_LICENSE_KEY: ${{ secrets.SIXLABORS_LICENSE_KEY }}
         run: |
-          docker build . --target convert-view-builder -t tmp-convert
-          docker create --name tmp-convert tmp-convert
+          set -euo pipefail
 
-          docker cp tmp-convert:/app/publish _export
+          if [ -z "${SIXLABORS_LICENSE_KEY:-}" ]; then
+            echo "::error::SIXLABORS_LICENSE_KEY is not configured."
+            exit 1
+          fi
 
-          docker rm tmp-convert
-          docker rmi tmp-convert
+          container_id=""
+          cleanup() {
+            if [ -n "${container_id}" ]; then
+              docker rm -f "${container_id}" >/dev/null 2>&1 || true
+            fi
+            docker rmi tmp-convert >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
 
+          docker build \
+            --target convert-view-builder \
+            --build-arg SIXLABORS_LICENSE_KEY="${SIXLABORS_LICENSE_KEY}" \
+            -t tmp-convert \
+            .
+
+          container_id=$(docker create tmp-convert)
+          mkdir -p _export
+          docker cp "${container_id}:/app/publish/." _export/
+
+          echo "Exported site files:"
           ls -la _export
+
+          if [ -z "$(find _export -type f -print -quit)" ]; then
+            echo "::error::The Docker build exported no site files."
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
